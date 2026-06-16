@@ -1,0 +1,44 @@
+---
+title: Integrations
+description: Connect the Xpoz MCP server to your preferred AI coding assistant, agent framework, or chat interface.
+---
+
+All Xpoz integrations connect to the same hosted MCP server at `https://mcp.xpoz.ai/mcp`. Choose the client that fits your workflow -- every integration gives you access to the full set of [48 MCP tools](/mcp/tools/overview) across Twitter/X, Instagram, Reddit, and TikTok.
+
+## Available Integrations
+
+<CardGroup cols={2}>
+  <Card title="Claude Code" icon="terminal" href="/integrations/claude-code">
+    One-command setup via `claude mcp add`. Supports bearer token and OAuth authentication.
+  </Card>
+  <Card title="Gemini CLI" icon="terminal" href="/integrations/gemini-cli">
+    Add Xpoz to your Gemini CLI settings file with bearer token auth.
+  </Card>
+  <Card title="OpenAI Codex" icon="code" href="/integrations/codex">
+    Configure the Xpoz MCP server in the Codex CLI for agentic social media research.
+  </Card>
+</CardGroup>
+
+## Common Setup Pattern
+
+Every integration follows the same pattern:
+
+1. **Get your access key** at [xpoz.ai/get-token](https://xpoz.ai/get-token)
+2. **Configure the MCP server** URL (`https://mcp.xpoz.ai/mcp`) with a bearer token header
+3. **Start querying** -- your client discovers all 48 tools automatically
+
+For details on authentication methods (access key, OAuth 2.1, token-based), see the [Authentication](/authentication) page.
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="MCP Server" icon="plug" href="/mcp/overview">
+    Learn about the MCP server architecture and capabilities
+  </Card>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Agent Skills" icon="wand-magic-sparkles" href="/skills/overview">
+    Pre-built AI workflows for common research tasks
+  </Card>
+</CardGroup>

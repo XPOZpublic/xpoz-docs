@@ -1,0 +1,1359 @@
+---
+title: "TypeScript SDK Reference"
+description: "Complete reference for the Xpoz TypeScript SDK — all methods, parameters, and type models."
+---
+
+## Twitter — `client.twitter`
+
+### Available Fields
+
+#### User Fields
+
+Pass these in the `options.fields` parameter on any user method.
+
+**Default:** `id`, `username`, `name`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `name`, `description`, `location`, `profileImageUrl`, `profileBannerUrl` |
+| **Verification** | `verified`, `isVerified`, `verifiedType`, `verifiedSinceDatetime` |
+| **Metrics** | `followersCount`, `followingCount`, `tweetCount`, `listedCount`, `likesCount`, `mediaCount` |
+| **Metadata** | `pinnedTweetId`, `source`, `label`, `labelType`, `accountBasedIn`, `locationAccurate` |
+| **History** | `usernameChanges`, `lastUsernameChangeDatetime`, `createdAt` |
+
+`getUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantTweetsCount`, `relevantTweetsImpressionsSum`, `relevantTweetsLikesSum`, `relevantTweetsQuotesSum`, `relevantTweetsRepliesSum`, `relevantTweetsRetweetsSum`.
+
+#### Post Fields
+
+Pass these in the `options.fields` parameter on any post method.
+
+**Default:** `id`, `text`, `authorUsername`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `text`, `authorId`, `authorUsername`, `createdAt`, `createdAtDate` |
+| **Engagement** | `retweetCount`, `replyCount`, `likeCount`, `quoteCount`, `impressionCount`, `bookmarkCount` |
+| **Metadata** | `lang`, `possiblySensitive`, `suspended`, `deleted`, `source`, `isRetweet`, `hasBirdwatchNotes`, `status` |
+| **Birdwatch** | `birdwatchNotesId`, `birdwatchNotesText`, `birdwatchNotesUrl` |
+| **Relations** | `conversationId`, `quotedTweetId`, `retweetedTweetId`, `replyToTweetId`, `replyToUserId`, `replyToUsername`, `originalTweetId`, `editedTweets` |
+| **Content** | `hashtags`, `mentions`, `mediaUrls`, `urls`, `grokGeneratedContent` |
+| **Location** | `country`, `region`, `city` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. For example, `["id", "text", "retweetCount", "likeCount", "createdAtDate"]` for engagement analysis. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### getUser
+
+Get a single Twitter user profile.
+
+```typescript
+const user = await client.twitter.getUser("elonmusk");
+const user = await client.twitter.getUser("44196397", { identifierType: "id" });
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `string` | Yes | Username or user ID |
+| `options.identifierType` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<TwitterUser>`
+
+---
+
+### searchUsers
+
+Search users by name or username.
+
+```typescript
+const users = await client.twitter.searchUsers("elon");
+const topFive = await client.twitter.searchUsers("elon", { limit: 5 });
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Yes | Name or username to search |
+| `options.limit` | `number` | No | Max results (default: 10) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<TwitterUser[]>`
+
+---
+
+### getUserConnections
+
+Get followers or following for a user.
+
+```typescript
+const followers = await client.twitter.getUserConnections("elonmusk", "followers");
+const following = await client.twitter.getUserConnections("elonmusk", "following");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `username` | `string` | Yes | Twitter username |
+| `connectionType` | `"followers" \| "following"` | Yes | Connection type |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<TwitterUser>>`
+
+---
+
+### getUsersByKeywords
+
+Find users who authored posts matching a keyword query.
+
+```typescript
+const users = await client.twitter.getUsersByKeywords('"machine learning"', {
+  fields: ["username", "name", "followersCount"],
+  responseType: ResponseType.Fast,
+  limit: 20,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Keyword query (supports boolean operators) |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.language` | `string` | No | Language filter |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TwitterUser>>`
+
+---
+
+### getPostsByIds
+
+Get 1-100 posts by their IDs.
+
+```typescript
+const tweets = await client.twitter.getPostsByIds(["1234567890", "0987654321"]);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postIds` | `string[]` | Yes | Array of post IDs (max 100) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<TwitterPost[]>`
+
+---
+
+### getPostsByAuthor
+
+Get all posts by an author with optional date filtering.
+
+```typescript
+const results = await client.twitter.getPostsByAuthor("elonmusk", {
+  startDate: "2025-01-01",
+  responseType: ResponseType.Fast,
+  limit: 100,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `string` | Yes | Username or user ID |
+| `options.identifierType` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TwitterPost>>`
+
+---
+
+### searchPosts
+
+Full-text search across Twitter posts with filters.
+
+```typescript
+const results = await client.twitter.searchPosts('"artificial intelligence" AND ethics', {
+  startDate: "2025-01-01",
+  endDate: "2025-06-01",
+  language: "en",
+  fields: ["id", "text", "likeCount", "authorUsername", "createdAtDate"],
+  responseType: ResponseType.Fast,
+  limit: 50,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Search query (supports exact phrases, boolean operators, grouping) |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.authorUsername` | `string` | No | Filter by author username |
+| `options.authorId` | `string` | No | Filter by author ID |
+| `options.language` | `string` | No | Language code filter |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TwitterPost>>`
+
+---
+
+### getRetweets
+
+Get retweets of a specific post.
+
+```typescript
+const retweets = await client.twitter.getRetweets("1234567890");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Post ID |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<TwitterPost>>`
+
+---
+
+### getQuotes
+
+Get quote tweets of a specific post.
+
+```typescript
+const quotes = await client.twitter.getQuotes("1234567890");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Post ID |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<TwitterPost>>`
+
+---
+
+### getComments
+
+Get replies to a specific post.
+
+```typescript
+const comments = await client.twitter.getComments("1234567890");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Post ID |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<TwitterPost>>`
+
+---
+
+### getPostInteractingUsers
+
+Get users who interacted with a post.
+
+```typescript
+const commenters = await client.twitter.getPostInteractingUsers("1234567890", "commenters");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Post ID |
+| `interactionType` | `"commenters" \| "quoters" \| "retweeters"` | Yes | Interaction type |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<TwitterUser>>`
+
+---
+
+### countPosts
+
+Count tweets containing a phrase within a date range.
+
+```typescript
+const count = await client.twitter.countPosts("bitcoin", { startDate: "2025-01-01" });
+console.log(`${count.toLocaleString()} tweets mention bitcoin`);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `phrase` | `string` | Yes | Phrase to count |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+
+**Returns:** `Promise<number>`
+
+---
+
+## Instagram — `client.instagram`
+
+### Available Fields
+
+#### User Fields
+
+Pass these in the `options.fields` parameter on any user method.
+
+**Default:** `id`, `username`, `fullName`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `fullName`, `biography`, `profilePicUrl`, `profilePicId`, `profileUrl`, `externalUrl` |
+| **Status** | `isPrivate`, `isVerified`, `hasAnonymousProfilePicture` |
+| **Metrics** | `followerCount`, `followingCount`, `mediaCount` |
+
+`getUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsVideoPlaysSum`.
+
+#### Post Fields
+
+Pass these in the `options.fields` parameter on any post method.
+
+**Default:** `id`, `caption`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `postType`, `userId`, `username`, `fullName`, `caption`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `videoPlayCount` |
+| **Media** | `mediaType`, `codeUrl`, `imageUrl`, `videoUrl`, `audioOnlyUrl`, `profilePicUrl`, `videoSubtitlesUri`, `subtitles`, `videoDuration` |
+
+#### Comment Fields
+
+Pass these in the `options.fields` parameter on `getComments`.
+
+**Default:** `id`, `text`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `text`, `parentPostId`, `type`, `parentCommentId`, `repliedToCommentId`, `childCommentCount`, `userId`, `username`, `fullName`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+| **Engagement** | `likeCount` |
+| **Status** | `status`, `isSpam`, `hasTranslation` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### getUser
+
+Get a single Instagram user profile.
+
+```typescript
+const user = await client.instagram.getUser("instagram");
+console.log(`${user.fullName} — ${user.followerCount?.toLocaleString()} followers`);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `string` | Yes | Username or user ID |
+| `options.identifierType` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<InstagramUser>`
+
+---
+
+### searchUsers
+
+Search Instagram users by name.
+
+```typescript
+const users = await client.instagram.searchUsers("nasa");
+const topThree = await client.instagram.searchUsers("nasa", { limit: 3 });
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Yes | Name to search |
+| `options.limit` | `number` | No | Max results |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<InstagramUser[]>`
+
+---
+
+### getUserConnections
+
+Get followers or following for an Instagram user.
+
+```typescript
+const followers = await client.instagram.getUserConnections("instagram", "followers");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `username` | `string` | Yes | Instagram username |
+| `connectionType` | `"followers" \| "following"` | Yes | Connection type |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<InstagramUser>>`
+
+---
+
+### getUsersByKeywords
+
+Find users who authored posts matching a keyword query.
+
+```typescript
+const users = await client.instagram.getUsersByKeywords('"sustainable fashion"', {
+  responseType: ResponseType.Fast,
+  limit: 20,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Keyword query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<InstagramUser>>`
+
+---
+
+### getPostsByIds
+
+Get Instagram posts by their IDs. Post IDs must be in strong_id format: `"media_id_user_id"`.
+
+```typescript
+const posts = await client.instagram.getPostsByIds(["3606450040306139062_4836333238"]);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postIds` | `string[]` | Yes | Array of post IDs in strong_id format |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<InstagramPost[]>`
+
+---
+
+### getPostsByUser
+
+Get all posts by an Instagram user.
+
+```typescript
+const results = await client.instagram.getPostsByUser("nasa", {
+  responseType: ResponseType.Fast,
+  limit: 50,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `string` | Yes | Username or user ID |
+| `options.identifierType` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<InstagramPost>>`
+
+---
+
+### searchPosts
+
+Full-text search across Instagram posts.
+
+```typescript
+const results = await client.instagram.searchPosts("travel photography", {
+  responseType: ResponseType.Fast,
+  limit: 30,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Search query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<InstagramPost>>`
+
+---
+
+### getComments
+
+Get comments on an Instagram post.
+
+```typescript
+const comments = await client.instagram.getComments("3606450040306139062_4836333238");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Post ID (strong_id format) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<InstagramComment>>`
+
+---
+
+### getPostInteractingUsers
+
+Get users who interacted with an Instagram post.
+
+```typescript
+const likers = await client.instagram.getPostInteractingUsers(
+  "3606450040306139062_4836333238",
+  "likers"
+);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Post ID (strong_id format) |
+| `interactionType` | `"commenters" \| "likers"` | Yes | Interaction type |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<InstagramUser>>`
+
+---
+
+## Reddit — `client.reddit`
+
+### Available Fields
+
+#### User Fields
+
+Pass these in the `options.fields` parameter on any user method.
+
+**Default:** `id`, `username`, `totalKarma`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `profileUrl`, `profilePicUrl`, `snoovatarImg`, `profileDescription`, `profileBannerUrl`, `profileTitle` |
+| **Karma** | `linkKarma`, `commentKarma`, `totalKarma`, `awardeeKarma`, `awarderKarma` |
+| **Status** | `isGold`, `isMod`, `isEmployee`, `hasVerifiedEmail`, `isSuspended`, `verified`, `isBlocked`, `acceptFollowers`, `hasSubscribed` |
+| **Settings** | `hideFromRobots`, `prefShowSnoovatar` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+`getUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsUpvotesSum`, `relevantPostsCommentsCountSum`.
+
+#### Post Fields
+
+Pass these in the `options.fields` parameter on any post method.
+
+**Default:** `id`, `title`, `authorUsername`, `subredditName`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `title`, `selftext`, `url`, `permalink`, `postUrl`, `thumbnail` |
+| **Author** | `authorId`, `authorUsername` |
+| **Subreddit** | `subredditName`, `subredditId` |
+| **Engagement** | `score`, `upvotes`, `downvotes`, `upvoteRatio`, `commentsCount`, `crosspostsCount` |
+| **Flags** | `isSelf`, `isVideo`, `isOriginalContent`, `over18`, `spoiler`, `locked`, `stickied`, `archived` |
+| **Meta** | `linkFlairText`, `postHint`, `domain`, `crosspostParent` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+#### Comment Fields
+
+Pass these in the `options.fields` parameter on `searchComments` and `getPostWithComments`.
+
+**Default:** `id`, `body`, `authorUsername`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `body`, `parentPostId`, `parentId` |
+| **Author** | `authorId`, `authorUsername` |
+| **Subreddit** | `postSubredditName`, `postSubredditId` |
+| **Engagement** | `score`, `upvotes`, `downvotes`, `controversiality` |
+| **Meta** | `depth`, `isSubmitter`, `stickied`, `collapsed`, `edited`, `distinguished` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+#### Subreddit Fields
+
+Pass these in the `options.fields` parameter on any subreddit method.
+
+**Default:** `id`, `displayName`, `title`, `subscribersCount`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `displayName`, `title`, `publicDescription`, `description` |
+| **Stats** | `subscribersCount`, `activeUserCount` |
+| **Meta** | `subredditType`, `over18`, `lang`, `url`, `subredditUrl` |
+| **Images** | `iconImg`, `bannerImg`, `headerImg`, `communityIcon` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+`getSubredditsByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsUpvotesSum`, `relevantPostsCommentsCountSum`.
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### getUser
+
+Get a single Reddit user profile.
+
+```typescript
+const user = await client.reddit.getUser("spez");
+console.log(`${user.username} — ${user.totalKarma?.toLocaleString()} karma`);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `username` | `string` | Yes | Reddit username |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<RedditUser>`
+
+---
+
+### searchUsers
+
+Search Reddit users by name.
+
+```typescript
+const users = await client.reddit.searchUsers("spez");
+const topThree = await client.reddit.searchUsers("spez", { limit: 3 });
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Yes | Name to search |
+| `options.limit` | `number` | No | Max results |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<RedditUser[]>`
+
+---
+
+### getUsersByKeywords
+
+Find Reddit users who authored posts matching a keyword query.
+
+```typescript
+const users = await client.reddit.getUsersByKeywords('"machine learning"', {
+  subreddit: "MachineLearning",
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Keyword query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.subreddit` | `string` | No | Filter to subreddit |
+
+**Returns:** `Promise<PaginatedResult<RedditUser>>`
+
+---
+
+### searchPosts
+
+Full-text search across Reddit posts.
+
+```typescript
+const results = await client.reddit.searchPosts("python tutorial", {
+  subreddit: "learnpython",
+  sort: "top",
+  time: "month",
+  responseType: ResponseType.Fast,
+  limit: 25,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Search query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.subreddit` | `string` | No | Filter to subreddit |
+| `options.sort` | `"relevance" \| "hot" \| "top" \| "new" \| "comments"` | No | Sort order |
+| `options.time` | `"hour" \| "day" \| "week" \| "month" \| "year" \| "all"` | No | Time filter |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<RedditPost>>`
+
+---
+
+### getPostWithComments
+
+Get a Reddit post with its comments.
+
+```typescript
+const result = await client.reddit.getPostWithComments("abc123");
+console.log(result.post.title);
+for (const comment of result.comments) {
+  console.log(`  ${comment.authorUsername}: ${comment.body?.slice(0, 80)}`);
+}
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Reddit post ID |
+| `options.fields` | `string[]` | No | Post fields to return |
+
+**Returns:** `Promise<RedditPostWithComments>`
+
+The returned object contains:
+- `post` — `RedditPost`
+- `comments` — `RedditComment[]`
+- `commentsPagination` — `PaginationInfo | null`
+- `commentsTableName` — `string | null`
+
+---
+
+### searchComments
+
+Search Reddit comments by keyword.
+
+```typescript
+const comments = await client.reddit.searchComments("helpful tip", {
+  subreddit: "LifeProTips",
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Search query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.subreddit` | `string` | No | Filter to subreddit |
+
+**Returns:** `Promise<PaginatedResult<RedditComment>>`
+
+---
+
+### searchSubreddits
+
+Search subreddits by name.
+
+```typescript
+const subs = await client.reddit.searchSubreddits("machine learning");
+const topFive = await client.reddit.searchSubreddits("machine learning", { limit: 5 });
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Subreddit name to search |
+| `options.limit` | `number` | No | Max results |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<RedditSubreddit[]>`
+
+---
+
+### getSubredditWithPosts
+
+Get a subreddit with its posts.
+
+```typescript
+const result = await client.reddit.getSubredditWithPosts("wallstreetbets");
+console.log(`r/${result.subreddit.displayName} — ${result.subreddit.subscribersCount?.toLocaleString()} members`);
+for (const post of result.posts) {
+  console.log(`  ${post.title} (${post.score} points)`);
+}
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `subredditName` | `string` | Yes | Subreddit name (without `r/` prefix) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<SubredditWithPosts>`
+
+The returned object contains:
+- `subreddit` — `RedditSubreddit`
+- `posts` — `RedditPost[]`
+- `postsPagination` — `PaginationInfo | null`
+- `postsTableName` — `string | null`
+
+---
+
+### getSubredditsByKeywords
+
+Find subreddits related to a keyword query.
+
+```typescript
+const subs = await client.reddit.getSubredditsByKeywords("cryptocurrency");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Keyword query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+
+**Returns:** `Promise<PaginatedResult<RedditSubreddit>>`
+
+---
+
+## TikTok — `client.tiktok`
+
+### Available Fields
+
+#### User Fields
+
+Pass these in the `options.fields` parameter on any user method.
+
+**Default:** `id`, `username`, `nickname`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `nickname`, `signature`, `secUid`, `avatar` |
+| **Status** | `isPrivate`, `isVerified` |
+| **Metrics** | `followerCount`, `followingCount`, `likeCount`, `postCount` |
+| **Locale** | `language`, `region` |
+| **Timestamps** | `createdAt`, `usernameModifyTime` |
+
+`getUsersByKeywords` and `getUsersByHashtags` also return aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsPlaysSum`, `relevantPostsForwardsSum`.
+
+#### Post Fields
+
+Pass these in the `options.fields` parameter on any post method.
+
+**Default:** `id`, `description`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `postType`, `isPrivate`, `userId`, `username`, `nickname`, `description`, `descriptionLanguage`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+| **Engagement** | `collectCount`, `commentCount`, `likeCount`, `downloadCount`, `forwardCount`, `playCount` |
+| **Media** | `videoThumbnail`, `videoUrl` (array of video URLs), `duration` (video length in seconds) |
+| **Content** | `hashtags` (array of hashtag strings), `transcriptsJson` |
+
+#### Comment Fields
+
+Pass these in the `options.fields` parameter on `getComments`.
+
+**Default:** `id`, `text`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **All** | `id`, `postId`, `userId`, `username`, `text`, `likeCount`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. For example, `["id", "description", "playCount", "likeCount", "hashtags"]` for content analysis. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### getUser
+
+Get a single TikTok user profile.
+
+```typescript
+const user = await client.tiktok.getUser("charlidamelio");
+console.log(`${user.nickname} — ${user.followerCount?.toLocaleString()} followers`);
+
+// By numeric ID
+const user = await client.tiktok.getUser("123456789", { identifierType: "id" });
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `string` | Yes | Username or user ID |
+| `options.identifierType` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<TiktokUser>`
+
+---
+
+### searchUsers
+
+Search TikTok users by name.
+
+```typescript
+const users = await client.tiktok.searchUsers("charli");
+const topFive = await client.tiktok.searchUsers("charli", { limit: 5 });
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Yes | Name to search |
+| `options.limit` | `number` | No | Max results |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<TiktokUser[]>`
+
+---
+
+### getUsersByKeywords
+
+Find TikTok users who authored posts matching a keyword query.
+
+```typescript
+const users = await client.tiktok.getUsersByKeywords('"machine learning"', {
+  responseType: ResponseType.Fast,
+  limit: 20,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Keyword query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TiktokUser>>`
+
+---
+
+### getPostsByIds
+
+Get 1-100 TikTok posts by their IDs.
+
+```typescript
+const posts = await client.tiktok.getPostsByIds(["7123456789012345678"]);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postIds` | `string[]` | Yes | Array of post IDs (max 100) |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<TiktokPost[]>`
+
+---
+
+### getPostsByUser
+
+Get all posts by a TikTok user.
+
+```typescript
+const results = await client.tiktok.getPostsByUser("charlidamelio", {
+  startDate: "2025-01-01",
+  responseType: ResponseType.Fast,
+  limit: 50,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `string` | Yes | Username or user ID |
+| `options.identifierType` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TiktokPost>>`
+
+---
+
+### searchPosts
+
+Full-text search across TikTok posts.
+
+```typescript
+const results = await client.tiktok.searchPosts("travel vlog", {
+  startDate: "2025-01-01",
+  responseType: ResponseType.Fast,
+  limit: 30,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `string` | Yes | Search query |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TiktokPost>>`
+
+---
+
+### getPostsByHashtags
+
+Search TikTok posts by hashtags. Pass bare alphanumeric tags (no leading `#`). Max 5 hashtags per request; OR semantics across the list.
+
+```typescript
+const results = await client.tiktok.getPostsByHashtags(["dance", "fyp"], {
+  responseType: ResponseType.Fast,
+  limit: 50,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `hashtags` | `string[]` | Yes | Hashtags to search (max 5, no `#` prefix) |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TiktokPost>>`
+
+---
+
+### getUsersByHashtags
+
+Find TikTok users who authored posts tagged with the given hashtags. Same input rules as `getPostsByHashtags`.
+
+```typescript
+const users = await client.tiktok.getUsersByHashtags(["sustainable_fashion"], {
+  responseType: ResponseType.Fast,
+  limit: 20,
+});
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `hashtags` | `string[]` | Yes | Hashtags to search (max 5, no `#` prefix) |
+| `options.fields` | `string[]` | No | Fields to return |
+| `options.startDate` | `string` | No | Start date (YYYY-MM-DD) |
+| `options.endDate` | `string` | No | End date (YYYY-MM-DD) |
+| `options.responseType` | `ResponseType` | No | Response mode |
+| `options.limit` | `number` | No | Max results (fast mode) |
+
+**Returns:** `Promise<PaginatedResult<TiktokUser>>`
+
+---
+
+### getComments
+
+Get comments on a TikTok post.
+
+```typescript
+const comments = await client.tiktok.getComments("7123456789012345678");
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `postId` | `string` | Yes | Post ID |
+| `options.fields` | `string[]` | No | Fields to return |
+
+**Returns:** `Promise<PaginatedResult<TiktokComment>>`
+
+---
+
+## Tracking — `client.tracking`
+
+Manage tracked items (keywords, users, subreddits) that Xpoz monitors on your behalf. Import the enums:
+
+```typescript
+import { XpozClient, TrackedItemType, TrackedItemPlatform } from "@xpoz/xpoz";
+```
+
+### getTrackedItems
+
+List all currently tracked items on your account.
+
+```typescript
+const items = await client.tracking.getTrackedItems();
+for (const item of items) {
+  console.log(`${item.platform} / ${item.type}: ${item.phrase}`);
+}
+```
+
+**Returns:** `Promise<TrackedItem[]>`
+
+---
+
+### addTrackedItems
+
+Add one or more items to track.
+
+```typescript
+const result = await client.tracking.addTrackedItems([
+  { phrase: "bitcoin", type: TrackedItemType.Keyword, platform: TrackedItemPlatform.Twitter },
+  { phrase: "nasa", type: TrackedItemType.User, platform: TrackedItemPlatform.Instagram },
+]);
+console.log(`Added ${result.addedCount} items (${result.currentCount}/${result.maxTrackedItems} used)`);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | `TrackedItemInput[]` | Yes | Items to track |
+| `items[].phrase` | `string` | Yes | Keyword, username, or subreddit name |
+| `items[].type` | `TrackedItemType` | Yes | `Keyword`, `User`, or `Subreddit` |
+| `items[].platform` | `TrackedItemPlatform` | Yes | `Twitter`, `Instagram`, `Reddit`, or `Tiktok` |
+
+**Returns:** `Promise<AddTrackedItemsResult>`
+
+---
+
+### removeTrackedItems
+
+Remove one or more tracked items.
+
+```typescript
+const result = await client.tracking.removeTrackedItems([
+  { phrase: "bitcoin", type: TrackedItemType.Keyword, platform: TrackedItemPlatform.Twitter },
+]);
+console.log(`Removed ${result.removedCount} items`);
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | `TrackedItemInput[]` | Yes | Items to remove (same format as `addTrackedItems`) |
+
+**Returns:** `Promise<RemoveTrackedItemsResult>`
+
+---
+
+## Type Models
+
+All fields are optional. Unknown fields from the server are preserved on the object.
+
+### TwitterPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Post ID |
+| `text` | `string` | Post text content |
+| `authorId` | `string` | Author's user ID |
+| `authorUsername` | `string` | Author's username |
+| `likeCount` | `number` | Number of likes |
+| `retweetCount` | `number` | Number of retweets |
+| `replyCount` | `number` | Number of replies |
+| `quoteCount` | `number` | Number of quotes |
+| `impressionCount` | `number` | Number of impressions |
+| `bookmarkCount` | `number` | Number of bookmarks |
+| `lang` | `string` | Language code |
+| `hashtags` | `string[]` | Hashtags in tweet |
+| `mentions` | `string[]` | Mentioned usernames |
+| `mediaUrls` | `string[]` | Media attachment URLs |
+| `urls` | `string[]` | URLs in tweet text |
+| `country` | `string` | Country (if geo-tagged) |
+| `createdAt` | `string` | Creation timestamp |
+| `createdAtDate` | `string` | Creation date (YYYY-MM-DD) |
+| `conversationId` | `string` | Thread conversation ID |
+| `quotedTweetId` | `string` | ID of quoted tweet |
+| `replyToTweetId` | `string` | ID of parent tweet |
+| `possiblySensitive` | `boolean` | Sensitive content flag |
+| `isRetweet` | `boolean` | Whether this is a retweet |
+| `hasBirdwatchNotes` | `boolean` | Has community notes |
+| `birdwatchNotesId` | `string` | Birdwatch note ID |
+| `birdwatchNotesText` | `string` | Birdwatch note text |
+| `birdwatchNotesUrl` | `string` | Birdwatch note URL |
+| `status` | `string` | Tweet status |
+
+### TwitterUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | User ID |
+| `username` | `string` | Username (handle) |
+| `name` | `string` | Display name |
+| `description` | `string` | Bio text |
+| `location` | `string` | Location string |
+| `verified` | `boolean` | Verification status |
+| `verifiedType` | `string` | Verification type |
+| `followersCount` | `number` | Number of followers |
+| `followingCount` | `number` | Number of following |
+| `tweetCount` | `number` | Total tweets |
+| `likesCount` | `number` | Total likes |
+| `profileImageUrl` | `string` | Profile picture URL |
+| `createdAt` | `string` | Account creation timestamp |
+| `accountBasedIn` | `string` | Account location |
+
+### InstagramPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Post ID (strong_id format) |
+| `caption` | `string` | Post caption |
+| `username` | `string` | Author username |
+| `fullName` | `string` | Author display name |
+| `likeCount` | `number` | Number of likes |
+| `commentCount` | `number` | Number of comments |
+| `reshareCount` | `number` | Number of reshares |
+| `videoPlayCount` | `number` | Video play count |
+| `mediaType` | `string` | Media type |
+| `imageUrl` | `string` | Image URL |
+| `videoUrl` | `string` | Video URL |
+| `createdAtDate` | `string` | Creation date |
+
+### InstagramUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | User ID |
+| `username` | `string` | Username |
+| `fullName` | `string` | Display name |
+| `biography` | `string` | Bio text |
+| `isPrivate` | `boolean` | Private account |
+| `isVerified` | `boolean` | Verified status |
+| `followerCount` | `number` | Followers |
+| `followingCount` | `number` | Following |
+| `mediaCount` | `number` | Total posts |
+| `profilePicUrl` | `string` | Profile picture URL |
+
+### InstagramComment
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Comment ID |
+| `text` | `string` | Comment text |
+| `username` | `string` | Author username |
+| `parentPostId` | `string` | Parent post ID |
+| `likeCount` | `number` | Number of likes |
+| `childCommentCount` | `number` | Reply count |
+| `createdAtDate` | `string` | Creation date |
+
+### RedditPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Post ID |
+| `title` | `string` | Post title |
+| `selftext` | `string` | Post body text |
+| `authorUsername` | `string` | Author username |
+| `subredditName` | `string` | Subreddit name |
+| `score` | `number` | Net score |
+| `upvotes` | `number` | Upvote count |
+| `commentsCount` | `number` | Comment count |
+| `url` | `string` | Post URL |
+| `permalink` | `string` | Reddit permalink |
+| `isSelf` | `boolean` | Self post (text only) |
+| `over18` | `boolean` | NSFW flag |
+| `createdAtDate` | `string` | Creation date |
+
+### RedditUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | User ID |
+| `username` | `string` | Username |
+| `totalKarma` | `number` | Total karma |
+| `linkKarma` | `number` | Link karma |
+| `commentKarma` | `number` | Comment karma |
+| `isGold` | `boolean` | Reddit Gold status |
+| `isMod` | `boolean` | Moderator status |
+| `profileDescription` | `string` | Profile bio |
+| `createdAtDate` | `string` | Account creation date |
+
+### RedditComment
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Comment ID |
+| `body` | `string` | Comment text |
+| `authorUsername` | `string` | Author username |
+| `parentPostId` | `string` | Parent post ID |
+| `score` | `number` | Net score |
+| `depth` | `number` | Nesting depth |
+| `isSubmitter` | `boolean` | Is OP |
+| `createdAtDate` | `string` | Creation date |
+
+### RedditSubreddit
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Subreddit ID |
+| `displayName` | `string` | Subreddit name |
+| `title` | `string` | Subreddit title |
+| `publicDescription` | `string` | Short description |
+| `description` | `string` | Full description |
+| `subscribersCount` | `number` | Subscriber count |
+| `activeUserCount` | `number` | Active users |
+| `over18` | `boolean` | NSFW flag |
+| `createdAtDate` | `string` | Creation date |
+
+### TiktokPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Post ID |
+| `description` | `string` | Post caption/description |
+| `descriptionLanguage` | `string` | Language of description |
+| `userId` | `string` | Author user ID |
+| `username` | `string` | Author username |
+| `nickname` | `string` | Author display name |
+| `likeCount` | `number` | Number of likes |
+| `commentCount` | `number` | Number of comments |
+| `playCount` | `number` | Video play count |
+| `collectCount` | `number` | Number of collects/saves |
+| `downloadCount` | `number` | Number of downloads |
+| `forwardCount` | `number` | Number of forwards/shares |
+| `videoThumbnail` | `string` | Thumbnail URL |
+| `videoUrl` | `string[]` | Array of video URLs |
+| `duration` | `number` | Video duration in seconds |
+| `hashtags` | `string[]` | Hashtags in the post |
+| `postType` | `number` | Post type code |
+| `isPrivate` | `boolean` | Private post flag |
+| `createdAt` | `string` | Creation timestamp |
+| `createdAtDate` | `string` | Creation date (YYYY-MM-DD) |
+
+### TiktokUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | User ID |
+| `username` | `string` | Username |
+| `nickname` | `string` | Display name |
+| `signature` | `string` | Bio text |
+| `secUid` | `string` | Secure user ID |
+| `avatar` | `string` | Profile picture URL |
+| `isPrivate` | `boolean` | Private account |
+| `isVerified` | `boolean` | Verified status |
+| `followerCount` | `number` | Number of followers |
+| `followingCount` | `number` | Number of following |
+| `likeCount` | `number` | Total likes received |
+| `postCount` | `number` | Total posts |
+| `language` | `string` | Profile language |
+| `region` | `string` | Account region |
+| `createdAt` | `string` | Account creation date |
+
+### TiktokComment
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Comment ID |
+| `postId` | `string` | Parent post ID |
+| `userId` | `string` | Author user ID |
+| `username` | `string` | Author username |
+| `text` | `string` | Comment text |
+| `likeCount` | `number` | Number of likes |
+| `createdAt` | `string` | Creation timestamp |
+| `createdAtDate` | `string` | Creation date (YYYY-MM-DD) |
+
+### TrackedItem
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `phrase` | `string` | Keyword, username, or subreddit name |
+| `type` | `TrackedItemType` | `"keyword"`, `"user"`, or `"subreddit"` |
+| `platform` | `TrackedItemPlatform` | `"twitter"`, `"instagram"`, `"reddit"`, or `"tiktok"` |
+
+### AddTrackedItemsResult
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `success` | `boolean` | Whether the operation succeeded |
+| `addedCount` | `number` | Number of items added |
+| `message` | `string` | Status message |
+| `currentCount` | `number` | Total tracked items after addition |
+| `maxTrackedItems` | `number` | Plan limit for tracked items |
+| `planName` | `string` | Current plan name |
+
+### RemoveTrackedItemsResult
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `success` | `boolean` | Whether the operation succeeded |
+| `removedCount` | `number` | Number of items removed |
+| `message` | `string` | Status message |
+
+<Note>
+For the Python equivalent of these types, see [Python SDK Reference](/sdks/python/reference). The Python SDK uses Pydantic v2 models with snake_case field names (e.g., `like_count` instead of `likeCount`).
+</Note>

@@ -1,0 +1,316 @@
+---
+title: "Twitter/X Tools"
+description: "Search Twitter/X users, posts, retweets, quotes, comments, and engagement with 13 MCP tools."
+---
+
+Xpoz provides **13 Twitter/X tools** across two categories: user tools and post tools.
+
+## Available Fields
+
+### User Fields
+
+These fields are available on all user tools (`getTwitterUser`, `getTwitterUsers`, `searchTwitterUsers`, `getTwitterUserConnections`, `getTwitterUsersByKeywords`, `getTwitterPostInteractingUsers`).
+
+**Default:** `id`, `username`, `name`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `name`, `description`, `location`, `profileImageUrl`, `profileBannerUrl` |
+| **Verification** | `verified`, `isVerified`, `verifiedType`, `verifiedSinceDatetime` |
+| **Metrics** | `followersCount`, `followingCount`, `tweetCount`, `listedCount`, `likesCount`, `mediaCount` |
+| **Metadata** | `pinnedTweetId`, `source`, `label`, `labelType`, `accountBasedIn`, `locationAccurate` |
+| **History** | `usernameChanges`, `lastUsernameChangeDatetime`, `createdAt` |
+
+`getTwitterUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantTweetsCount`, `relevantTweetsImpressionsSum`, `relevantTweetsLikesSum`, `relevantTweetsQuotesSum`, `relevantTweetsRepliesSum`, `relevantTweetsRetweetsSum`.
+
+### Post Fields
+
+These fields are available on all post tools (`getTwitterPostsByIds`, `getTwitterPostsByAuthor`, `getTwitterPostsByKeywords`, `getTwitterPostRetweets`, `getTwitterPostQuotes`, `getTwitterPostComments`).
+
+**Default:** `id`, `text`, `authorUsername`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `text`, `authorId`, `authorUsername`, `createdAt`, `createdAtDate` |
+| **Engagement** | `retweetCount`, `replyCount`, `likeCount`, `quoteCount`, `impressionCount`, `bookmarkCount` |
+| **Metadata** | `lang`, `possiblySensitive`, `suspended`, `deleted`, `source`, `isRetweet`, `hasBirdwatchNotes`, `status` |
+| **Birdwatch** | `birdwatchNotesId`, `birdwatchNotesText`, `birdwatchNotesUrl` |
+| **Relations** | `conversationId`, `quotedTweetId`, `retweetedTweetId`, `replyToTweetId`, `replyToUserId`, `replyToUsername`, `originalTweetId`, `editedTweets` |
+| **Content** | `hashtags`, `mentions`, `mediaUrls`, `urls`, `grokGeneratedContent` |
+| **Location** | `country`, `region`, `city` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. For example, `["id", "text", "retweetCount", "likeCount", "createdAtDate"]` for engagement analysis. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+## User Tools
+
+### getTwitterUser
+
+Get a single Twitter user profile by ID or username.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `identifier` | string | Yes | User ID (numeric) or username. |
+| `identifierType` | string | Yes | `"id"` or `"username"`. |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API, bypassing cache. Default: `false`. |
+
+<Tip>
+For exact username lookups, use `getTwitterUser`. For name-based or fuzzy searches, use `searchTwitterUsers` instead.
+</Tip>
+
+---
+
+### getTwitterUsers
+
+Get one or more Twitter user profiles by IDs or usernames (1-100 per request).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `identifiers` | string[] | Yes | Array of user IDs or usernames (1-100). All must match `identifierType`. |
+| `identifierType` | string | Yes | `"id"` or `"username"`. |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Returns only found users, omitting not-found identifiers.
+
+<Tip>
+Batching multiple users in a single `getTwitterUsers` call is more efficient than calling `getTwitterUser` multiple times.
+</Tip>
+
+---
+
+### searchTwitterUsers
+
+Search users by name, partial username, or fuzzy match with real-time results.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Search query (person name, partial username, or keywords). |
+| `limit` | number | No | Max results. Default: `10`, max: `10`. |
+| `fields` | string[] | No | Fields to return. |
+
+<Note>
+This tool performs a real-time search. For exact username lookups, use `getTwitterUser` instead.
+</Note>
+
+---
+
+### getTwitterUserConnections
+
+Get followers or following for a Twitter user.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `username` | string | Yes | Twitter username (without `@`). |
+| `connectionType` | string | Yes | `"followers"` or `"following"`. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `fields` | string[] | No | User fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). Requires `tableName` for pages > 1. |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. Must be >= `pageNumber`. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 1,000 users per page (with default fields) or 100 per page (with extra fields). See [Pagination](/mcp/pagination) for details.
+
+---
+
+### getTwitterUsersByKeywords
+
+Search for users who authored tweets matching keywords. Returns unique, deduplicated user profiles.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of tweet content. Max 250 characters. Supports exact phrases, boolean operators (`AND`, `OR`), and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `language` | string | No | Filter by language. |
+| `fields` | string[] | No | Fields to return. Includes user fields plus aggregation fields. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). Requires `tableName` for pages > 1. |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. Must be >= `pageNumber`. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 users per page. See [Pagination](/mcp/pagination) and [Query Syntax](/mcp/query-syntax) for details.
+
+---
+
+## Post Tools
+
+### getTwitterPostsByIds
+
+Get one or more Twitter posts by numeric IDs (1-100 per request).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postIds` | string[] | Yes | Array of numeric post IDs (1-100). Each must be digits only. |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Returns only found posts, omitting not-found IDs. Returns the most up-to-date data available.
+
+---
+
+### getTwitterPostsByAuthor
+
+Get posts from a Twitter user by username.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `username` | string | Yes | Twitter username (without `@`). |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 posts per page. Returns the most up-to-date data available.
+
+---
+
+### getTwitterPostsByKeywords
+
+Search Twitter posts by keywords.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post content. Max 250 characters. Supports exact phrases, boolean operators (`AND`, `OR`), and parentheses. Do not use `from:`, `lang:`, or other filter operators in the query -- use dedicated parameters. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `authorUsername` | string | No | Filter posts by author username. |
+| `authorId` | string | No | Filter posts by author ID (numeric). Alternative to `authorUsername`. |
+| `language` | string | No | Filter by language. |
+| `filterOutRetweets` | boolean | No | Exclude retweets from results. Default: `false`. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 posts per page. See [Query Syntax](/mcp/query-syntax) for details on search operators.
+
+---
+
+### getTwitterPostRetweets
+
+Get retweets of a specific post. Database-only -- searches historical retweet data.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | Numeric post ID (digits only). |
+| `responseType` | string | No | `"fast"` (default) or `"paging"`. CSV is not supported. |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Post fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+
+Supports server-side pagination with 100 posts per page.
+
+<Note>
+This tool searches historical retweet data only. For quote posts, use `getTwitterPostQuotes` instead.
+</Note>
+
+---
+
+### getTwitterPostQuotes
+
+Get quote posts of a specific post.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | Numeric post ID (digits only). |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Post fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+Data older than 10 days is automatically refreshed.
+</Note>
+
+Supports server-side pagination with 100 posts per page.
+
+---
+
+### getTwitterPostComments
+
+Get comments (replies) to a specific post.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | Numeric post ID (digits only). |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Post fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+Data older than 10 days is automatically refreshed.
+</Note>
+
+Supports server-side pagination with 100 posts per page.
+
+---
+
+### getTwitterPostInteractingUsers
+
+Get user profiles of people who interacted with a specific post.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | Numeric post ID (digits only). |
+| `interactionType` | string | Yes | `"commenters"`, `"quoters"`, or `"retweeters"`. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | **User** fields to return (not post fields). |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+This tool returns **user profiles**, not post data. The `fields` parameter accepts user fields (see [User Fields](#user-fields) above).
+</Note>
+
+Supports server-side pagination with 1,000 users per page (with default fields) or 100 per page (with extra fields).
+
+---
+
+### countTweets
+
+Count tweets containing a specific phrase within a date range. Returns an integer count without retrieving full tweet data.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `phrase` | string | Yes | Phrase to count in tweets. |
+| `startDate` | string | No | Start date (`YYYY-MM-DD`). Default: 6 months ago. |
+| `endDate` | string | No | End date (`YYYY-MM-DD`). Default: current date. |
+
+<Tip>
+Use `countTweets` for analytics and trend analysis when you only need volume data, not individual posts.
+</Tip>

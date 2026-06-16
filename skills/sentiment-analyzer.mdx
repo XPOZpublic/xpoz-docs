@@ -1,0 +1,50 @@
+---
+title: "Sentiment Analyzer"
+description: "Analyze brand and topic sentiment across Twitter, Reddit, and Instagram with automated scoring and theme extraction."
+---
+
+The Sentiment Analyzer skill searches Twitter, Reddit, and Instagram for posts about a brand or topic, classifies each post by sentiment, extracts recurring themes, and produces a scored summary. It handles multi-platform data collection and analysis in a single workflow.
+
+## Example Prompts
+
+- "What's the sentiment around Tesla on social media?"
+- "How are people feeling about Cursor IDE on Reddit?"
+- "Analyze public sentiment about the new iPhone launch"
+- "What do people think about remote work policies?"
+
+## How It Works
+
+<Steps>
+  <Step title="Search across platforms">
+    Queries Twitter, Reddit, and Instagram using the target brand or topic as keywords.
+  </Step>
+  <Step title="Classify sentiment">
+    Each post is classified into one of five levels: positive, leaning-positive, neutral, leaning-negative, or negative.
+  </Step>
+  <Step title="Extract themes">
+    Identifies 5-8 recurring themes across the collected posts (e.g., pricing concerns, feature praise, competitor comparisons).
+  </Step>
+  <Step title="Generate report">
+    Produces a structured report with an overall sentiment score, platform breakdown, key themes, and notable posts.
+  </Step>
+</Steps>
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getTwitterPostsByKeywords` | Search Twitter for relevant posts |
+| `getRedditPostsByKeywords` | Search Reddit for relevant discussions |
+| `getInstagramPostsByKeywords` | Search Instagram for relevant content |
+
+## Output Format
+
+- **Overall Sentiment Score**: 0-100 scale (0 = extremely negative, 100 = extremely positive)
+- **Platform Breakdown**: Per-platform sentiment scores and post counts in a table
+- **Key Themes**: 5-8 recurring themes with sentiment tendency and representative quotes
+- **Notable Posts**: High-engagement posts that exemplify the dominant sentiment
+- **Summary**: Concise narrative of findings and actionable insights
+
+## Get Started
+
+Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.

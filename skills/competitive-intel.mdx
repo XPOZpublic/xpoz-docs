@@ -1,0 +1,53 @@
+---
+title: "Competitive Intelligence"
+description: "Compare 2-5 brands across social media with share of voice, sentiment, engagement, and positioning analysis."
+---
+
+The Competitive Intelligence skill compares 2-5 brands head-to-head across social media. It calculates share of voice, compares sentiment, measures engagement differences, identifies audience overlap, and maps competitive positioning.
+
+## Example Prompts
+
+- "Compare Slack vs Discord vs Teams on social media"
+- "How does Claude compare to ChatGPT and Gemini?"
+- "Competitive analysis: Figma vs Sketch vs Adobe XD"
+- "Compare sentiment around Nike vs Adidas vs Puma"
+
+## Analysis Components
+
+- **Share of Voice**: Percentage of total social mentions each brand captures across platforms. Measured by total post volume per brand.
+- **Sentiment Comparison**: Side-by-side sentiment scores for each brand, highlighting which brand has the most positive (or negative) perception.
+- **Engagement Comparison**: Average likes, retweets, comments per post for each brand, showing which brand generates the most interaction.
+- **Audience Overlap**: Identifies users who discuss multiple brands, revealing shared audience segments.
+- **Positioning Analysis**: How each brand is perceived relative to competitors -- what unique strengths and weaknesses the social conversation reveals.
+
+## How It Works
+
+<Steps>
+  <Step title="Build brand queries">
+    Constructs targeted queries for each brand with disambiguation terms to avoid false positives.
+  </Step>
+  <Step title="Collect data per brand">
+    Searches Twitter and Reddit for each brand independently.
+  </Step>
+  <Step title="Normalize metrics">
+    Normalizes engagement and volume metrics across brands for fair comparison.
+  </Step>
+  <Step title="Compare and rank">
+    Calculates share of voice, sentiment deltas, and engagement ratios.
+  </Step>
+  <Step title="Generate report">
+    Produces a comparative report with tables, rankings, and positioning insights.
+  </Step>
+</Steps>
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getTwitterPostsByKeywords` | Search Twitter mentions per brand |
+| `getTwitterUsersByKeywords` | Find users discussing each brand |
+| `getRedditPostsByKeywords` | Search Reddit discussions per brand |
+
+## Get Started
+
+Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.

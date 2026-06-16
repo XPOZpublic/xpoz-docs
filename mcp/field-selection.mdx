@@ -1,0 +1,234 @@
+---
+title: "Field Selection"
+description: "Optimize performance by requesting only the fields you need with the fields parameter"
+---
+
+All post, user, and comment tools support a `fields` parameter that lets you specify exactly which fields to include in the response. This dramatically improves response time and reduces token consumption.
+
+<Warning>
+  Always specify only the fields you need. Requesting all fields when you only need a few wastes tokens and slows down responses.
+</Warning>
+
+## Usage
+
+Pass an array of field names to the `fields` parameter:
+
+```json
+{
+  "tool": "getTwitterPostsByKeywords",
+  "arguments": {
+    "query": "artificial intelligence",
+    "fields": ["id", "text", "authorUsername", "retweetCount", "createdAtDate"]
+  }
+}
+```
+
+When `fields` is omitted, tools return a set of default fields (not all fields).
+
+## Available Fields by Platform
+
+<Tabs>
+  <Tab title="Twitter Posts">
+    **Default fields:** `id`, `text`, `authorUsername`, `impressionCount`, `lang`, `createdAtDate`
+
+    | Category | Fields |
+    |---|---|
+    | **IDs and Content** | `id`, `authorId`, `authorUsername`, `text` |
+    | **Engagement** | `bookmarkCount`, `impressionCount`, `likeCount`, `quoteCount`, `replyCount`, `retweetCount` |
+    | **References** | `conversationId`, `quotedTweetId`, `retweetedTweetId`, `replyToTweetId`, `replyToUserId`, `replyToUsername`, `originalTweetId`, `editedTweets` |
+    | **Content Tags** | `hashtags`, `mentions`, `mediaUrls`, `urls` |
+    | **Status** | `status`, `deleted`, `suspended`, `possiblySensitive`, `isRetweet` |
+    | **Metadata** | `lang`, `source`, `createdAt`, `createdAtDate` |
+    | **Birdwatch** | `hasBirdwatchNotes`, `birdwatchNotesId`, `birdwatchNotesText`, `birdwatchNotesUrl` |
+    | **AI** | `grokGeneratedContent` |
+    | **Location** | `country`, `region`, `city` |
+  </Tab>
+
+  <Tab title="Twitter Users">
+    **Default fields:** `id`, `username`, `name`
+
+    | Category | Fields |
+    |---|---|
+    | **Identity** | `id`, `username`, `name` |
+    | **Profile** | `profileImageUrl`, `profileBannerUrl`, `profileInterstitialType`, `verifiedType`, `description`, `location` |
+    | **Counts** | `followersCount`, `followingCount`, `tweetCount`, `listedCount`, `likesCount`, `mediaCount` |
+    | **Verification** | `verified`, `isVerified`, `verifiedSinceDatetime` |
+    | **Status** | `status`, `protected` |
+    | **Metadata** | `source`, `modifiedAt`, `createdAt`, `pinnedTweetId` |
+    | **Languages** | `nLang`, `nLangsFiltered` |
+    | **Labels** | `label`, `labelType` |
+    | **Account History** | `usernameChanges`, `lastUsernameChangeDatetime`, `accountBasedIn`, `locationAccurate` |
+  </Tab>
+
+  <Tab title="Instagram Posts">
+    **Default fields:** `id`, `caption`, `username`, `createdAtDate`
+
+    | Category | Fields |
+    |---|---|
+    | **Identity** | `id`, `userId`, `postType` |
+    | **Content** | `caption`, `mediaType`, `imageUrl`, `videoUrl`, `audioOnlyUrl` |
+    | **Metadata** | `codeUrl`, `profilePicUrl`, `videoSubtitlesUri`, `subtitles`, `location` |
+    | **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `videoPlayCount` |
+    | **Video** | `videoDuration` |
+    | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+    | **Account** | `username`, `fullName` |
+  </Tab>
+
+  <Tab title="Instagram Users">
+    **Default fields:** `id`, `username`, `fullName`
+
+    | Category | Fields |
+    |---|---|
+    | **Identity** | `id`, `username`, `fullName` |
+    | **Profile** | `profileUrl`, `profilePicUrl`, `biography`, `externalUrl` |
+    | **Status** | `isPrivate`, `isVerified` |
+    | **Counts** | `followerCount`, `followingCount`, `mediaCount` |
+    | **Metadata** | `profilePicId`, `profileInterstitialType`, `hasAnonymousProfilePicture` |
+  </Tab>
+
+  <Tab title="Instagram Comments">
+    **Default fields:** `id`, `text`, `username`, `createdAtDate`
+
+    | Category | Fields |
+    |---|---|
+    | **Content** | `id`, `text` |
+    | **References** | `parentPostId`, `parentPostUserId`, `parentCommentId`, `repliedToCommentId` |
+    | **Metadata** | `type`, `childCommentCount`, `status` |
+    | **Author** | `userId`, `username`, `fullName` |
+    | **Engagement** | `likeCount` |
+    | **Flags** | `isSpam`, `hasTranslation` |
+    | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+  </Tab>
+
+  <Tab title="Reddit Posts">
+    **Default fields:** `id`, `title`, `authorUsername`, `subredditName`, `createdAtDate`
+
+    | Category | Fields |
+    |---|---|
+    | **Content** | `id`, `title`, `selftext`, `url`, `postUrl`, `permalink` |
+    | **Media** | `thumbnail`, `postHint`, `domain` |
+    | **Author** | `authorId`, `authorUsername`, `subredditId`, `subredditName` |
+    | **Engagement** | `score`, `upvotes`, `downvotes`, `upvoteRatio`, `commentsCount`, `crosspostsCount` |
+    | **Content Type** | `isSelf`, `isVideo`, `isOriginalContent` |
+    | **Visibility** | `over18`, `spoiler`, `locked`, `stickied`, `archived` |
+    | **Flair** | `linkFlairText` |
+    | **Cross-post** | `crosspostParent` |
+    | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+  </Tab>
+
+  <Tab title="Reddit Users">
+    **Default fields:** `id`, `username`, `totalKarma`
+
+    | Category | Fields |
+    |---|---|
+    | **Identity** | `id`, `username` |
+    | **Profile** | `profileUrl`, `profilePicUrl`, `snoovatarImg`, `profileTitle`, `profileDescription`, `profileBannerUrl` |
+    | **Karma** | `linkKarma`, `commentKarma`, `totalKarma`, `awardeeKarma`, `awarderKarma` |
+    | **Status** | `isGold`, `isMod`, `isEmployee`, `isSuspended`, `verified`, `isBlocked` |
+    | **Preferences** | `hasVerifiedEmail`, `acceptFollowers`, `hasSubscribed`, `hideFromRobots`, `prefShowSnoovatar` |
+    | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+  </Tab>
+
+  <Tab title="Reddit Comments">
+    **Default fields:** `id`, `body`, `authorUsername`, `createdAtDate`
+
+    | Category | Fields |
+    |---|---|
+    | **Content** | `id`, `body` |
+    | **References** | `parentPostId`, `parentId` |
+    | **Author** | `authorId`, `authorUsername`, `postSubredditId`, `postSubredditName` |
+    | **Engagement** | `score`, `upvotes`, `downvotes` |
+    | **Structure** | `depth`, `controversiality`, `isSubmitter` |
+    | **Status** | `stickied`, `collapsed`, `edited`, `distinguished` |
+    | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+  </Tab>
+
+  <Tab title="TikTok Posts">
+    **Default fields:** `id`, `description`, `username`, `createdAtDate`
+
+    | Category | Fields |
+    |---|---|
+    | **Content** | `id`, `postType`, `description`, `descriptionLanguage` |
+    | **Author** | `userId`, `username`, `nickname` |
+    | **Media** | `videoThumbnail`, `videoUrl`, `hashtags`, `duration` |
+    | **Engagement** | `likeCount`, `commentCount`, `playCount`, `collectCount`, `downloadCount`, `forwardCount` |
+    | **Metadata** | `isPrivate`, `transcriptsJson` |
+    | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+  </Tab>
+
+  <Tab title="TikTok Users">
+    **Default fields:** `id`, `username`, `nickname`
+
+    | Category | Fields |
+    |---|---|
+    | **Identity** | `id`, `username`, `nickname`, `secUid` |
+    | **Profile** | `signature`, `avatar`, `language`, `region` |
+    | **Status** | `isPrivate`, `isVerified` |
+    | **Counts** | `followerCount`, `followingCount`, `likeCount`, `postCount` |
+    | **Metadata** | `usernameModifyTime`, `createdAt` |
+  </Tab>
+
+  <Tab title="TikTok Comments">
+    **Default fields:** `id`, `text`, `username`, `createdAtDate`
+
+    | Category | Fields |
+    |---|---|
+    | **Content** | `id`, `postId`, `text` |
+    | **Author** | `userId`, `username` |
+    | **Engagement** | `likeCount` |
+    | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+  </Tab>
+</Tabs>
+
+## Examples by Use Case
+
+<AccordionGroup>
+  <Accordion title="Engagement Analysis">
+    Focus on metrics and timing:
+
+    ```json
+    {
+      "fields": ["id", "text", "retweetCount", "likeCount", "quoteCount", "replyCount", "createdAtDate"]
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Content Discovery">
+    Focus on text and author context:
+
+    ```json
+    {
+      "fields": ["id", "text", "authorUsername", "hashtags", "mentions", "createdAtDate"]
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="User Profiling">
+    Focus on identity and reach:
+
+    ```json
+    {
+      "fields": ["id", "username", "name", "followersCount", "followingCount", "description", "isVerified"]
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Minimal (IDs Only)">
+    When you only need to count or reference results:
+
+    ```json
+    {
+      "fields": ["id"]
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  If you are unsure which fields you need, start with the defaults (omit the `fields` parameter). Then narrow down to specific fields once you know what your analysis requires.
+</Tip>
+
+## Related
+
+- [Response Modes](/mcp/response-modes) -- Control how results are delivered
+- [Pagination](/mcp/pagination) -- Iterate through large result sets

@@ -1,0 +1,253 @@
+---
+title: "Reddit Tools"
+description: "Search Reddit users, posts, comments, and subreddits with 9 MCP tools."
+---
+
+Xpoz provides **9 Reddit tools** across four categories: users, posts, comments, and subreddits.
+
+## Available Fields
+
+### User Fields
+
+These fields are available on user tools (`getRedditUser`, `searchRedditUsers`, `getRedditUsersByKeywords`).
+
+**Default:** `id`, `username`, `totalKarma`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `profileUrl`, `profilePicUrl`, `snoovatarImg`, `profileDescription`, `profileBannerUrl`, `profileTitle` |
+| **Karma** | `linkKarma`, `commentKarma`, `totalKarma`, `awardeeKarma`, `awarderKarma` |
+| **Status** | `isGold`, `isMod`, `isEmployee`, `hasVerifiedEmail`, `isSuspended`, `verified`, `isBlocked`, `acceptFollowers`, `hasSubscribed` |
+| **Settings** | `hideFromRobots`, `prefShowSnoovatar` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+`getRedditUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsUpvotesSum`, `relevantPostsCommentsCountSum`.
+
+### Post Fields
+
+These fields are available on post tools (`getRedditPostsByKeywords`, `getRedditPostWithCommentsById`).
+
+**Default:** `id`, `title`, `authorUsername`, `subredditName`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `title`, `selftext`, `url`, `permalink`, `postUrl`, `thumbnail` |
+| **Author** | `authorId`, `authorUsername` |
+| **Subreddit** | `subredditName`, `subredditId` |
+| **Engagement** | `score`, `upvotes`, `downvotes`, `upvoteRatio`, `commentsCount`, `crosspostsCount` |
+| **Flags** | `isSelf`, `isVideo`, `isOriginalContent`, `over18`, `spoiler`, `locked`, `stickied`, `archived` |
+| **Meta** | `linkFlairText`, `postHint`, `domain`, `crosspostParent` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+### Comment Fields
+
+These fields are available on `getRedditCommentsByKeywords` and `getRedditPostWithCommentsById`.
+
+**Default:** `id`, `body`, `authorUsername`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `body`, `parentPostId`, `parentId` |
+| **Author** | `authorId`, `authorUsername` |
+| **Subreddit** | `postSubredditName`, `postSubredditId` |
+| **Engagement** | `score`, `upvotes`, `downvotes`, `controversiality` |
+| **Meta** | `depth`, `isSubmitter`, `stickied`, `collapsed`, `edited`, `distinguished` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+### Subreddit Fields
+
+These fields are available on subreddit tools (`searchRedditSubreddits`, `getRedditSubredditWithPostsByName`, `getRedditSubredditsByKeywords`).
+
+**Default:** `id`, `displayName`, `title`, `subscribersCount`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `displayName`, `title`, `publicDescription`, `description` |
+| **Stats** | `subscribersCount`, `activeUserCount` |
+| **Meta** | `subredditType`, `over18`, `lang`, `url`, `subredditUrl` |
+| **Images** | `iconImg`, `bannerImg`, `headerImg`, `communityIcon` |
+| **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+`getRedditSubredditsByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsUpvotesSum`, `relevantPostsCommentsCountSum`.
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+## User Tools
+
+### getRedditUser
+
+Get a Reddit user profile by username.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `username` | string | Yes | Reddit username (without `u/` prefix). |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API, bypassing cache. Default: `false`. |
+
+---
+
+### searchRedditUsers
+
+Search Reddit users by name, username, or profile description with real-time results.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Search query (name, username, or keywords from profile). Max 250 characters. |
+| `limit` | integer | No | Max results. Default: `50`, max: `50`. |
+| `fields` | string[] | No | Fields to return. |
+
+<Note>
+This tool performs a real-time search. For exact username lookups, use `getRedditUser` instead.
+</Note>
+
+---
+
+### getRedditUsersByKeywords
+
+Search for users who authored Reddit posts matching keywords. Returns unique, deduplicated user profiles.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post titles and content. Max 250 characters. Supports exact phrases, boolean operators (`AND`, `OR`), and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `subreddit` | string | No | Filter to a specific subreddit (without `r/` prefix). |
+| `fields` | string[] | No | Fields to return. Includes user fields plus aggregation fields. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). Requires `tableName` for pages > 1. |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. Must be >= `pageNumber`. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 users per page. See [Pagination](/mcp/pagination) for details.
+
+---
+
+## Post Tools
+
+### getRedditPostsByKeywords
+
+Search Reddit posts by keywords in titles and selftext.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post content. Max 250 characters. Supports exact phrases, boolean operators, and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `sort` | string | No | Sort order: `"relevance"` (default), `"hot"`, `"top"`, `"new"`, `"comments"`. |
+| `time` | string | No | Time filter: `"hour"`, `"day"`, `"week"`, `"month"`, `"year"`, `"all"` (default). |
+| `subreddit` | string | No | Filter to a specific subreddit (without `r/` prefix). |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 posts per page. See [Pagination](/mcp/pagination) and [Query Syntax](/mcp/query-syntax) for details.
+
+---
+
+### getRedditPostWithCommentsById
+
+Get a Reddit post with its comments by post ID.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | Reddit post ID. |
+| `responseType` | string | No | `"fast"` (default) or `"paging"`. CSV is not supported for this tool. |
+| `limit` | number | No | Max comments to return. Fast: up to 300. Paging: max 500,000. |
+| `postFields` | string[] | No | Fields for the post. See [Post Fields](#post-fields) above. |
+| `commentFields` | string[] | No | Fields for comments. See [Comment Fields](#comment-fields) above. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+This tool uses separate `postFields` and `commentFields` parameters instead of a single `fields` parameter.
+</Note>
+
+---
+
+## Comment Tools
+
+### getRedditCommentsByKeywords
+
+Search Reddit comments by keywords in comment body text. Database-only -- searches existing records.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of comment body. Max 250 characters. Supports exact phrases, boolean operators, and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `subreddit` | string | No | Filter to a specific subreddit (without `r/` prefix). |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+
+Supports server-side pagination with 100 comments per page.
+
+---
+
+## Subreddit Tools
+
+### searchRedditSubreddits
+
+Search subreddits by keywords with real-time results.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Search query for subreddit names and descriptions. Max 250 characters. |
+| `limit` | integer | No | Max results. Default: `50`, max: `50`. |
+| `fields` | string[] | No | Fields to return. |
+
+---
+
+### getRedditSubredditWithPostsByName
+
+Get subreddit details with its posts.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subredditName` | string | Yes | Subreddit name (without `r/` prefix). Example: `"wallstreetbets"`. |
+| `responseType` | string | No | `"fast"` (default) or `"paging"`. CSV is not supported. |
+| `limit` | number | No | Max posts to return. Fast: up to 300. Paging: max 500,000. |
+| `subredditFields` | string[] | No | Fields for the subreddit. See [Subreddit Fields](#subreddit-fields) above. |
+| `postFields` | string[] | No | Fields for the posts. See [Post Fields](#post-fields) above. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+This tool uses separate `subredditFields` and `postFields` parameters instead of a single `fields` parameter.
+</Note>
+
+---
+
+### getRedditSubredditsByKeywords
+
+Search for subreddits where Reddit posts match keywords. Returns unique, deduplicated subreddit profiles.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post titles and content to find subreddits where matching posts were made. Max 250 characters. |
+| `responseType` | string | No | `"fast"` (default) or `"paging"`. CSV is not supported. |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. Includes subreddit fields plus aggregation fields. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |

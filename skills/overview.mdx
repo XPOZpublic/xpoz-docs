@@ -1,0 +1,124 @@
+---
+title: Agent Skills
+description: Pre-built AI workflows for social media intelligence, powered by Xpoz.
+---
+
+## What are Agent Skills?
+
+Agent Skills are pre-built AI workflows that combine Xpoz tools into end-to-end social media intelligence tasks. They run inside AI agents like Claude Code, OpenAI Codex CLI, ChatGPT, and any agent supporting the SKILL.md standard.
+
+Each skill knows which Xpoz tools to call, how to process results, and how to format output.
+
+## Available Skills
+
+| Skill | Description | Platforms |
+|---|---|---|
+| Best Practices | Reference guide for Xpoz query syntax, response modes, and patterns | All |
+| Getting Started | Onboarding guide for setup, auth, and capability discovery | All |
+| Social Tracking | Set up continuous tracking for better coverage and fresher data | All |
+| Sentiment Analyzer | Analyze brand/topic sentiment with scoring and theme extraction | Twitter, Reddit, Instagram |
+| Twitter Data Export | Export up to 500K rows of Twitter data to CSV | Twitter |
+| Influencer Discovery | Find and rank influencers by engagement, reach, and authenticity | Twitter |
+| Reddit Research | Deep-dive into Reddit discussions for market research | Reddit |
+| Competitive Intelligence | Compare 2-5 brands across social media metrics | Twitter, Reddit |
+| Security OSINT | Monitor for CVEs, breaches, and emerging threats | Twitter, Reddit |
+
+## Compatible Agents
+
+- Claude Code (recommended)
+- OpenAI Codex CLI
+- Cursor
+- Gemini CLI
+- ChatGPT (via custom instructions)
+- Any agent supporting the SKILL.md standard
+
+## Setup
+
+<Tabs>
+  <Tab title="skills.sh (Recommended)">
+    Install all Xpoz skills with a single command:
+
+    ```bash
+    npx skills add XPOZpublic/xpoz-agent-skills --all
+    ```
+
+    Or install a specific skill:
+
+    ```bash
+    npx skills add XPOZpublic/xpoz-agent-skills --skill social-sentiment-analyzer
+    ```
+
+    This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https://www.skills.sh/). Skills are installed directly into your agent's skills directory — no further configuration needed.
+
+    **Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `reddit-research`, `competitive-intel`, `security-osint`
+
+    <Tip>
+      You still need to configure Xpoz access (MCP server or access key) to use the skills. See the MCP Server or SDK tabs for auth setup.
+    </Tip>
+  </Tab>
+  <Tab title="MCP Server">
+    For Claude Code users, add to `~/.claude.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "url": "https://mcp.xpoz.ai/mcp",
+          "transport": "http-stream"
+        }
+      }
+    }
+    ```
+
+    OAuth authentication happens on first use.
+  </Tab>
+  <Tab title="SDK">
+    **Python:**
+
+    ```bash
+    pip install xpoz
+    export XPOZ_API_KEY=your-key-here
+    ```
+
+    **TypeScript:**
+
+    ```bash
+    npm install @xpoz/xpoz
+    export XPOZ_API_KEY=your-key-here
+    ```
+
+    Get a free access key (100K results/month) at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+  </Tab>
+</Tabs>
+
+## Explore Skills
+
+<CardGroup cols={3}>
+  <Card title="Best Practices" icon="book" href="/skills/best-practices">
+    Reference guide for Xpoz query syntax, response modes, and patterns.
+  </Card>
+  <Card title="Getting Started" icon="rocket" href="/skills/getting-started">
+    Onboarding guide for setup, auth, and capability discovery.
+  </Card>
+  <Card title="Social Tracking" icon="satellite-dish" href="/skills/social-tracking">
+    Set up continuous tracking for better coverage and fresher data.
+  </Card>
+  <Card title="Sentiment Analyzer" icon="chart-line" href="/skills/sentiment-analyzer">
+    Analyze brand/topic sentiment with scoring and theme extraction.
+  </Card>
+  <Card title="Twitter Data Export" icon="file-csv" href="/skills/twitter-data-export">
+    Export up to 500K rows of Twitter data to CSV.
+  </Card>
+  <Card title="Influencer Discovery" icon="users" href="/skills/influencer-discovery">
+    Find and rank influencers by engagement, reach, and authenticity.
+  </Card>
+  <Card title="Reddit Research" icon="magnifying-glass-chart" href="/skills/reddit-research">
+    Deep-dive into Reddit discussions for market research.
+  </Card>
+  <Card title="Competitive Intelligence" icon="scale-balanced" href="/skills/competitive-intel">
+    Compare 2-5 brands across social media metrics.
+  </Card>
+  <Card title="Security OSINT" icon="shield-halved" href="/skills/security-osint">
+    Monitor for CVEs, breaches, and emerging threats.
+  </Card>
+</CardGroup>

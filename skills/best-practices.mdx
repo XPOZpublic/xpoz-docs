@@ -1,0 +1,95 @@
+---
+title: "Best Practices"
+description: "Reference guide for Xpoz query syntax, response modes, field selection, tracking, and common workflow patterns."
+---
+
+The Best Practices skill is a reference guide that should be loaded for any Xpoz interaction. It covers authentication, query construction, response mode selection, field optimization, and common workflow patterns across all 48 Xpoz tools.
+
+## Query Syntax
+
+Reference for building effective queries across all Xpoz search tools.
+
+- **Simple keywords**: `artificial intelligence` (matches posts containing both words)
+- **Exact phrases**: `"machine learning"` (matches the exact phrase)
+- **AND operator**: `AI AND healthcare` (both terms required)
+- **OR operator**: `ChatGPT OR "Claude AI"` (either term matches)
+- **Grouping**: `("generative AI" OR LLM) AND startup`
+- **Date filtering**: Use `startDate` and `endDate` parameters in YYYY-MM-DD format
+
+## Response Modes
+
+Every search tool supports a `responseType` parameter that controls how results are delivered.
+
+| Mode | Description | Best For |
+| --- | --- | --- |
+| `fast` | Returns results immediately in a single response | Quick lookups, small datasets, interactive analysis |
+| `paging` | Returns paginated results (100 per page) with cursor-based navigation | Medium datasets, iterative analysis, when you need to process results page by page |
+| `csv` | Exports results to S3 as a CSV file (up to 500K rows) | Bulk exports, large datasets, data pipeline ingestion |
+
+## Field Selection
+
+Use the `fields` parameter to request only specific fields, reducing response size and improving performance. Rather than returning the full object with all available fields, specify exactly which fields you need.
+
+<Tabs>
+  <Tab title="Example Request">
+    ```json
+    {
+      "keywords": "artificial intelligence",
+      "fields": ["id", "text", "authorUsername", "likeCount"],
+      "responseType": "fast"
+    }
+    ```
+  </Tab>
+  <Tab title="Without Field Selection">
+    ```json
+    {
+      "keywords": "artificial intelligence",
+      "responseType": "fast"
+    }
+    ```
+    Returns all available fields, which may include dozens of properties you do not need.
+  </Tab>
+</Tabs>
+
+## Continuous Tracking
+
+Continuous tracking monitors keywords, users, subreddits, and hashtags on a regular schedule, resulting in better data coverage and fresher results. Track any brand, keyword, or user you query regularly to ensure more complete, up-to-date content.
+
+See the [Social Tracking skill](/skills/social-tracking) for setup details on adding and managing tracked items.
+
+## Common Workflow Patterns
+
+<CardGroup cols={3}>
+  <Card title="Search, Analyze, Export">
+    Search for posts using keyword queries, analyze results in-agent to identify patterns or insights, then export the full dataset to CSV for downstream processing.
+  </Card>
+  <Card title="Find Users, Get Posts, Analyze">
+    Search for relevant users by keyword or criteria, fetch their recent posts, then perform engagement or content analysis across the collected data.
+  </Card>
+  <Card title="Track, Collect, Report">
+    Set up tracking for keywords or users, let data accumulate over days or weeks, then run periodic analysis and reporting on the growing dataset.
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+| Issue | Cause | Solution |
+| --- | --- | --- |
+| No results returned | Query too narrow or date range too restrictive | Broaden keywords, extend date range, try OR instead of AND |
+| Slow response | Large result set with responseType="fast" | Switch to "paging" mode or narrow the query |
+| CSV export pending | Export still processing | Poll `checkOperationStatus` with the operation ID until complete |
+| Authentication error | Invalid or expired access key | Regenerate your key at xpoz.ai or re-authenticate via OAuth |
+| Rate limit hit | Too many requests per minute | Add delays between requests, batch queries where possible |
+
+## Platform Quick Reference
+
+- **Twitter/X**: 13 tools (users, posts, connections, comments)
+- **Instagram**: 9 tools (users, posts, comments, connections)
+- **Reddit**: 9 tools (users, posts, comments, subreddits)
+- **TikTok**: 9 tools (users, posts, comments, hashtags)
+- **Operations**: 2 tools
+- **Account**: 1 tool
+- **Auth**: 2 tools
+- **Tracking**: 3 tools
+
+Total: 48 tools. See [MCP Tools Overview](/mcp/tools/overview) for the full reference.

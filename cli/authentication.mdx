@@ -1,0 +1,97 @@
+---
+title: "Authentication"
+description: "Manage access keys for the Xpoz CLI -- login, logout, and credential storage"
+---
+
+The CLI requires an access key to authenticate with the Xpoz MCP server. Get your key from the [Xpoz dashboard](https://www.xpoz.ai/settings).
+
+## Login
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up or log in at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Settings page](https://www.xpoz.ai/settings).
+  </Step>
+  <Step title="Store the key">
+    ```bash
+    xpoz-cli auth login
+    ```
+
+    You will be prompted to enter your access key. The key is stored locally in a config file (see [Config File Location](#config-file-location) below).
+  </Step>
+  <Step title="Verify">
+    ```bash
+    xpoz-cli auth status
+    ```
+
+    Confirms that a valid access key is stored and shows your account status.
+  </Step>
+</Steps>
+
+## Logout
+
+Remove the stored access key:
+
+```bash
+xpoz-cli auth logout
+```
+
+## Auth Commands
+
+| Command | Description |
+|---|---|
+| `xpoz-cli auth login` | Store your access key |
+| `xpoz-cli auth status` | Check authentication status |
+| `xpoz-cli auth logout` | Remove stored credentials |
+
+## Credential Precedence
+
+The CLI resolves credentials in this order:
+
+1. **`--api-key` flag** -- highest priority, overrides everything
+2. **`XPOZ_API_KEY` environment variable** -- useful for CI/CD and scripting
+3. **Stored config file** -- set by `xpoz-cli auth login`
+
+```bash
+# Use a specific key for one command
+xpoz-cli twitter get_user --identifier elonmusk --api-key sk-your-key
+
+# Or set the environment variable
+export XPOZ_API_KEY=sk-your-key
+xpoz-cli twitter get_user --identifier elonmusk
+```
+
+<Tip>
+  For CI/CD pipelines and automation, use the `XPOZ_API_KEY` environment variable. For local development, `auth login` is more convenient.
+</Tip>
+
+## Config File Location
+
+<Tabs>
+  <Tab title="Linux / macOS">
+    ```
+    ~/.config/xpoz/config.json
+    ```
+
+    The file is created with `0600` permissions (owner read/write only) to protect your access key.
+  </Tab>
+  <Tab title="Windows">
+    ```
+    %APPDATA%\xpoz\config.json
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+  The config file contains your access key in plain text. Do not commit it to version control. The CLI sets restrictive file permissions (`0600`) on Linux and macOS to prevent other users on the system from reading it.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Usage" icon="terminal" href="/cli/usage">
+    Start querying platforms with the CLI.
+  </Card>
+  <Card title="MCP Authentication" icon="plug" href="/mcp/installation">
+    Set up the same access key with the MCP server directly.
+  </Card>
+</CardGroup>

@@ -1,0 +1,52 @@
+---
+title: "Security OSINT"
+description: "Monitor social platforms for CVE mentions, breach reports, exploit chatter, and emerging security threats."
+---
+
+The Security OSINT skill monitors Twitter and Reddit for security-related discussions including CVE mentions, zero-day chatter, data breach reports, exploit code sharing, and emerging threats. It reconstructs timelines, assesses severity from social signals, and evaluates source credibility.
+
+## Example Prompts
+
+- "What's the security community saying about CVE-2026-1234?"
+- "OSINT: find breach reports about Company X"
+- "Monitor Twitter for zero-day exploit discussions this week"
+- "What are the emerging security threats being discussed on Reddit?"
+- "Track threat actor mentions for APT29 on social media"
+
+## Capabilities
+
+- **CVE Tracking**: Search for specific CVE IDs across social platforms to gauge community response, severity perception, and exploitation status.
+- **Breach Monitoring**: Detect and aggregate reports of data breaches, leaked credentials, and security incidents as they surface on social media.
+- **Exploit Chatter**: Identify discussions about proof-of-concept exploits, attack techniques, and vulnerability details.
+- **Timeline Reconstruction**: Build chronological timelines of security events from the earliest social mentions to current status.
+- **Severity Assessment**: Gauge real-world severity based on social signals -- discussion volume, expert engagement, and community urgency.
+- **Source Credibility**: Evaluate the credibility of threat intelligence sources based on their posting history and community standing.
+
+## How It Works
+
+<Steps>
+  <Step title="Build security queries">
+    Constructs targeted queries using CVE IDs, vulnerability terms, breach terminology, and threat actor names.
+  </Step>
+  <Step title="Search security communities">
+    Queries Twitter and Reddit, focusing on security-focused communities and researchers.
+  </Step>
+  <Step title="Analyze findings">
+    Assesses severity, identifies key sources, and reconstructs event timelines.
+  </Step>
+  <Step title="Generate intelligence report">
+    Produces a structured report with timeline, severity assessment, source credibility, and recommended actions.
+  </Step>
+</Steps>
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getTwitterPostsByKeywords` | Search Twitter for security-related posts |
+| `getTwitterUsersByKeywords` | Identify security researchers and threat intel sources |
+| `getRedditPostsByKeywords` | Search Reddit security communities (r/netsec, r/cybersecurity, etc.) |
+
+## Get Started
+
+Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.

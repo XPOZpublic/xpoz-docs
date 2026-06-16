@@ -1,0 +1,91 @@
+---
+title: Claude Code
+description: Connect Xpoz to Claude Code with a single command for social media intelligence in your terminal.
+---
+
+Claude Code connects to the Xpoz MCP server over HTTP, giving you access to all [48 tools](/mcp/tools/overview) directly from your terminal. Bearer token auth is the fastest path; OAuth is also supported for interactive workflows.
+
+## Setup
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Add the MCP server">
+    Run a single command:
+
+    ```bash
+    claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
+      -t http \
+      -H "Authorization: Bearer YOUR_API_KEY"
+    ```
+
+    This registers the Xpoz MCP server with Claude Code. All 48 tools are discovered automatically on the next conversation.
+  </Step>
+  <Step title="Verify the connection">
+    Start a new Claude Code session and ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Claude calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+  </Step>
+</Steps>
+
+## Alternative: Manual Configuration
+
+Instead of the CLI command, you can add the server directly to your `~/.claude.json` configuration file:
+
+```json
+{
+  "mcpServers": {
+    "xpoz-mcp": {
+      "url": "https://mcp.xpoz.ai/mcp",
+      "type": "http",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Code after editing the configuration file.
+
+## OAuth Authentication
+
+If you prefer OAuth over a static bearer token, add the server without an authorization header:
+
+```bash
+claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http
+```
+
+Claude Code will initiate the OAuth 2.1 flow automatically when it first connects to the server. You authenticate with your Google account, and subsequent requests are handled with the issued JWT token.
+
+<Note>
+OAuth requires the Xpoz MCP server to have Google OAuth enabled. See the [Authentication](/authentication) page for details on configuring OAuth 2.1 with Google SSO.
+</Note>
+
+## What You Can Do
+
+Once connected, ask Claude to perform any social media research task:
+
+- Search posts by keyword across Twitter, Instagram, Reddit, and TikTok
+- Look up user profiles and follower counts
+- Analyze engagement metrics and trends
+- Track keywords and users for continuous monitoring
+- Export large datasets in CSV format
+
+See the full list of available tools in the [MCP Tools reference](/mcp/tools/overview), or explore pre-built research workflows in [Agent Skills](/skills/overview).
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/guides/query-syntax">
+    Write effective search queries with boolean operators
+  </Card>
+</CardGroup>

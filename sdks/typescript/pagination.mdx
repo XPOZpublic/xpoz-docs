@@ -1,0 +1,123 @@
+---
+title: "TypeScript SDK Pagination"
+description: "Navigate paginated results, choose response types, and export data to CSV with the Xpoz TypeScript SDK."
+---
+
+## PaginatedResult
+
+Methods that return large datasets use server-side pagination (100 items per page). These return a `PaginatedResult<T>` with built-in navigation helpers.
+
+```typescript
+const results = await client.twitter.searchPosts("AI");
+
+// Access current page data
+results.data;                         // TwitterPost[] — current page items
+results.pagination.totalRows;         // total matching rows
+results.pagination.totalPages;        // total pages
+results.pagination.pageNumber;        // current page number
+results.pagination.pageSize;          // items per page (100)
+results.pagination.resultsCount;      // items on current page
+results.hasNextPage();                // boolean
+```
+
+### Navigating Pages
+
+```typescript
+const results = await client.twitter.searchPosts("AI");
+
+// Fetch the next page
+if (results.hasNextPage()) {
+  const page2 = await results.nextPage();
+  console.log(page2.data); // next 100 items
+}
+
+// Jump to a specific page
+const page5 = await results.getPage(5);
+```
+
+### Exporting to CSV
+
+Any paginated result can be exported to CSV. This triggers a server-side export and returns a download URL:
+
+```typescript
+const results = await client.twitter.searchPosts("AI");
+const csvUrl = await results.exportCsv();
+console.log(csvUrl); // URL to download the CSV file
+```
+
+## Response Types
+
+Search and query methods support a `responseType` option that controls how results are returned. Import the `ResponseType` enum:
+
+```typescript
+import { XpozClient, ResponseType } from "@xpoz/xpoz";
+```
+
+| Mode | Enum Value | Behavior | Best For |
+| --- | --- | --- | --- |
+| **Fast** | `ResponseType.Fast` | Returns up to 300 results immediately, no async polling | Quick queries, UI previews |
+| **Paging** | `ResponseType.Paging` | Async paginated query with full dataset access | Full analysis, large datasets |
+| **CSV** | `ResponseType.Csv` | Async bulk export, returns download URL via `exportCsv()` | Data exports |
+
+### Fast Mode (default)
+
+Returns results immediately without polling. Use `limit` to constrain the number of results (max 300):
+
+```typescript
+const results = await client.twitter.searchPosts("bitcoin", {
+  startDate: "2025-01-01",
+  responseType: ResponseType.Fast,
+  limit: 50,
+});
+console.log(results.data.length); // up to 50 results, returned immediately
+```
+
+<Tip>
+Fast mode skips async operation polling, making it significantly faster for small result sets. Use it when you need a quick preview or only need a limited number of results.
+</Tip>
+
+### Paging Mode
+
+Returns paginated results with full `totalRows`, `totalPages`, and navigation helpers:
+
+```typescript
+const results = await client.twitter.searchPosts("bitcoin", {
+  startDate: "2025-01-01",
+  responseType: ResponseType.Paging,
+});
+console.log(results.pagination.totalRows);  // total matching rows
+
+if (results.hasNextPage()) {
+  const page2 = await results.nextPage();
+}
+```
+
+### CSV Mode
+
+Initiates an async export. Call `exportCsv()` on the result to poll the export operation and get a download URL:
+
+```typescript
+const results = await client.twitter.searchPosts("bitcoin", {
+  startDate: "2025-01-01",
+  responseType: ResponseType.Csv,
+});
+const downloadUrl = await results.exportCsv();
+console.log(downloadUrl); // URL to download the CSV file
+```
+
+## Methods Supporting Response Types
+
+The following methods accept both `responseType` and `limit`:
+
+- `twitter.getPostsByAuthor()`, `twitter.searchPosts()`, `twitter.getUsersByKeywords()`
+- `instagram.getPostsByUser()`, `instagram.searchPosts()`, `instagram.getUsersByKeywords()`
+- `reddit.searchPosts()`
+- `tiktok.getPostsByUser()`, `tiktok.searchPosts()`, `tiktok.getUsersByKeywords()`, `tiktok.getPostsByHashtags()`, `tiktok.getUsersByHashtags()`
+
+These methods accept `limit` only (no `responseType`):
+
+- `twitter.searchUsers()`, `instagram.searchUsers()`, `reddit.searchUsers()`, `reddit.searchSubreddits()`, `tiktok.searchUsers()`
+
+<Note>
+For the equivalent pagination patterns in Python, see [Python SDK Pagination](/sdks/python/pagination). The Python SDK uses `ResponseType.FAST`, `ResponseType.PAGING`, and `ResponseType.CSV` (uppercase enum values) and snake_case field names.
+</Note>

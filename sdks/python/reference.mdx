@@ -1,0 +1,1333 @@
+---
+title: "Python SDK Reference"
+description: "Complete reference for the Xpoz Python SDK — all methods, parameters, and Pydantic models."
+---
+
+All methods are available on both `XpozClient` (sync) and `AsyncXpozClient` (async). Async methods have the same signature but return awaitables.
+
+## Twitter — `client.twitter`
+
+### Available Fields
+
+<Note>
+The Python SDK accepts snake_case field names and automatically maps them to the camelCase names used by the underlying MCP server.
+</Note>
+
+#### User Fields
+
+Pass these in the `fields` parameter on any user method (`get_user`, `search_users`, `get_user_connections`, `get_users_by_keywords`, `get_post_interacting_users`).
+
+**Default:** `id`, `username`, `name`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `name`, `description`, `location`, `profile_image_url`, `profile_banner_url` |
+| **Verification** | `verified`, `is_verified`, `verified_type`, `verified_since_datetime` |
+| **Metrics** | `followers_count`, `following_count`, `tweet_count`, `listed_count`, `likes_count`, `media_count` |
+| **Metadata** | `pinned_tweet_id`, `source`, `label`, `label_type`, `account_based_in`, `location_accurate` |
+| **History** | `username_changes`, `last_username_change_datetime`, `created_at` |
+
+`get_users_by_keywords` also returns aggregation fields: `agg_relevance`, `relevant_tweets_count`, `relevant_tweets_impressions_sum`, `relevant_tweets_likes_sum`, `relevant_tweets_quotes_sum`, `relevant_tweets_replies_sum`, `relevant_tweets_retweets_sum`.
+
+#### Post Fields
+
+Pass these in the `fields` parameter on any post method (`get_posts_by_ids`, `get_posts_by_author`, `search_posts`, `get_retweets`, `get_quotes`, `get_comments`).
+
+**Default:** `id`, `text`, `author_username`, `created_at_date`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `text`, `author_id`, `author_username`, `created_at`, `created_at_date` |
+| **Engagement** | `retweet_count`, `reply_count`, `like_count`, `quote_count`, `impression_count`, `bookmark_count` |
+| **Metadata** | `lang`, `possibly_sensitive`, `suspended`, `deleted`, `source`, `is_retweet`, `has_birdwatch_notes`, `status` |
+| **Birdwatch** | `birdwatch_notes_id`, `birdwatch_notes_text`, `birdwatch_notes_url` |
+| **Relations** | `conversation_id`, `quoted_tweet_id`, `retweeted_tweet_id`, `reply_to_tweet_id`, `reply_to_user_id`, `reply_to_username`, `original_tweet_id`, `edited_tweets` |
+| **Content** | `hashtags`, `mentions`, `media_urls`, `urls`, `grok_generated_content` |
+| **Location** | `country`, `region`, `city` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. For example, `["id", "text", "retweet_count", "like_count", "created_at_date"]` for engagement analysis. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### get_user
+
+Get a single Twitter user profile.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    user = client.twitter.get_user("elonmusk")
+    user = client.twitter.get_user("44196397", identifier_type="id")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    user = await client.twitter.get_user("elonmusk")
+    user = await client.twitter.get_user("44196397", identifier_type="id")
+    ```
+  </Tab>
+</Tabs>
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `str` | Yes | Username or user ID |
+| `identifier_type` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `fields` | `list[str]` | No | Fields to return (snake_case) |
+
+**Returns:** `TwitterUser`
+
+---
+
+### search_users
+
+Search users by name or username.
+
+```python
+users = client.twitter.search_users("elon")
+top_five = client.twitter.search_users("elon", limit=5)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `str` | Yes | Name or username to search |
+| `limit` | `int` | No | Max results (default: 10) |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `list[TwitterUser]`
+
+---
+
+### get_user_connections
+
+Get followers or following for a user.
+
+```python
+followers = client.twitter.get_user_connections("elonmusk", "followers")
+following = client.twitter.get_user_connections("elonmusk", "following")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `username` | `str` | Yes | Twitter username |
+| `connection_type` | `"followers" \| "following"` | Yes | Connection type |
+| `fields` | `list[str]` | No | Fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[TwitterUser]`
+
+---
+
+### get_users_by_keywords
+
+Find users who authored posts matching a keyword query. Includes aggregation fields like `relevant_tweets_count` and `relevant_tweets_likes_sum`.
+
+```python
+users = client.twitter.get_users_by_keywords(
+    '"machine learning"',
+    fields=["username", "name", "followers_count", "relevant_tweets_count"],
+    response_type=ResponseType.FAST,
+    limit=20,
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Keyword query (supports boolean operators) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `language` | `str` | No | Language filter |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TwitterUser]`
+
+---
+
+### get_posts_by_ids
+
+Get 1-100 posts by their IDs.
+
+```python
+tweets = client.twitter.get_posts_by_ids(["1234567890", "0987654321"])
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_ids` | `list[str]` | Yes | Array of post IDs (max 100) |
+| `fields` | `list[str]` | No | Fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `list[TwitterPost]`
+
+---
+
+### get_posts_by_author
+
+Get all posts by an author with optional date filtering.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    results = client.twitter.get_posts_by_author("elonmusk", start_date="2025-01-01")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    results = await client.twitter.get_posts_by_author("elonmusk", start_date="2025-01-01")
+    ```
+  </Tab>
+</Tabs>
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `str` | Yes | Username or user ID |
+| `identifier_type` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TwitterPost]`
+
+---
+
+### search_posts
+
+Full-text search across Twitter posts with filters.
+
+```python
+results = client.twitter.search_posts(
+    '"artificial intelligence" AND ethics',
+    start_date="2025-01-01",
+    end_date="2025-06-01",
+    language="en",
+    fields=["id", "text", "like_count", "author_username", "created_at_date"],
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Search query (supports exact phrases, boolean operators, grouping) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `author_username` | `str` | No | Filter by author username |
+| `author_id` | `str` | No | Filter by author ID |
+| `language` | `str` | No | Language code filter |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TwitterPost]`
+
+---
+
+### get_retweets
+
+Get retweets of a specific post.
+
+```python
+retweets = client.twitter.get_retweets("1234567890")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Post ID |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+
+**Returns:** `PaginatedResult[TwitterPost]`
+
+---
+
+### get_quotes
+
+Get quote tweets of a specific post.
+
+```python
+quotes = client.twitter.get_quotes("1234567890")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Post ID |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[TwitterPost]`
+
+---
+
+### get_comments
+
+Get replies to a specific post.
+
+```python
+comments = client.twitter.get_comments("1234567890")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Post ID |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[TwitterPost]`
+
+---
+
+### get_post_interacting_users
+
+Get users who interacted with a post.
+
+```python
+commenters = client.twitter.get_post_interacting_users("1234567890", "commenters")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Post ID |
+| `interaction_type` | `"commenters" \| "quoters" \| "retweeters"` | Yes | Interaction type |
+| `fields` | `list[str]` | No | Fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[TwitterUser]`
+
+---
+
+### count_posts
+
+Count tweets containing a phrase within a date range.
+
+```python
+count = client.twitter.count_posts("bitcoin", start_date="2025-01-01")
+print(f"{count:,} tweets mention bitcoin")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `phrase` | `str` | Yes | Phrase to count |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+
+**Returns:** `int`
+
+---
+
+## Instagram — `client.instagram`
+
+### Available Fields
+
+<Note>
+The Python SDK accepts snake_case field names and automatically maps them to the camelCase names used by the underlying MCP server.
+</Note>
+
+#### User Fields
+
+Pass these in the `fields` parameter on any user method (`get_user`, `search_users`, `get_user_connections`, `get_post_interacting_users`, `get_users_by_keywords`).
+
+**Default:** `id`, `username`, `full_name`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `full_name`, `biography`, `profile_pic_url`, `profile_pic_id`, `profile_url`, `external_url` |
+| **Status** | `is_private`, `is_verified`, `has_anonymous_profile_picture` |
+| **Metrics** | `follower_count`, `following_count`, `media_count` |
+
+`get_users_by_keywords` also returns aggregation fields: `agg_relevance`, `relevant_posts_count`, `relevant_posts_likes_sum`, `relevant_posts_comments_sum`, `relevant_posts_reshares_sum`, `relevant_posts_video_plays_sum`.
+
+#### Post Fields
+
+Pass these in the `fields` parameter on any post method (`get_posts_by_ids`, `get_posts_by_user`, `search_posts`).
+
+**Default:** `id`, `caption`, `username`, `created_at_date`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `post_type`, `user_id`, `username`, `full_name`, `caption`, `created_at`, `created_at_timestamp`, `created_at_date` |
+| **Engagement** | `like_count`, `comment_count`, `reshare_count`, `video_play_count` |
+| **Media** | `media_type`, `code_url`, `image_url`, `video_url`, `audio_only_url`, `profile_pic_url`, `video_subtitles_uri`, `subtitles`, `video_duration` |
+
+#### Comment Fields
+
+Pass these in the `fields` parameter on `get_comments`.
+
+**Default:** `id`, `text`, `username`, `created_at_date`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `text`, `parent_post_id`, `type`, `parent_comment_id`, `replied_to_comment_id`, `child_comment_count`, `user_id`, `username`, `full_name`, `created_at`, `created_at_timestamp`, `created_at_date` |
+| **Engagement** | `like_count` |
+| **Status** | `status`, `is_spam`, `has_translation` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### get_user
+
+Get a single Instagram user profile.
+
+```python
+user = client.instagram.get_user("instagram")
+print(f"{user.full_name} — {user.follower_count:,} followers")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `str` | Yes | Username or user ID |
+| `identifier_type` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `InstagramUser`
+
+---
+
+### search_users
+
+Search Instagram users by name.
+
+```python
+users = client.instagram.search_users("nasa")
+top_three = client.instagram.search_users("nasa", limit=3)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `str` | Yes | Name to search |
+| `limit` | `int` | No | Max results |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `list[InstagramUser]`
+
+---
+
+### get_user_connections
+
+Get followers or following for an Instagram user.
+
+```python
+followers = client.instagram.get_user_connections("instagram", "followers")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `username` | `str` | Yes | Instagram username |
+| `connection_type` | `"followers" \| "following"` | Yes | Connection type |
+| `fields` | `list[str]` | No | Fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[InstagramUser]`
+
+---
+
+### get_users_by_keywords
+
+Find users who authored posts matching a keyword query.
+
+```python
+users = client.instagram.get_users_by_keywords('"sustainable fashion"')
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Keyword query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[InstagramUser]`
+
+---
+
+### get_posts_by_ids
+
+Get Instagram posts by their IDs. Post IDs must be in strong_id format: `"media_id_user_id"`.
+
+```python
+posts = client.instagram.get_posts_by_ids(["3606450040306139062_4836333238"])
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_ids` | `list[str]` | Yes | Array of post IDs in strong_id format |
+| `fields` | `list[str]` | No | Fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `list[InstagramPost]`
+
+---
+
+### get_posts_by_user
+
+Get all posts by an Instagram user.
+
+```python
+results = client.instagram.get_posts_by_user("nasa")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `str` | Yes | Username or user ID |
+| `identifier_type` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[InstagramPost]`
+
+---
+
+### search_posts
+
+Full-text search across Instagram posts.
+
+```python
+results = client.instagram.search_posts("travel photography")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Search query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[InstagramPost]`
+
+---
+
+### get_comments
+
+Get comments on an Instagram post.
+
+```python
+comments = client.instagram.get_comments("3606450040306139062_4836333238")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Post ID (strong_id format) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[InstagramComment]`
+
+---
+
+### get_post_interacting_users
+
+Get users who interacted with an Instagram post.
+
+```python
+likers = client.instagram.get_post_interacting_users(
+    "3606450040306139062_4836333238", "likers"
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Post ID (strong_id format) |
+| `interaction_type` | `"commenters" \| "likers"` | Yes | Interaction type |
+| `fields` | `list[str]` | No | Fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[InstagramUser]`
+
+---
+
+## Reddit — `client.reddit`
+
+### Available Fields
+
+<Note>
+The Python SDK accepts snake_case field names and automatically maps them to the camelCase names used by the underlying MCP server.
+</Note>
+
+#### User Fields
+
+Pass these in the `fields` parameter on any user method (`get_user`, `search_users`, `get_users_by_keywords`).
+
+**Default:** `id`, `username`, `total_karma`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `profile_url`, `profile_pic_url`, `snoovatar_img`, `profile_description`, `profile_banner_url`, `profile_title` |
+| **Karma** | `link_karma`, `comment_karma`, `total_karma`, `awardee_karma`, `awarder_karma` |
+| **Status** | `is_gold`, `is_mod`, `is_employee`, `has_verified_email`, `is_suspended`, `verified`, `is_blocked`, `accept_followers`, `has_subscribed` |
+| **Settings** | `hide_from_robots`, `pref_show_snoovatar` |
+| **Timestamps** | `created_at`, `created_at_timestamp`, `created_at_date` |
+
+`get_users_by_keywords` also returns aggregation fields: `agg_relevance`, `relevant_posts_count`, `relevant_posts_upvotes_sum`, `relevant_posts_comments_count_sum`.
+
+#### Post Fields
+
+Pass these in the `fields` parameter on post methods (`search_posts`) or the `post_fields` parameter on `get_post_with_comments` and `get_subreddit_with_posts`.
+
+**Default:** `id`, `title`, `author_username`, `subreddit_name`, `created_at_date`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `title`, `selftext`, `url`, `permalink`, `post_url`, `thumbnail` |
+| **Author** | `author_id`, `author_username` |
+| **Subreddit** | `subreddit_name`, `subreddit_id` |
+| **Engagement** | `score`, `upvotes`, `downvotes`, `upvote_ratio`, `comments_count`, `crossposts_count` |
+| **Flags** | `is_self`, `is_video`, `is_original_content`, `over18`, `spoiler`, `locked`, `stickied`, `archived` |
+| **Meta** | `link_flair_text`, `post_hint`, `domain`, `crosspost_parent` |
+| **Timestamps** | `created_at`, `created_at_timestamp`, `created_at_date` |
+
+#### Comment Fields
+
+Pass these in the `fields` parameter on `search_comments` or the `comment_fields` parameter on `get_post_with_comments`.
+
+**Default:** `id`, `body`, `author_username`, `created_at_date`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `body`, `parent_post_id`, `parent_id` |
+| **Author** | `author_id`, `author_username` |
+| **Subreddit** | `post_subreddit_name`, `post_subreddit_id` |
+| **Engagement** | `score`, `upvotes`, `downvotes`, `controversiality` |
+| **Meta** | `depth`, `is_submitter`, `stickied`, `collapsed`, `edited`, `distinguished` |
+| **Timestamps** | `created_at`, `created_at_timestamp`, `created_at_date` |
+
+#### Subreddit Fields
+
+Pass these in the `fields` parameter on subreddit methods (`search_subreddits`, `get_subreddits_by_keywords`) or the `subreddit_fields` parameter on `get_subreddit_with_posts`.
+
+**Default:** `id`, `display_name`, `title`, `subscribers_count`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `display_name`, `title`, `public_description`, `description` |
+| **Stats** | `subscribers_count`, `active_user_count` |
+| **Meta** | `subreddit_type`, `over18`, `lang`, `url`, `subreddit_url` |
+| **Images** | `icon_img`, `banner_img`, `header_img`, `community_icon` |
+| **Timestamps** | `created_at`, `created_at_timestamp`, `created_at_date` |
+
+`get_subreddits_by_keywords` also returns aggregation fields: `agg_relevance`, `relevant_posts_count`, `relevant_posts_upvotes_sum`, `relevant_posts_comments_count_sum`.
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### get_user
+
+Get a single Reddit user profile.
+
+```python
+user = client.reddit.get_user("spez")
+print(f"{user.username} — {user.total_karma:,} karma")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `username` | `str` | Yes | Reddit username |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `RedditUser`
+
+---
+
+### search_users
+
+Search Reddit users by name.
+
+```python
+users = client.reddit.search_users("spez")
+top_three = client.reddit.search_users("spez", limit=3)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `str` | Yes | Name to search |
+| `limit` | `int` | No | Max results |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `list[RedditUser]`
+
+---
+
+### get_users_by_keywords
+
+Find Reddit users who authored posts matching a keyword query.
+
+```python
+users = client.reddit.get_users_by_keywords(
+    '"machine learning"', subreddit="MachineLearning"
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Keyword query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `subreddit` | `str` | No | Filter to subreddit |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[RedditUser]`
+
+---
+
+### search_posts
+
+Full-text search across Reddit posts.
+
+```python
+results = client.reddit.search_posts(
+    "python tutorial",
+    subreddit="learnpython",
+    sort="top",
+    time="month",
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Search query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `subreddit` | `str` | No | Filter to subreddit |
+| `sort` | `"relevance" \| "hot" \| "top" \| "new" \| "comments"` | No | Sort order |
+| `time` | `"hour" \| "day" \| "week" \| "month" \| "year" \| "all"` | No | Time filter |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[RedditPost]`
+
+---
+
+### get_post_with_comments
+
+Get a Reddit post with its comments.
+
+```python
+result = client.reddit.get_post_with_comments("abc123")
+print(result.post.title)
+for comment in result.comments:
+    print(f"  {comment.author_username}: {comment.body[:80]}")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Reddit post ID |
+| `post_fields` | `list[str]` | No | Post fields to return |
+| `comment_fields` | `list[str]` | No | Comment fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `RedditPostWithComments`
+
+The returned object contains:
+- `post` -- `RedditPost`
+- `comments` -- `list[RedditComment]`
+- `comments_pagination` -- `PaginationInfo | None`
+
+---
+
+### search_comments
+
+Search Reddit comments by keyword.
+
+```python
+comments = client.reddit.search_comments("helpful tip", subreddit="LifeProTips")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Search query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `subreddit` | `str` | No | Filter to subreddit |
+
+**Returns:** `PaginatedResult[RedditComment]`
+
+---
+
+### search_subreddits
+
+Search subreddits by name.
+
+```python
+subs = client.reddit.search_subreddits("machine learning")
+top_five = client.reddit.search_subreddits("machine learning", limit=5)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Subreddit name to search |
+| `limit` | `int` | No | Max results |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `list[RedditSubreddit]`
+
+---
+
+### get_subreddit_with_posts
+
+Get a subreddit with its posts.
+
+```python
+result = client.reddit.get_subreddit_with_posts("wallstreetbets")
+print(f"r/{result.subreddit.display_name} — {result.subreddit.subscribers_count:,} members")
+for post in result.posts:
+    print(f"  {post.title} ({post.score} points)")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `subreddit_name` | `str` | Yes | Subreddit name (without `r/` prefix) |
+| `subreddit_fields` | `list[str]` | No | Subreddit fields to return |
+| `post_fields` | `list[str]` | No | Post fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `SubredditWithPosts`
+
+The returned object contains:
+- `subreddit` -- `RedditSubreddit`
+- `posts` -- `list[RedditPost]`
+- `posts_pagination` -- `PaginationInfo | None`
+
+---
+
+### get_subreddits_by_keywords
+
+Find subreddits related to a keyword query.
+
+```python
+subs = client.reddit.get_subreddits_by_keywords("cryptocurrency")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Keyword query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[RedditSubreddit]`
+
+---
+
+## TikTok — `client.tiktok`
+
+### Available Fields
+
+<Note>
+The Python SDK accepts snake_case field names and automatically maps them to the camelCase names used by the underlying MCP server.
+</Note>
+
+#### User Fields
+
+Pass these in the `fields` parameter on any user method (`get_user`, `search_users`, `get_users_by_keywords`, `get_users_by_hashtags`).
+
+**Default:** `id`, `username`, `nickname`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `nickname`, `signature`, `sec_uid`, `avatar` |
+| **Status** | `is_private`, `is_verified` |
+| **Metrics** | `follower_count`, `following_count`, `like_count`, `post_count` |
+| **Locale** | `language`, `region` |
+| **Timestamps** | `created_at`, `username_modify_time` |
+
+`get_users_by_keywords` and `get_users_by_hashtags` also return aggregation fields: `agg_relevance`, `relevant_posts_count`, `relevant_posts_likes_sum`, `relevant_posts_comments_sum`, `relevant_posts_plays_sum`, `relevant_posts_forwards_sum`.
+
+#### Post Fields
+
+Pass these in the `fields` parameter on any post method (`get_posts_by_ids`, `get_posts_by_user`, `search_posts`, `get_posts_by_hashtags`).
+
+**Default:** `id`, `description`, `username`, `created_at_date`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `post_type`, `is_private`, `user_id`, `username`, `nickname`, `description`, `description_language`, `created_at`, `created_at_timestamp`, `created_at_date` |
+| **Engagement** | `collect_count`, `comment_count`, `like_count`, `download_count`, `forward_count`, `play_count` |
+| **Media** | `video_thumbnail`, `video_url` (array of video URLs), `duration` (video length in seconds) |
+| **Content** | `hashtags` (array of hashtag strings), `transcripts_json` |
+
+#### Comment Fields
+
+Pass these in the `fields` parameter on `get_comments`.
+
+**Default:** `id`, `text`, `username`, `created_at_date`
+
+| Category | Fields |
+|----------|--------|
+| **All** | `id`, `post_id`, `user_id`, `username`, `text`, `like_count`, `created_at`, `created_at_timestamp`, `created_at_date` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. For example, `["id", "description", "play_count", "like_count", "hashtags"]` for content analysis. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+### get_user
+
+Get a single TikTok user profile.
+
+```python
+user = client.tiktok.get_user("charlidamelio")
+print(f"{user.nickname} — {user.follower_count:,} followers")
+
+# By numeric ID
+user = client.tiktok.get_user("123456789", identifier_type="id")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `str` | Yes | Username or user ID |
+| `identifier_type` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `TiktokUser`
+
+---
+
+### search_users
+
+Search TikTok users by name.
+
+```python
+users = client.tiktok.search_users("charli")
+top_five = client.tiktok.search_users("charli", limit=5)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `str` | Yes | Name to search |
+| `limit` | `int` | No | Max results |
+| `fields` | `list[str]` | No | Fields to return |
+
+**Returns:** `list[TiktokUser]`
+
+---
+
+### get_users_by_keywords
+
+Find TikTok users who authored posts matching a keyword query.
+
+```python
+users = client.tiktok.get_users_by_keywords(
+    '"machine learning"',
+    response_type=ResponseType.FAST,
+    limit=20,
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Keyword query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TiktokUser]`
+
+---
+
+### get_posts_by_ids
+
+Get 1-100 TikTok posts by their IDs.
+
+```python
+posts = client.tiktok.get_posts_by_ids(["7123456789012345678"])
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_ids` | `list[str]` | Yes | Array of post IDs (max 100) |
+| `fields` | `list[str]` | No | Fields to return |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `list[TiktokPost]`
+
+---
+
+### get_posts_by_user
+
+Get all posts by a TikTok user.
+
+```python
+results = client.tiktok.get_posts_by_user("charlidamelio", start_date="2025-01-01")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `identifier` | `str` | Yes | Username or user ID |
+| `identifier_type` | `"username" \| "id"` | No | Identifier type (default: `"username"`) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TiktokPost]`
+
+---
+
+### search_posts
+
+Full-text search across TikTok posts.
+
+```python
+results = client.tiktok.search_posts(
+    "travel vlog",
+    start_date="2025-01-01",
+    response_type=ResponseType.FAST,
+    limit=30,
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | `str` | Yes | Search query |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TiktokPost]`
+
+---
+
+### get_posts_by_hashtags
+
+Search TikTok posts by hashtags. Pass bare alphanumeric tags (no leading `#`). Max 5 hashtags per request; OR semantics across the list.
+
+```python
+results = client.tiktok.get_posts_by_hashtags(
+    ["dance", "fyp"],
+    response_type=ResponseType.FAST,
+    limit=50,
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `hashtags` | `list[str]` | Yes | Hashtags to search (max 5, no `#` prefix) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TiktokPost]`
+
+---
+
+### get_users_by_hashtags
+
+Find TikTok users who authored posts tagged with the given hashtags. Same input rules as `get_posts_by_hashtags`.
+
+```python
+users = client.tiktok.get_users_by_hashtags(
+    ["sustainable_fashion"],
+    response_type=ResponseType.FAST,
+    limit=20,
+)
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `hashtags` | `list[str]` | Yes | Hashtags to search (max 5, no `#` prefix) |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+| `response_type` | `ResponseType` | No | Response mode |
+| `limit` | `int` | No | Max results (fast mode) |
+
+**Returns:** `PaginatedResult[TiktokUser]`
+
+---
+
+### get_comments
+
+Get comments on a TikTok post.
+
+```python
+comments = client.tiktok.get_comments("7123456789012345678")
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `post_id` | `str` | Yes | Post ID |
+| `fields` | `list[str]` | No | Fields to return |
+| `start_date` | `str` | No | Start date (YYYY-MM-DD) |
+| `end_date` | `str` | No | End date (YYYY-MM-DD) |
+| `force_latest` | `bool` | No | Force fresh data fetch |
+
+**Returns:** `PaginatedResult[TiktokComment]`
+
+---
+
+## Type Models
+
+All models are Pydantic v2 `BaseModel` subclasses with `extra="allow"` (unknown fields are preserved). All fields are `Optional` and default to `None`. Field names use snake_case.
+
+### TwitterPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Post ID |
+| `text` | `str` | Post text content |
+| `author_id` | `str` | Author's user ID |
+| `author_username` | `str` | Author's username |
+| `like_count` | `int` | Number of likes |
+| `retweet_count` | `int` | Number of retweets |
+| `reply_count` | `int` | Number of replies |
+| `quote_count` | `int` | Number of quotes |
+| `impression_count` | `int` | Number of impressions |
+| `bookmark_count` | `int` | Number of bookmarks |
+| `lang` | `str` | Language code |
+| `hashtags` | `list[str]` | Hashtags in tweet |
+| `mentions` | `list[str]` | Mentioned usernames |
+| `media_urls` | `list[str]` | Media attachment URLs |
+| `urls` | `list[str]` | URLs in tweet text |
+| `country` | `str` | Country (if geo-tagged) |
+| `created_at` | `str` | Creation timestamp |
+| `created_at_date` | `str` | Creation date (YYYY-MM-DD) |
+| `conversation_id` | `str` | Thread conversation ID |
+| `quoted_tweet_id` | `str` | ID of quoted tweet |
+| `reply_to_tweet_id` | `str` | ID of parent tweet |
+| `possibly_sensitive` | `bool` | Sensitive content flag |
+| `is_retweet` | `bool` | Whether this is a retweet |
+| `has_birdwatch_notes` | `bool` | Has community notes |
+| `birdwatch_notes_id` | `str` | Birdwatch note ID |
+| `birdwatch_notes_text` | `str` | Birdwatch note text |
+| `birdwatch_notes_url` | `str` | Birdwatch note URL |
+| `status` | `str` | Tweet status |
+
+### TwitterUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | User ID |
+| `username` | `str` | Username (handle) |
+| `name` | `str` | Display name |
+| `description` | `str` | Bio text |
+| `location` | `str` | Location string |
+| `verified` | `bool` | Verification status |
+| `verified_type` | `str` | Verification type |
+| `followers_count` | `int` | Number of followers |
+| `following_count` | `int` | Number of following |
+| `tweet_count` | `int` | Total tweets |
+| `likes_count` | `int` | Total likes |
+| `profile_image_url` | `str` | Profile picture URL |
+| `created_at` | `str` | Account creation timestamp |
+| `account_based_in` | `str` | Account location |
+
+### InstagramPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Post ID (strong_id format) |
+| `caption` | `str` | Post caption |
+| `username` | `str` | Author username |
+| `full_name` | `str` | Author display name |
+| `like_count` | `int` | Number of likes |
+| `comment_count` | `int` | Number of comments |
+| `reshare_count` | `int` | Number of reshares |
+| `video_play_count` | `int` | Video play count |
+| `media_type` | `str` | Media type |
+| `image_url` | `str` | Image URL |
+| `video_url` | `str` | Video URL |
+| `created_at_date` | `str` | Creation date |
+
+### InstagramUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | User ID |
+| `username` | `str` | Username |
+| `full_name` | `str` | Display name |
+| `biography` | `str` | Bio text |
+| `is_private` | `bool` | Private account |
+| `is_verified` | `bool` | Verified status |
+| `follower_count` | `int` | Followers |
+| `following_count` | `int` | Following |
+| `media_count` | `int` | Total posts |
+| `profile_pic_url` | `str` | Profile picture URL |
+
+### InstagramComment
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Comment ID |
+| `text` | `str` | Comment text |
+| `username` | `str` | Author username |
+| `parent_post_id` | `str` | Parent post ID |
+| `like_count` | `int` | Number of likes |
+| `child_comment_count` | `int` | Reply count |
+| `created_at_date` | `str` | Creation date |
+
+### RedditPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Post ID |
+| `title` | `str` | Post title |
+| `selftext` | `str` | Post body text |
+| `author_username` | `str` | Author username |
+| `subreddit_name` | `str` | Subreddit name |
+| `score` | `int` | Net score |
+| `upvotes` | `int` | Upvote count |
+| `comments_count` | `int` | Comment count |
+| `url` | `str` | Post URL |
+| `permalink` | `str` | Reddit permalink |
+| `is_self` | `bool` | Self post (text only) |
+| `over18` | `bool` | NSFW flag |
+| `created_at_date` | `str` | Creation date |
+
+### RedditUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | User ID |
+| `username` | `str` | Username |
+| `total_karma` | `int` | Total karma |
+| `link_karma` | `int` | Link karma |
+| `comment_karma` | `int` | Comment karma |
+| `is_gold` | `bool` | Reddit Gold status |
+| `is_mod` | `bool` | Moderator status |
+| `profile_description` | `str` | Profile bio |
+| `created_at_date` | `str` | Account creation date |
+
+### RedditComment
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Comment ID |
+| `body` | `str` | Comment text |
+| `author_username` | `str` | Author username |
+| `parent_post_id` | `str` | Parent post ID |
+| `score` | `int` | Net score |
+| `depth` | `int` | Nesting depth |
+| `is_submitter` | `bool` | Is OP |
+| `created_at_date` | `str` | Creation date |
+
+### RedditSubreddit
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Subreddit ID |
+| `display_name` | `str` | Subreddit name |
+| `title` | `str` | Subreddit title |
+| `public_description` | `str` | Short description |
+| `description` | `str` | Full description |
+| `subscribers_count` | `int` | Subscriber count |
+| `active_user_count` | `int` | Active users |
+| `over18` | `bool` | NSFW flag |
+| `created_at_date` | `str` | Creation date |
+
+### TiktokPost
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Post ID |
+| `description` | `str` | Post caption/description |
+| `description_language` | `str` | Language of description |
+| `user_id` | `str` | Author user ID |
+| `username` | `str` | Author username |
+| `nickname` | `str` | Author display name |
+| `like_count` | `int` | Number of likes |
+| `comment_count` | `int` | Number of comments |
+| `play_count` | `int` | Video play count |
+| `collect_count` | `int` | Number of collects/saves |
+| `download_count` | `int` | Number of downloads |
+| `forward_count` | `int` | Number of forwards/shares |
+| `video_thumbnail` | `str` | Thumbnail URL |
+| `video_url` | `list[str]` | Array of video URLs |
+| `duration` | `int` | Video duration in seconds |
+| `hashtags` | `list[str]` | Hashtags in the post |
+| `post_type` | `int` | Post type code |
+| `is_private` | `bool` | Private post flag |
+| `created_at` | `str` | Creation timestamp |
+| `created_at_date` | `str` | Creation date (YYYY-MM-DD) |
+
+### TiktokUser
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | User ID |
+| `username` | `str` | Username |
+| `nickname` | `str` | Display name |
+| `signature` | `str` | Bio text |
+| `sec_uid` | `str` | Secure user ID |
+| `avatar` | `str` | Profile picture URL |
+| `is_private` | `bool` | Private account |
+| `is_verified` | `bool` | Verified status |
+| `follower_count` | `int` | Number of followers |
+| `following_count` | `int` | Number of following |
+| `like_count` | `int` | Total likes received |
+| `post_count` | `int` | Total posts |
+| `language` | `str` | Profile language |
+| `region` | `str` | Account region |
+| `created_at` | `str` | Account creation date |
+
+### TiktokComment
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `str` | Comment ID |
+| `post_id` | `str` | Parent post ID |
+| `user_id` | `str` | Author user ID |
+| `username` | `str` | Author username |
+| `text` | `str` | Comment text |
+| `like_count` | `int` | Number of likes |
+| `created_at` | `str` | Creation timestamp |
+| `created_at_date` | `str` | Creation date (YYYY-MM-DD) |
+
+### Composite Types
+
+**`RedditPostWithComments`** -- returned by `get_post_with_comments()`:
+
+- `post: RedditPost`
+- `comments: list[RedditComment]`
+- `comments_pagination: PaginationInfo | None`
+
+**`SubredditWithPosts`** -- returned by `get_subreddit_with_posts()`:
+
+- `subreddit: RedditSubreddit`
+- `posts: list[RedditPost]`
+- `posts_pagination: PaginationInfo | None`
+
+<Note>
+For the TypeScript equivalent of these types, see [TypeScript SDK Reference](/sdks/typescript/reference). The TypeScript SDK uses plain interfaces with camelCase field names (e.g., `likeCount` instead of `like_count`).
+</Note>

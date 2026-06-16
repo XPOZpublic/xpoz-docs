@@ -1,0 +1,140 @@
+---
+title: "Pagination"
+description: "Iterate through large result sets using server-side pagination with cached tables"
+---
+
+When you use `responseType: "paging"`, the Xpoz MCP server creates a server-side cached table and returns results 100 items per page. This enables efficient iteration through large datasets without re-executing the underlying query.
+
+## How It Works
+
+```
+1. First call (with responseType: "paging")
+   ├── Server executes the query
+   ├── Creates a cached pagination table
+   ├── Returns page 1 + metadata
+   └── tableName: "op_getTwitterPostsByKeywords_1718..."
+
+2. Subsequent calls (with tableName + pageNumber)
+   ├── Server looks up the cached table
+   ├── Returns the requested page (O(1) lookup)
+   └── No query re-execution needed
+```
+
+## First Call
+
+Set `responseType` to `"paging"` on your initial request. The response includes pagination metadata alongside the first page of results.
+
+**Example -- search Twitter posts:**
+
+```json
+{
+  "tool": "getTwitterPostsByKeywords",
+  "arguments": {
+    "query": "artificial intelligence",
+    "responseType": "paging"
+  }
+}
+```
+
+**Response metadata:**
+
+| Field | Type | Description |
+|---|---|---|
+| `tableName` | string | Identifier for the cached pagination table |
+| `totalPages` | number | Total number of pages available |
+| `totalRows` | number | Total number of matching results |
+| `pageSize` | number | Items per page (always 100) |
+| `pageNumber` | number | Current page number (1 on first call) |
+
+## Fetching Additional Pages
+
+Pass the `tableName` from the first response along with the desired `pageNumber`:
+
+```json
+{
+  "tool": "getTwitterPostsByKeywords",
+  "arguments": {
+    "tableName": "op_getTwitterPostsByKeywords_1718123456_abc",
+    "pageNumber": 2
+  }
+}
+```
+
+<Note>
+  When fetching subsequent pages, you only need `tableName` and `pageNumber`. The original query parameters are not required -- the cached table already contains the full result set.
+</Note>
+
+## Iterating Through All Pages
+
+A typical pattern for retrieving all results:
+
+```
+Step 1: Call tool with responseType: "paging"
+        → Get tableName, totalPages, page 1 data
+
+Step 2: Loop from page 2 to totalPages
+        → Call tool with tableName + pageNumber
+        → Process each page of results
+
+Step 3: All data retrieved
+```
+
+**Example conversation flow:**
+
+```
+Agent: I'll search for AI-related tweets and iterate through all results.
+
+Call 1: getTwitterPostsByKeywords(query: "AI", responseType: "paging")
+→ tableName: "op_..._abc", totalPages: 5, totalRows: 487, page 1 (100 items)
+
+Call 2: getTwitterPostsByKeywords(tableName: "op_..._abc", pageNumber: 2)
+→ page 2 (100 items)
+
+Call 3: getTwitterPostsByKeywords(tableName: "op_..._abc", pageNumber: 3)
+→ page 3 (100 items)
+
+Call 4: getTwitterPostsByKeywords(tableName: "op_..._abc", pageNumber: 4)
+→ page 4 (100 items)
+
+Call 5: getTwitterPostsByKeywords(tableName: "op_..._abc", pageNumber: 5)
+→ page 5 (87 items)
+```
+
+## Bulk Page Fetching
+
+Some tools support fetching multiple pages at once using the `pageNumberEnd` parameter:
+
+```json
+{
+  "tool": "getTwitterPostsByKeywords",
+  "arguments": {
+    "tableName": "op_..._abc",
+    "pageNumber": 1,
+    "pageNumberEnd": 5
+  }
+}
+```
+
+This returns pages 1 through 5 in a single response, reducing the number of round trips.
+
+## Page Size
+
+All paginated tools use a fixed page size of **100 items per page**. User connection tools (`getTwitterUserConnections`, `getInstagramUserConnections`) use **1,000 users per page** with default fields.
+
+## Table Lifecycle
+
+Cached pagination tables are temporary and managed automatically:
+
+- Tables are created when the first `paging` request is made
+- The server handles cleanup automatically
+- If a table expires or is not found, re-issue the original query with `responseType: "paging"` to create a new one
+
+<Warning>
+  Do not store `tableName` values for long-term use. They are temporary identifiers tied to a specific query execution. Always be prepared to re-query if a table is no longer available.
+</Warning>
+
+## Related
+
+- [Response Modes](/mcp/response-modes) -- Choosing between fast, paging, and CSV
+- [Field Selection](/mcp/field-selection) -- Reduce page payload size by selecting specific fields
+- [Operations](/mcp/operations) -- Long-running operations that produce paginated results

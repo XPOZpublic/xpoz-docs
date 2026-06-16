@@ -1,0 +1,163 @@
+---
+title: "Python SDK Pagination"
+description: "Navigate paginated results, choose response types, and export data to CSV with the Xpoz Python SDK."
+---
+
+## PaginatedResult
+
+Methods that return large datasets use server-side pagination (100 items per page). These return a `PaginatedResult[T]` (sync) or `AsyncPaginatedResult[T]` (async) with built-in navigation helpers.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    results = client.twitter.search_posts("AI")
+
+    # Access current page data
+    results.data                        # list[TwitterPost] — current page items
+    results.pagination.total_rows       # total matching rows
+    results.pagination.total_pages      # total pages
+    results.pagination.page_number      # current page number
+    results.pagination.page_size        # items per page (100)
+    results.pagination.results_count    # items on current page
+    results.has_next_page()             # bool
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    results = await client.twitter.search_posts("AI")
+
+    # Same attributes, but navigation methods are awaited
+    results.data                        # list[TwitterPost]
+    results.pagination.total_rows       # total matching rows
+    results.has_next_page()             # bool
+    ```
+  </Tab>
+</Tabs>
+
+### Navigating Pages
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    results = client.twitter.search_posts("AI")
+
+    # Fetch the next page
+    if results.has_next_page():
+        page2 = results.next_page()
+        print(page2.data)  # next 100 items
+
+    # Jump to a specific page
+    page5 = results.get_page(5)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    results = await client.twitter.search_posts("AI")
+
+    # Fetch the next page
+    if results.has_next_page():
+        page2 = await results.next_page()
+
+    # Jump to a specific page
+    page5 = await results.get_page(5)
+    ```
+  </Tab>
+</Tabs>
+
+### Exporting to CSV
+
+Any paginated result can be exported to CSV. This triggers a server-side export and returns a download URL.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    results = client.twitter.search_posts("AI")
+    csv_url = results.export_csv()
+    print(csv_url)  # URL to download the CSV file
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    results = await client.twitter.search_posts("AI")
+    csv_url = await results.export_csv()
+    print(csv_url)
+    ```
+  </Tab>
+</Tabs>
+
+## Response Types
+
+Methods that return `PaginatedResult` support a `response_type` parameter to control how results are fetched. Import the `ResponseType` enum:
+
+```python
+from xpoz import XpozClient, ResponseType
+```
+
+| Mode | Enum Value | Behavior | Best For |
+| --- | --- | --- | --- |
+| **Fast** | `ResponseType.FAST` | Returns up to `limit` results immediately, no polling | Quick queries, UI previews |
+| **Paging** | `ResponseType.PAGING` | Async paginated query with full dataset access | Full analysis, large datasets |
+| **CSV** | `ResponseType.CSV` | Async bulk export, returns download URL via `export_csv()` | Data exports |
+
+### Fast Mode (default)
+
+Returns results immediately without polling. This is the default behavior when `response_type` is not specified.
+
+```python
+results = client.twitter.search_posts(
+    "bitcoin",
+    limit=10,
+    fields=["id", "text", "like_count"],
+)
+# Equivalent to response_type=ResponseType.FAST
+for tweet in results.data:
+    print(tweet.text)
+```
+
+<Tip>
+Fast mode skips async operation polling, making it significantly faster for small result sets. Use it when you need a quick preview or only need a limited number of results.
+</Tip>
+
+### Paging Mode
+
+Returns full paginated results (100 items per page). Use this when you need to iterate through all results.
+
+```python
+results = client.twitter.search_posts(
+    "bitcoin",
+    response_type=ResponseType.PAGING,
+)
+print(results.pagination.total_rows)  # total matching rows
+```
+
+### CSV Mode
+
+Triggers a server-side CSV export. The result contains no inline data -- call `export_csv()` to get the download URL.
+
+```python
+results = client.twitter.search_posts(
+    "bitcoin",
+    response_type=ResponseType.CSV,
+)
+csv_url = results.export_csv()
+print(csv_url)  # URL to download the CSV file
+```
+
+## Methods Supporting Response Types
+
+The following methods accept both `response_type` and `limit`:
+
+| Platform | Method |
+| --- | --- |
+| Twitter | `search_posts`, `get_posts_by_author`, `get_users_by_keywords` |
+| Instagram | `search_posts`, `get_posts_by_user`, `get_users_by_keywords` |
+| Reddit | `search_posts` |
+| TikTok | `search_posts`, `get_posts_by_user`, `get_users_by_keywords` |
+
+These methods accept `limit` only (no `response_type`):
+
+- `twitter.search_users()`, `instagram.search_users()`, `reddit.search_users()`, `reddit.search_subreddits()`, `tiktok.search_users()`
+
+<Note>
+For the equivalent pagination patterns in TypeScript, see [TypeScript SDK Pagination](/sdks/typescript/pagination). The TypeScript SDK uses `ResponseType.Fast`, `ResponseType.Paging`, and `ResponseType.Csv` (PascalCase enum values) and camelCase field names.
+</Note>

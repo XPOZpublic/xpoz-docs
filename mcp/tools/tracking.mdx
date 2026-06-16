@@ -1,0 +1,88 @@
+---
+title: "Tracking Tools"
+description: "Track keywords, users, subreddits, and hashtags across Twitter/X, Instagram, Reddit, and TikTok."
+---
+
+Xpoz provides **3 tools** for managing tracked items. Tracked items are monitored continuously, ensuring fresh data is available for your searches.
+
+## Tracked Item Schema
+
+Every tracked item has three fields:
+
+| Field | Type | Values | Description |
+|-------|------|--------|-------------|
+| `phrase` | string | Any non-empty string | The keyword, username, subreddit name, or hashtag to track. |
+| `type` | string | `"keyword"`, `"user"`, `"subreddit"`, `"hashtag"` | Type of item. `"subreddit"` is Reddit-only. `"hashtag"` is TikTok-only. |
+| `platform` | string | `"twitter"`, `"instagram"`, `"reddit"`, `"tiktok"` | Target platform. |
+
+<Note>
+The number of tracked items is limited by your plan. Use `getAccountDetails` to check your current limits and usage.
+</Note>
+
+---
+
+## Tools
+
+### getTrackedItems
+
+Get all tracked keywords and users for the authenticated user.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `feedback` | string | No | Free-form product feedback. |
+
+Returns an array of tracked items, each with `phrase`, `type`, and `platform`.
+
+<Tip>
+Call `getTrackedItems` before using `removeTrackedItems` to see the exact items you can remove.
+</Tip>
+
+---
+
+### addTrackedItems
+
+Add keywords, users, subreddits, or hashtags to track.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `items` | TrackedItem[] | Yes | Array of items to track (minimum 1). Each item has `phrase`, `type`, and `platform`. |
+| `feedback` | string | No | Free-form product feedback. |
+
+**Example `items` value:**
+
+```json
+[
+  { "phrase": "AI agents", "type": "keyword", "platform": "twitter" },
+  { "phrase": "elonmusk", "type": "user", "platform": "twitter" },
+  { "phrase": "wallstreetbets", "type": "subreddit", "platform": "reddit" },
+  { "phrase": "machinelearning", "type": "hashtag", "platform": "tiktok" }
+]
+```
+
+Returns an error if adding the items would exceed your plan's tracking limit.
+
+---
+
+### removeTrackedItems
+
+Remove tracked keywords, users, subreddits, or hashtags.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `items` | TrackedItem[] | Yes | Array of items to remove (minimum 1). Each item must match an existing tracked item by `phrase`, `type`, and `platform`. |
+| `feedback` | string | No | Free-form product feedback. |
+
+<Note>
+Items must match exactly by `phrase`, `type`, and `platform`. Call `getTrackedItems` first to see the exact values to use.
+</Note>
+
+---
+
+## Platform and Type Compatibility
+
+| Type | Twitter | Instagram | Reddit | TikTok |
+|------|---------|-----------|--------|--------|
+| `keyword` | Yes | Yes | Yes | Yes |
+| `user` | Yes | Yes | Yes | Yes |
+| `subreddit` | -- | -- | Yes | -- |
+| `hashtag` | -- | -- | -- | Yes |

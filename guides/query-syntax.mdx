@@ -1,0 +1,256 @@
+---
+title: Query Syntax
+description: Master Xpoz's Lucene-style search syntax with boolean operators, exact phrases, and grouping.
+---
+
+All `search*` and `get*ByKeywords` methods across every platform accept a `query` parameter that supports Lucene-style full-text search. This guide covers every operator with practical examples.
+
+## Basic syntax
+
+### Plain text (OR by default)
+
+Space-separated terms without quotes match posts containing **any** of the words. A bare space is treated as `OR`:
+
+```
+AI crypto blockchain
+```
+
+This returns posts containing "AI" **or** "crypto" **or** "blockchain".
+
+<Note>
+  Because bare spaces default to OR, always use explicit `AND` when you need all terms present.
+</Note>
+
+### Exact phrases
+
+Wrap terms in double quotes to match the exact phrase:
+
+```
+"machine learning"
+"climate change"
+"artificial intelligence"
+```
+
+Only posts containing the exact phrase (in that word order) are returned.
+
+## Boolean operators
+
+Use `AND` and `OR` to combine terms. Operators are **case-insensitive** (`and`, `AND`, `And` all work).
+
+### AND -- both terms required
+
+```
+AI AND robotics
+"deep learning" AND python
+Tesla AND "quarterly earnings"
+```
+
+### OR -- either term matches
+
+```
+Tesla OR SpaceX
+pytorch OR tensorflow
+"machine learning" OR "deep learning"
+```
+
+## Grouping with parentheses
+
+Combine operators with parentheses for complex queries:
+
+```
+(AI OR ML) AND (healthcare OR medical)
+(AI OR "artificial intelligence") AND ethics
+("machine learning" OR "deep learning") AND python
+```
+
+## Common patterns
+
+| Use case | Query |
+|----------|-------|
+| Brand monitoring | `"your brand" OR @yourbrand` |
+| Competitor comparison | `(CompanyA OR CompanyB) AND "product launch"` |
+| Sentiment on a topic | `"electric vehicles" AND (love OR hate OR amazing OR terrible)` |
+| Industry trends | `("generative AI" OR "large language models") AND 2025` |
+| Job market signals | `(hiring OR "open role") AND "data scientist"` |
+| Academic research | `"climate change" AND (study OR research OR paper)` |
+| Product feedback | `"your product" AND (bug OR issue OR broken OR love OR amazing)` |
+
+## SDK examples
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import { XpozClient, ResponseType } from '@xpoz/xpoz';
+
+    const client = new XpozClient({ apiKey: 'your-api-key' });
+    await client.connect();
+
+    // Exact phrase with boolean operators
+    const results = await client.twitter.searchPosts(
+      '("machine learning" OR "deep learning") AND python ',
+      {
+        startDate: '2025-01-01',
+        language: 'en',
+        responseType: ResponseType.Fast,
+        limit: 50,
+        fields: ['id', 'text', 'likeCount', 'authorUsername', 'createdAtDate'],
+      }
+    );
+
+    for (const post of results.data) {
+      console.log(`@${post.authorUsername}: ${post.text}`);
+    }
+
+    await client.close();
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    from xpoz import XpozClient, ResponseType
+
+    with XpozClient("your-api-key") as client:
+        results = client.twitter.search_posts(
+            '("machine learning" OR "deep learning") AND python ',
+            start_date="2025-01-01",
+            language="en",
+            response_type=ResponseType.FAST,
+            limit=50,
+            fields=["id", "text", "like_count", "author_username", "created_at_date"],
+        )
+
+        for post in results.data:
+            print(f"@{post.author_username}: {post.text}")
+    ```
+  </Tab>
+  <Tab title="MCP (Claude)">
+    Ask your AI agent:
+    ```
+    Search Twitter for posts matching ("machine learning" OR "deep learning")
+    AND python , from the last 30 days, in English.
+    Show me the top 50 results with author, text, and like count.
+    ```
+  </Tab>
+</Tabs>
+
+<Accordion title="Advanced patterns">
+  ## Multi-platform search
+
+  The same query syntax works across all platforms. Platform behavior is consistent, but content differs:
+
+  | Platform | Search methods |
+  |----------|---------------|
+  | Twitter/X | `searchPosts`, `getUsersByKeywords` |
+  | Instagram | `searchPosts`, `getUsersByKeywords` |
+  | Reddit | `searchPosts`, `searchComments`, `getUsersByKeywords`, `getSubredditsByKeywords` |
+  | TikTok | `searchPosts`, `getUsersByKeywords` |
+
+  ## Combining with dedicated parameters
+
+  Do **not** embed platform-specific operators in the query string. Use the dedicated parameters instead:
+
+  | Instead of... | Use parameter |
+  |---------------|---------------|
+  | `from:elonmusk` | `authorUsername: "elonmusk"` (TS) / `author_username="elonmusk"` (Python) |
+  | `lang:en` | `language: "en"` (TS) / `language="en"` (Python) |
+  | `since:2025-01-01` | `startDate: "2025-01-01"` (TS) / `start_date="2025-01-01"` (Python) |
+  | `until:2025-06-01` | `endDate: "2025-06-01"` (TS) / `end_date="2025-06-01"` (Python) |
+
+  <Tabs>
+    <Tab title="TypeScript">
+      ```typescript
+      const results = await client.twitter.searchPosts(
+        '"artificial intelligence" AND ethics',
+        {
+          startDate: '2025-01-01',
+          endDate: '2025-06-01',
+          language: 'en',
+          fields: ['id', 'text', 'likeCount', 'authorUsername'],
+        }
+      );
+      ```
+    </Tab>
+    <Tab title="Python">
+      ```python
+      results = client.twitter.search_posts(
+          '"artificial intelligence" AND ethics',
+          start_date="2025-01-01",
+          end_date="2025-06-01",
+          language="en",
+          fields=["id", "text", "like_count", "author_username"],
+      )
+      ```
+    </Tab>
+  </Tabs>
+
+  ## Reddit-specific filters
+
+  Reddit search methods accept additional parameters for sorting and time filtering:
+
+  <Tabs>
+    <Tab title="TypeScript">
+      ```typescript
+      const results = await client.reddit.searchPosts('python tutorial', {
+        subreddit: 'learnpython',
+        sort: 'top',
+        time: 'month',
+        responseType: ResponseType.Fast,
+        limit: 25,
+      });
+      ```
+    </Tab>
+    <Tab title="Python">
+      ```python
+      results = client.reddit.search_posts(
+          "python tutorial",
+          subreddit="learnpython",
+          sort="top",
+          time="month",
+          response_type=ResponseType.FAST,
+          limit=25,
+      )
+      ```
+    </Tab>
+  </Tabs>
+
+  Reddit sort options: `relevance`, `hot`, `top`, `new`, `comments`.
+  Time filters: `hour`, `day`, `week`, `month`, `year`, `all`.
+</Accordion>
+
+<Accordion title="Troubleshooting">
+  ## Common mistakes
+
+  **Forgetting quotes for exact phrases:**
+  - `machine learning` matches "machine" OR "learning" (two separate words)
+  - `"machine learning"` matches the exact phrase
+
+  **Implicit OR behavior:**
+  - `AI blockchain crypto` returns posts with ANY of these terms
+  - `AI AND blockchain AND crypto` returns posts with ALL three terms
+
+  **Nested parentheses:**
+  - Keep grouping to one level of nesting for best results
+  - `(A OR B) AND (C OR D)` works well
+  - Deeply nested queries may produce unexpected results
+
+  **Empty results:**
+  - Broaden your date range or remove restrictive filters
+  - Try fewer AND conditions
+  - Check spelling of exact phrases
+</Accordion>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Response Modes" icon="gauge" href="/mcp/response-modes">
+    Choose fast, paging, or CSV for your queries
+  </Card>
+  <Card title="Field Selection" icon="filter" href="/mcp/field-selection">
+    Reduce response size by selecting specific fields
+  </Card>
+  <Card title="CSV Exports" icon="file-csv" href="/guides/csv-exports">
+    Export large result sets to CSV
+  </Card>
+  <Card title="Best Practices" icon="lightbulb" href="/guides/best-practices">
+    Optimize queries for performance
+  </Card>
+</CardGroup>

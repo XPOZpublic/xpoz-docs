@@ -1,0 +1,258 @@
+---
+title: "Instagram Tools"
+description: "Search Instagram users, posts, comments, and engagement with 9 MCP tools."
+---
+
+Xpoz provides **9 Instagram tools** across three categories: users, posts, and comments.
+
+## Available Fields
+
+### User Fields
+
+These fields are available on all user tools (`getInstagramUser`, `searchInstagramUsers`, `getInstagramUserConnections`, `getInstagramPostInteractingUsers`, `getInstagramUsersByKeywords`).
+
+**Default:** `id`, `username`, `fullName`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `fullName`, `biography`, `profilePicUrl`, `profilePicId`, `profileUrl`, `externalUrl` |
+| **Status** | `isPrivate`, `isVerified`, `hasAnonymousProfilePicture` |
+| **Metrics** | `followerCount`, `followingCount`, `mediaCount` |
+
+`getInstagramUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsVideoPlaysSum`.
+
+### Post Fields
+
+These fields are available on all post tools (`getInstagramPostsByIds`, `getInstagramPostsByUser`, `getInstagramPostsByKeywords`).
+
+**Default:** `id`, `caption`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `postType`, `userId`, `username`, `fullName`, `caption`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `videoPlayCount` |
+| **Media** | `mediaType`, `codeUrl`, `imageUrl`, `videoUrl`, `audioOnlyUrl`, `profilePicUrl`, `videoSubtitlesUri`, `subtitles`, `videoDuration` |
+
+### Comment Fields
+
+These fields are available on `getInstagramCommentsByPostId`.
+
+**Default:** `id`, `text`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `text`, `parentPostId`, `type`, `parentCommentId`, `repliedToCommentId`, `childCommentCount`, `userId`, `username`, `fullName`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+| **Engagement** | `likeCount` |
+| **Status** | `status`, `isSpam`, `hasTranslation` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+## User Tools
+
+### getInstagramUser
+
+Get a single Instagram user profile by ID or username.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `identifier` | string | Yes | User ID (numeric) or username. |
+| `identifierType` | string | Yes | `"id"` or `"username"`. |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API, bypassing cache. Default: `false`. |
+
+<Tip>
+For exact username lookups, use `getInstagramUser`. For name-based or fuzzy searches, use `searchInstagramUsers` instead.
+</Tip>
+
+---
+
+### searchInstagramUsers
+
+Search users by name, partial username, or fuzzy match with real-time results.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Search query (person name, partial username, or keywords). |
+| `limit` | number | No | Max results. Default: `10`, max: `10`. |
+| `fields` | string[] | No | Fields to return. |
+
+<Note>
+This tool performs a real-time search. For exact username lookups, use `getInstagramUser` instead.
+</Note>
+
+---
+
+### getInstagramUserConnections
+
+Get followers or following for an Instagram user.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `username` | string | Yes | Instagram username (without `@`). |
+| `connectionType` | string | Yes | `"followers"` or `"following"`. |
+| `responseType` | string | No | `"fast"` (default) or `"paging"`. CSV is not supported. |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging: max 500,000. |
+| `fields` | string[] | No | User fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). Requires `tableName` for pages > 1. |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. Must be >= `pageNumber`. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+Data freshness: automatically checks data age. Data older than 1 week triggers a refresh from the API.
+</Note>
+
+Supports server-side pagination with 100 users per page. See [Pagination](/mcp/pagination) for details.
+
+---
+
+### getInstagramPostInteractingUsers
+
+Get user profiles of people who interacted with an Instagram post (commenters or likers).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | Post ID in strong_id format (e.g., `"3606450040306139062_4836333238"`). |
+| `interactionType` | string | Yes | `"commenters"` or `"likers"`. |
+| `responseType` | string | No | `"fast"` (default) or `"paging"`. CSV is not supported. |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging: max 500,000. |
+| `fields` | string[] | No | **User** fields to return (see [User Fields](#user-fields) above). |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+This tool returns **user profiles**, not comment content. To read actual comment text, use `getInstagramCommentsByPostId` instead.
+</Note>
+
+<Warning>
+The `postId` must be in strong_id format (`mediaId_userId`). Use the full `id` value returned by other Instagram tools.
+</Warning>
+
+---
+
+### getInstagramUsersByKeywords
+
+Search for users who authored Instagram posts matching keywords. Returns unique, deduplicated user profiles.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post captions. Max 250 characters. Supports exact phrases, boolean operators (`AND`, `OR`), and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. Includes user fields plus aggregation fields. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). Requires `tableName` for pages > 1. |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. Must be >= `pageNumber`. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 users per page. See [Pagination](/mcp/pagination) and [Query Syntax](/mcp/query-syntax) for details.
+
+---
+
+## Post Tools
+
+### getInstagramPostsByIds
+
+Get one or more Instagram posts by IDs (1-100 per request).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postIds` | string[] | Yes | Array of post IDs in strong_id format (1-100). E.g., `["3606450040306139062_4836333238"]`. |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Returns only found posts, omitting not-found IDs. Returns the most up-to-date data available.
+
+<Note>
+Data older than 3 days is automatically refreshed.
+</Note>
+
+<Warning>
+Post IDs must be in strong_id format (`mediaId_userId`). Use the full `id` value returned by other Instagram tools.
+</Warning>
+
+---
+
+### getInstagramPostsByUser
+
+Get posts from an Instagram user by ID or username.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `identifier` | string | Yes | User ID (numeric) or username. |
+| `identifierType` | string | Yes | `"id"` or `"username"`. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 posts per page. See [Pagination](/mcp/pagination) for details.
+
+---
+
+### getInstagramPostsByKeywords
+
+Search Instagram posts by keywords in captions and video subtitles.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post captions and subtitles. Max 250 characters. Supports exact phrases, boolean operators (`AND`, `OR`), and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+Data older than 1 week is automatically refreshed.
+</Note>
+
+Supports server-side pagination with 100 posts per page. See [Query Syntax](/mcp/query-syntax) for details on search operators.
+
+---
+
+## Comment Tools
+
+### getInstagramCommentsByPostId
+
+Get comments for an Instagram post.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | Post ID in strong_id format (e.g., `"3606450040306139062_4836333238"`). |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+This tool returns **comment content** (text, likes, metadata). To get **user profiles** of commenters, use `getInstagramPostInteractingUsers` with `interactionType="commenters"` instead.
+</Note>
+
+<Warning>
+The `postId` must be in strong_id format (`mediaId_userId`). Use the full `id` value returned by other Instagram tools.
+</Warning>
+
+Supports server-side pagination with 100 comments per page.

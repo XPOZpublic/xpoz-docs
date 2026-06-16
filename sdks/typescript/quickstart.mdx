@@ -1,0 +1,151 @@
+---
+title: "TypeScript SDK Quickstart"
+description: "Install and configure the Xpoz TypeScript SDK. Make your first call in minutes."
+---
+
+## Installation
+
+```bash
+npm install @xpoz/xpoz
+```
+
+Requires Node.js 18+.
+
+## Get an Access Key
+
+Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+
+## Create a Client
+
+```typescript
+import { XpozClient } from "@xpoz/xpoz";
+
+// Pass access key directly
+const client = new XpozClient({ apiKey: "your-api-key" });
+await client.connect();
+
+// Or use the XPOZ_API_KEY environment variable
+const client = new XpozClient();
+await client.connect();
+```
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `apiKey` | `string` | `process.env.XPOZ_API_KEY` | Access key for authentication |
+| `serverUrl` | `string` | `https://mcp.xpoz.ai/mcp` | MCP server URL |
+| `timeoutMs` | `number` | `300000` | Operation timeout in milliseconds |
+
+```typescript
+const client = new XpozClient({
+  apiKey: "your-api-key",
+  serverUrl: "https://mcp.xpoz.ai/mcp",
+  timeoutMs: 600_000, // 10 minutes
+});
+await client.connect();
+```
+
+## Your First Call
+
+```typescript
+import { XpozClient } from "@xpoz/xpoz";
+
+const client = new XpozClient({ apiKey: "your-api-key" });
+await client.connect();
+
+// Get a Twitter user profile
+const user = await client.twitter.getUser("elonmusk");
+console.log(`${user.name} — ${user.followersCount?.toLocaleString()} followers`);
+
+// Search for posts
+const results = await client.twitter.searchPosts("artificial intelligence", {
+  startDate: "2025-01-01",
+});
+for (const post of results.data) {
+  console.log(post.text, post.likeCount);
+}
+
+await client.close();
+```
+
+## Connection Lifecycle
+
+You must call `connect()` before making any calls and `close()` when done.
+
+### Manual connect/close
+
+```typescript
+const client = new XpozClient({ apiKey: "your-api-key" });
+await client.connect();
+try {
+  const results = await client.twitter.searchPosts("AI");
+} finally {
+  await client.close();
+}
+```
+
+### Async disposal (recommended)
+
+With TypeScript 5.2+ or Node.js 18.2+ (with `--experimental-vm-modules`), you can use `Symbol.asyncDispose` to auto-close the client:
+
+```typescript
+await using client = new XpozClient({ apiKey: "your-api-key" });
+await client.connect();
+
+const user = await client.twitter.getUser("elonmusk");
+// client.close() is called automatically when the block exits
+```
+
+## Field Selection
+
+All methods accept a `fields` option. Requesting fewer fields significantly improves response time.
+
+```typescript
+const results = await client.twitter.searchPosts("AI", {
+  fields: ["id", "text", "likeCount", "retweetCount", "createdAtDate"],
+});
+
+const user = await client.twitter.getUser("elonmusk", {
+  fields: ["id", "username", "name", "followersCount", "description"],
+});
+```
+
+<Tip>
+Use `fields` to request only the data you need. This reduces response time and memory usage, especially for large result sets.
+</Tip>
+
+## Query Syntax
+
+The `query` parameter on `searchPosts`, `getUsersByKeywords`, and similar methods supports Lucene-style full-text search:
+
+```typescript
+// Exact phrase
+await client.twitter.searchPosts('"machine learning"');
+
+// Boolean operators
+await client.twitter.searchPosts('"deep learning" AND python');
+await client.twitter.searchPosts("tensorflow OR pytorch");
+await client.twitter.searchPosts("climate AND policy");
+
+// Grouping
+await client.twitter.searchPosts('(AI OR "artificial intelligence") AND ethics');
+```
+
+<Note>
+Do not use `from:`, `lang:`, `since:`, or `until:` in the query string. Use the dedicated parameters (`authorUsername`, `language`, `startDate`, `endDate`) instead.
+</Note>
+
+## Environment Variables
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `XPOZ_API_KEY` | Access key for authentication | -- |
+| `XPOZ_SERVER_URL` | MCP server URL | `https://mcp.xpoz.ai/mcp` |
+
+## Next Steps
+
+- [Pagination](/sdks/typescript/pagination) -- navigate large result sets and export CSV
+- [Error Handling](/sdks/typescript/error-handling) -- handle errors gracefully
+- [SDK Reference](/sdks/typescript/reference) -- full list of methods and type models
+- [Python SDK Quickstart](/sdks/python/quickstart) -- equivalent guide for the Python SDK

@@ -1,0 +1,221 @@
+---
+title: Quickstart
+description: Get started with Xpoz in under 2 minutes.
+---
+
+## 1. Get your access key
+
+Sign up at [xpoz.ai](https://xpoz.ai) and get your access key from the dashboard. Free tier includes 100K results per month.
+
+## 2. Choose your integration
+
+<Tabs>
+  <Tab title="Claude Code">
+    ```bash
+    claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
+      -t http \
+      -H "Authorization: Bearer YOUR_API_KEY"
+    ```
+
+    That's it. Ask Claude to search social media:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+  </Tab>
+  <Tab title="TypeScript SDK">
+    ```bash
+    npm install @xpoz/xpoz
+    ```
+
+    ```typescript
+    import { XpozClient } from '@xpoz/xpoz';
+
+    const client = new XpozClient({ apiKey: 'YOUR_API_KEY' });
+
+    const user = await client.twitter.getUser({
+      identifier: 'elonmusk',
+      identifierType: 'username'
+    });
+
+    console.log(user.name, user.followersCount);
+    ```
+  </Tab>
+  <Tab title="Python SDK">
+    ```bash
+    pip install xpoz
+    ```
+
+    ```python
+    from xpoz import XpozClient
+
+    client = XpozClient(api_key="YOUR_API_KEY")
+
+    user = client.twitter.get_user(
+        identifier="elonmusk",
+        identifier_type="username"
+    )
+
+    print(user.name, user.followers_count)
+    ```
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    # Install
+    brew install xpoz-ai/tap/xpoz-cli
+
+    # Authenticate
+    xpoz-cli auth login
+
+    # Search
+    xpoz-cli twitter get_user --identifier elonmusk
+    ```
+  </Tab>
+</Tabs>
+
+## 3. Try a search
+
+Here are some queries to get you started:
+
+<AccordionGroup>
+  <Accordion title="Search Twitter posts by keyword">
+    <Tabs>
+      <Tab title="MCP">
+        Ask your AI agent:
+        ```
+        Search Twitter for posts about "machine learning" from the last 30 days
+        ```
+      </Tab>
+      <Tab title="TypeScript">
+        ```typescript
+        const results = await client.twitter.searchPosts({
+          query: 'machine learning',
+          startDate: '2025-01-01',
+          responseType: 'fast'
+        });
+
+        for (const post of results.data) {
+          console.log(post.text, post.retweetCount);
+        }
+        ```
+      </Tab>
+      <Tab title="Python">
+        ```python
+        results = client.twitter.search_posts(
+            query="machine learning",
+            start_date="2025-01-01",
+            response_type="fast"
+        )
+
+        for post in results.data:
+            print(post.text, post.retweet_count)
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+  <Accordion title="Get an Instagram user profile">
+    <Tabs>
+      <Tab title="TypeScript">
+        ```typescript
+        const user = await client.instagram.getUser({
+          identifier: 'natgeo',
+          identifierType: 'username'
+        });
+
+        console.log(user.fullName, user.followerCount);
+        ```
+      </Tab>
+      <Tab title="Python">
+        ```python
+        user = client.instagram.get_user(
+            identifier="natgeo",
+            identifier_type="username"
+        )
+
+        print(user.full_name, user.follower_count)
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+  <Accordion title="Search Reddit posts">
+    <Tabs>
+      <Tab title="TypeScript">
+        ```typescript
+        const results = await client.reddit.searchPosts({
+          query: 'python best practices',
+          subreddit: 'learnpython',
+          responseType: 'fast'
+        });
+        ```
+      </Tab>
+      <Tab title="Python">
+        ```python
+        results = client.reddit.search_posts(
+            query="python best practices",
+            subreddit="learnpython",
+            response_type="fast"
+        )
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+## 4. Set up continuous tracking
+
+Xpoz can continuously monitor keywords, users, subreddits, and hashtags you care about. Continuous tracking gives you **better data coverage** and **fresher results**.
+
+<Tabs>
+  <Tab title="MCP">
+    Ask your AI agent:
+    ```
+    Track the keyword "artificial intelligence" on Twitter and Reddit,
+    and track the user "openai" on Twitter
+    ```
+  </Tab>
+  <Tab title="TypeScript">
+    ```typescript
+    await client.tracking.addTrackedItems({
+      items: [
+        { phrase: "artificial intelligence", type: "keyword", platform: "twitter" },
+        { phrase: "artificial intelligence", type: "keyword", platform: "reddit" },
+        { phrase: "openai", type: "user", platform: "twitter" },
+      ]
+    });
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    client.tracking.add_tracked_items(items=[
+        {"phrase": "artificial intelligence", "type": "keyword", "platform": "twitter"},
+        {"phrase": "artificial intelligence", "type": "keyword", "platform": "reddit"},
+        {"phrase": "openai", "type": "user", "platform": "twitter"},
+    ])
+    ```
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    xpoz-cli tracking add_tracked_items \
+      --items '[{"phrase":"artificial intelligence","type":"keyword","platform":"twitter"},{"phrase":"artificial intelligence","type":"keyword","platform":"reddit"}]'
+    ```
+  </Tab>
+</Tabs>
+
+You can track keywords and users on all platforms, subreddits on Reddit, and hashtags on TikTok. See the [Tracking Guide](/guides/tracking) for best practices and common workflows.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Learn about access keys, Google sign-in, and bearer tokens
+  </Card>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 available tools
+  </Card>
+  <Card title="Continuous Tracking" icon="radar" href="/tracking">
+    Best practices for continuous tracking
+  </Card>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/mcp/query-syntax">
+    Master search with boolean operators
+  </Card>
+</CardGroup>

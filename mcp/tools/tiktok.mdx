@@ -1,0 +1,259 @@
+---
+title: "TikTok Tools"
+description: "Search TikTok users, posts, comments, and hashtags with 10 MCP tools."
+---
+
+Xpoz provides **10 TikTok tools** across three categories: users, posts, and comments. TikTok is unique in having hashtag-specific search tools.
+
+## Available Fields
+
+### User Fields
+
+These fields are available on all user tools (`getTiktokUser`, `searchTiktokUsers`, `getTiktokUsersByKeywords`, `getTiktokUsersByHashtags`).
+
+**Default:** `id`, `username`, `nickname`
+
+| Category | Fields |
+|----------|--------|
+| **Identity** | `id`, `username`, `nickname`, `signature`, `secUid`, `avatar` |
+| **Status** | `isPrivate`, `isVerified` |
+| **Metrics** | `followerCount`, `followingCount`, `likeCount`, `postCount` |
+| **Locale** | `language`, `region` |
+| **Timestamps** | `createdAt`, `usernameModifyTime` |
+
+`getTiktokUsersByKeywords` and `getTiktokUsersByHashtags` also return aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsPlaysSum`, `relevantPostsForwardsSum`.
+
+### Post Fields
+
+These fields are available on all post tools (`getTiktokPostsByIds`, `getTiktokPostsByUser`, `getTiktokPostsByKeywords`, `getTiktokPostsByHashtags`).
+
+**Default:** `id`, `description`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `postType`, `isPrivate`, `userId`, `username`, `nickname`, `description`, `descriptionLanguage`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+| **Engagement** | `collectCount`, `commentCount`, `likeCount`, `downloadCount`, `forwardCount`, `playCount` |
+| **Media** | `videoThumbnail`, `videoUrl` (array of video URLs), `duration` (video length in seconds) |
+| **Content** | `hashtags` (array of hashtag strings), `transcriptsJson` |
+
+### Comment Fields
+
+These fields are available on `getTiktokCommentsByPostId`.
+
+**Default:** `id`, `text`, `username`, `createdAtDate`
+
+| Category | Fields |
+|----------|--------|
+| **All** | `id`, `postId`, `userId`, `username`, `text`, `likeCount`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
+
+<Tip>
+Always specify only the fields you need using the `fields` parameter. For example, `["id", "description", "playCount", "likeCount", "hashtags"]` for content analysis. See [Field Selection](/mcp/field-selection) for details.
+</Tip>
+
+---
+
+## User Tools
+
+### getTiktokUser
+
+Get a single TikTok user profile by ID or username.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `identifier` | string | Yes | User ID (numeric) or username. |
+| `identifierType` | string | Yes | `"id"` or `"username"`. |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API, bypassing cache. Default: `false`. |
+
+<Tip>
+For exact username lookups, use `getTiktokUser`. For name-based or fuzzy searches, use `searchTiktokUsers` instead.
+</Tip>
+
+---
+
+### searchTiktokUsers
+
+Search TikTok users by name or username with real-time results.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Search query (name, partial username, or keywords). |
+| `limit` | number | No | Max results. Default: `10`, max: `10`. |
+| `fields` | string[] | No | Fields to return. |
+
+<Note>
+This tool performs a real-time search. For exact username lookups, use `getTiktokUser` instead.
+</Note>
+
+---
+
+### getTiktokUsersByKeywords
+
+Search for users who authored TikTok posts matching keywords. Returns unique, deduplicated user profiles.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post descriptions. Max 250 characters. Supports exact phrases, boolean operators (`AND`, `OR`), and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. Includes user fields plus aggregation fields. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). Requires `tableName` for pages > 1. |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. Must be >= `pageNumber`. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 users per page. See [Pagination](/mcp/pagination) and [Query Syntax](/mcp/query-syntax) for details.
+
+---
+
+### getTiktokUsersByHashtags
+
+Search for users who posted content tagged with specific hashtags. Returns unique, deduplicated user profiles.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `hashtags` | string[] | Yes | Array of hashtags (1-5). Bare alphanumeric/underscore only -- do not include `#`. OR semantics: matches users who posted with **any** of the listed hashtags. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. Includes user fields plus aggregation fields. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). Requires `tableName` for pages > 1. |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. Must be >= `pageNumber`. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+**Example `hashtags` values:** `["dance", "fyp"]`, `["cooking"]`, `["sustainable_fashion"]`
+
+<Warning>
+Pass bare alphanumeric tags only -- no leading `#`. Each hashtag must match the pattern `[A-Za-z0-9_]` with a max length of 500 characters.
+</Warning>
+
+---
+
+## Post Tools
+
+### getTiktokPostsByIds
+
+Get one or more TikTok posts by IDs (1-100 per request).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postIds` | string[] | Yes | Array of numeric post IDs (1-100). Each must be digits only. |
+| `fields` | string[] | No | Fields to return. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Returns only found posts, omitting not-found IDs. Returns the most up-to-date data available.
+
+<Note>
+Data older than 3 days is automatically refreshed.
+</Note>
+
+---
+
+### getTiktokPostsByUser
+
+Get posts from a TikTok user by ID or username.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `identifier` | string | Yes | User ID (numeric) or username. |
+| `identifierType` | string | Yes | `"id"` or `"username"`. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+Data older than 1 week is automatically refreshed.
+</Note>
+
+Supports server-side pagination with 100 posts per page. See [Pagination](/mcp/pagination) for details.
+
+---
+
+### getTiktokPostsByKeywords
+
+Search TikTok posts by keywords in descriptions and video transcripts.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Full-text search of post descriptions. Max 250 characters. Supports exact phrases, boolean operators (`AND`, `OR`), and parentheses. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+Supports server-side pagination with 100 posts per page. See [Query Syntax](/mcp/query-syntax) for details on search operators.
+
+<Note>
+For hashtag-based search, use `getTiktokPostsByHashtags` instead -- it searches the indexed hashtags column directly, which is more precise than keyword search in descriptions.
+</Note>
+
+---
+
+### getTiktokPostsByHashtags
+
+Search TikTok posts by hashtags. Searches the indexed `hashtags` column directly (not post descriptions).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `hashtags` | string[] | Yes | Array of hashtags (1-5). Bare alphanumeric/underscore only -- do not include `#`. OR semantics: matches posts containing **any** of the listed hashtags. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+**Example `hashtags` values:** `["dance", "fyp", "viral"]`, `["cooking"]`, `["sustainable_fashion"]`
+
+<Warning>
+Pass bare alphanumeric tags only -- no leading `#`. Each hashtag must match the pattern `[A-Za-z0-9_]` with a max length of 500 characters.
+</Warning>
+
+<Tip>
+Use `getTiktokPostsByHashtags` for precise hashtag matching. Use `getTiktokPostsByKeywords` when searching for terms in post descriptions and transcripts.
+</Tip>
+
+---
+
+## Comment Tools
+
+### getTiktokCommentsByPostId
+
+Get comments for a TikTok post.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `postId` | string | Yes | TikTok post ID. |
+| `responseType` | string | No | `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `limit` | number | No | Max results. Fast: capped at 300. Paging/CSV: max 500,000. |
+| `startDate` | string | No | Start date filter (`YYYY-MM-DD`). |
+| `endDate` | string | No | End date filter (`YYYY-MM-DD`). |
+| `fields` | string[] | No | Fields to return. |
+| `pageNumber` | integer | No | Page to fetch (1-indexed). |
+| `pageNumberEnd` | integer | No | End page for bulk fetching. |
+| `tableName` | string | No | Cached table name from a previous pagination response. |
+| `forceLatest` | boolean | No | Force fresh data from API. Default: `false`. |
+
+<Note>
+Data older than 1 week is automatically refreshed.
+</Note>
+
+Supports server-side pagination with 100 comments per page.

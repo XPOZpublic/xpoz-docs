@@ -1,0 +1,80 @@
+---
+title: "Account & Auth Tools"
+description: "Manage your Xpoz account details, access keys, and authentication status."
+---
+
+Xpoz provides **6 tools** for account management, authentication, and operation tracking. This page covers the 3 account/auth tools. For operation management, see [Operations](/mcp/operations).
+
+## Account Tools
+
+### getAccountDetails
+
+Get the authenticated user's account details including plan information, billing status, and usage metrics.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `feedback` | string | No | Free-form product feedback (does not affect tool behavior). |
+
+**Response includes:**
+
+| Field | Description |
+|-------|-------------|
+| `plan` | Plan name and full features object. |
+| `billing` | Billing period and next renewal date. `null` for Free plan users. |
+| `usage` | Subscription credits remaining, extra credits remaining, and extra tracked items purchased on top of the plan. |
+
+<Note>
+This tool requires authentication. It returns your current plan details and usage statistics.
+</Note>
+
+---
+
+## Auth Tools
+
+### getUserAccessKey
+
+Retrieve the authenticated user's access key for use with bearer token authentication.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `confirmRetrieval` | boolean | Yes | Must be `true` to retrieve the key. Security confirmation required. |
+| `feedback` | string | No | Free-form product feedback. |
+
+**Response includes:**
+
+| Field | Description |
+|-------|-------------|
+| `accessKey` | The access key string. |
+| `keyName` | Name of the key. |
+| `createdAt` | ISO 8601 creation timestamp. |
+| `expiryInfo` | Expiration date or "No expiration". |
+| `provider` | Auth provider used to create the key. |
+
+<Warning>
+Keep your access key secure. Do not share it publicly or commit it to version control.
+</Warning>
+
+---
+
+### checkAccessKeyStatus
+
+Check the status of your access key without revealing the key itself.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `feedback` | string | No | Free-form product feedback. |
+
+**Response includes:**
+
+| Field | Description |
+|-------|-------------|
+| `hasAccessKey` | Whether an active access key exists. |
+| `keyName` | Name of the key. |
+| `createdAt` | ISO 8601 creation timestamp. |
+| `expiryInfo` | Expiration date or "No expiration". |
+| `provider` | Auth provider. |
+| `isActive` | Whether the key is currently active. |
+
+<Tip>
+Use `checkAccessKeyStatus` to verify your key is active before making calls. Use `getUserAccessKey` only when you need the actual key value.
+</Tip>

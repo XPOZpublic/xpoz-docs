@@ -1,0 +1,114 @@
+---
+title: "Tools Overview"
+description: "Reference for all 48 Xpoz MCP tools across Twitter/X, Instagram, Reddit, TikTok, tracking, and account management."
+---
+
+The Xpoz MCP server exposes **48 tools** across four social media platforms plus tracking and account management. Each tool is read-only and safe to call without side effects (except tracking tools, which modify your tracked items list).
+
+## Twitter/X (13 tools)
+
+| Tool | Description | Pagination |
+|------|-------------|------------|
+| [`getTwitterUser`](/mcp/tools/twitter#getTwitterUser) | Get user profile by ID or username | No |
+| [`getTwitterUsers`](/mcp/tools/twitter#getTwitterUsers) | Get 1-100 user profiles by IDs or usernames | No |
+| [`searchTwitterUsers`](/mcp/tools/twitter#searchTwitterUsers) | Search users by name/username (max 10) | No |
+| [`getTwitterUserConnections`](/mcp/tools/twitter#getTwitterUserConnections) | Get followers or following | Yes |
+| [`getTwitterUsersByKeywords`](/mcp/tools/twitter#getTwitterUsersByKeywords) | Find users who posted about keywords | Yes |
+| [`getTwitterPostsByIds`](/mcp/tools/twitter#getTwitterPostsByIds) | Get 1-100 posts by numeric IDs | No |
+| [`getTwitterPostsByAuthor`](/mcp/tools/twitter#getTwitterPostsByAuthor) | Get posts by author username | Yes |
+| [`getTwitterPostsByKeywords`](/mcp/tools/twitter#getTwitterPostsByKeywords) | Search posts by keywords | Yes |
+| [`getTwitterPostRetweets`](/mcp/tools/twitter#getTwitterPostRetweets) | Get retweets of a specific post | Yes |
+| [`getTwitterPostQuotes`](/mcp/tools/twitter#getTwitterPostQuotes) | Get quote posts of a specific post | Yes |
+| [`getTwitterPostComments`](/mcp/tools/twitter#getTwitterPostComments) | Get replies to a specific post | Yes |
+| [`getTwitterPostInteractingUsers`](/mcp/tools/twitter#getTwitterPostInteractingUsers) | Get users who interacted with a post | Yes |
+| [`countTweets`](/mcp/tools/twitter#countTweets) | Count tweets matching a phrase in a date range | No |
+
+## Instagram (9 tools)
+
+| Tool | Description | Pagination |
+|------|-------------|------------|
+| [`getInstagramUser`](/mcp/tools/instagram#getInstagramUser) | Get user profile by ID or username | No |
+| [`searchInstagramUsers`](/mcp/tools/instagram#searchInstagramUsers) | Search users by name/username (max 10) | No |
+| [`getInstagramUserConnections`](/mcp/tools/instagram#getInstagramUserConnections) | Get followers or following | Yes |
+| [`getInstagramPostInteractingUsers`](/mcp/tools/instagram#getInstagramPostInteractingUsers) | Get users who liked/commented on a post | Yes |
+| [`getInstagramUsersByKeywords`](/mcp/tools/instagram#getInstagramUsersByKeywords) | Find users who posted about keywords | Yes |
+| [`getInstagramPostsByIds`](/mcp/tools/instagram#getInstagramPostsByIds) | Get 1-100 posts by strong IDs | No |
+| [`getInstagramPostsByUser`](/mcp/tools/instagram#getInstagramPostsByUser) | Get posts by user ID or username | Yes |
+| [`getInstagramPostsByKeywords`](/mcp/tools/instagram#getInstagramPostsByKeywords) | Search posts by keywords | Yes |
+| [`getInstagramCommentsByPostId`](/mcp/tools/instagram#getInstagramCommentsByPostId) | Get comments for a post | Yes |
+
+## Reddit (9 tools)
+
+| Tool | Description | Pagination |
+|------|-------------|------------|
+| [`getRedditUser`](/mcp/tools/reddit#getRedditUser) | Get user profile by username | No |
+| [`searchRedditUsers`](/mcp/tools/reddit#searchRedditUsers) | Search users by name/username (max 50) | No |
+| [`getRedditUsersByKeywords`](/mcp/tools/reddit#getRedditUsersByKeywords) | Find users who posted about keywords | Yes |
+| [`getRedditPostsByKeywords`](/mcp/tools/reddit#getRedditPostsByKeywords) | Search posts by keywords | Yes |
+| [`getRedditPostWithCommentsById`](/mcp/tools/reddit#getRedditPostWithCommentsById) | Get a post with its comments | Yes |
+| [`getRedditCommentsByKeywords`](/mcp/tools/reddit#getRedditCommentsByKeywords) | Search comments by keywords | Yes |
+| [`searchRedditSubreddits`](/mcp/tools/reddit#searchRedditSubreddits) | Search subreddits by name (max 50) | No |
+| [`getRedditSubredditWithPostsByName`](/mcp/tools/reddit#getRedditSubredditWithPostsByName) | Get subreddit with its posts | Yes |
+| [`getRedditSubredditsByKeywords`](/mcp/tools/reddit#getRedditSubredditsByKeywords) | Find subreddits where keywords appear | Yes |
+
+## TikTok (10 tools)
+
+| Tool | Description | Pagination |
+|------|-------------|------------|
+| [`getTiktokUser`](/mcp/tools/tiktok#getTiktokUser) | Get user profile by ID or username | No |
+| [`searchTiktokUsers`](/mcp/tools/tiktok#searchTiktokUsers) | Search users by name/username (max 10) | No |
+| [`getTiktokUsersByKeywords`](/mcp/tools/tiktok#getTiktokUsersByKeywords) | Find users who posted about keywords | Yes |
+| [`getTiktokUsersByHashtags`](/mcp/tools/tiktok#getTiktokUsersByHashtags) | Find users who posted with specific hashtags | Yes |
+| [`getTiktokPostsByIds`](/mcp/tools/tiktok#getTiktokPostsByIds) | Get 1-100 posts by numeric IDs | No |
+| [`getTiktokPostsByUser`](/mcp/tools/tiktok#getTiktokPostsByUser) | Get posts by user ID or username | Yes |
+| [`getTiktokPostsByKeywords`](/mcp/tools/tiktok#getTiktokPostsByKeywords) | Search posts by keywords | Yes |
+| [`getTiktokPostsByHashtags`](/mcp/tools/tiktok#getTiktokPostsByHashtags) | Search posts by hashtags | Yes |
+| [`getTiktokCommentsByPostId`](/mcp/tools/tiktok#getTiktokCommentsByPostId) | Get comments for a post | Yes |
+
+<Note>
+TikTok is the only platform with hashtag-specific tools (`getTiktokUsersByHashtags` and `getTiktokPostsByHashtags`). These search the indexed `hashtags` column directly for precise matching.
+</Note>
+
+## Tracking (3 tools)
+
+| Tool | Description | Pagination |
+|------|-------------|------------|
+| [`getTrackedItems`](/mcp/tools/tracking#getTrackedItems) | List all tracked keywords, users, subreddits, and hashtags | No |
+| [`addTrackedItems`](/mcp/tools/tracking#addTrackedItems) | Add items to track across platforms | No |
+| [`removeTrackedItems`](/mcp/tools/tracking#removeTrackedItems) | Remove tracked items | No |
+
+## Account & Auth (3 tools)
+
+| Tool | Description | Pagination |
+|------|-------------|------------|
+| [`getAccountDetails`](/mcp/tools/account#getAccountDetails) | Get plan, billing, and usage info | No |
+| [`getUserAccessKey`](/mcp/tools/account#getUserAccessKey) | Retrieve your access key | No |
+| [`checkAccessKeyStatus`](/mcp/tools/account#checkAccessKeyStatus) | Check access key status without revealing the key | No |
+
+## Operations (2 tools)
+
+| Tool | Description | Pagination |
+|------|-------------|------------|
+| `checkOperationStatus` | Check status and retrieve results from a background operation | No |
+| `cancelOperation` | Cancel a running background operation | No |
+
+For details on how operations work with paginated tools, see [Operations](/mcp/operations).
+
+---
+
+## Common Parameters
+
+Most tools share these optional parameters:
+
+| Parameter | Description |
+|-----------|-------------|
+| `fields` | Specify which fields to return. Dramatically reduces response size and improves performance. See [Field Selection](/mcp/field-selection). |
+| `responseType` | Choose between `"fast"` (default), `"paging"`, or `"csv"`. See [Response Modes](/mcp/response-modes). |
+| `forceLatest` | Force the latest available data. Use sparingly — increases latency. |
+| `startDate` / `endDate` | Filter by date range in `YYYY-MM-DD` format. Omit by default to retrieve all data. |
+| `pageNumber` / `tableName` | For paginated results. See [Pagination](/mcp/pagination). |
+| `feedback` | Free-form product feedback. Does not affect tool behavior. |
+
+<Tip>
+Always specify only the `fields` you need to reduce response size and improve performance. For example, use `["id", "text", "likeCount"]` instead of retrieving all fields.
+</Tip>

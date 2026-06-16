@@ -1,0 +1,76 @@
+---
+title: OpenAI Codex
+description: Connect Xpoz to the OpenAI Codex CLI for agentic social media research.
+---
+
+The OpenAI Codex CLI supports MCP servers for tool integration. Add the Xpoz MCP server to give Codex access to all [48 tools](/mcp/tools/overview) across Twitter/X, Instagram, Reddit, and TikTok.
+
+## Setup
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Configure the MCP server">
+    Add the Xpoz server to your Codex MCP configuration file at `~/.codex/config.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "url": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    Replace `YOUR_API_KEY` with your actual Xpoz access key.
+  </Step>
+  <Step title="Restart Codex">
+    Close and reopen the Codex CLI to load the new configuration. All 48 Xpoz tools will be discovered automatically.
+  </Step>
+  <Step title="Verify the connection">
+    Ask Codex to run a test query:
+
+    ```
+    Search Twitter for posts about "machine learning" using Xpoz
+    ```
+
+    If Codex calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+  </Step>
+</Steps>
+
+## Alternative: Environment Variable
+
+You can also pass the access key as an environment variable when launching Codex:
+
+```bash
+XPOZ_ACCESS_TOKEN=YOUR_API_KEY codex
+```
+
+This requires the MCP server entry in your config to reference the environment variable instead of a hardcoded token.
+
+## What You Can Do
+
+With Xpoz connected, Codex can:
+
+- Search posts and users across all four platforms
+- Retrieve engagement metrics and follower data
+- Track keywords and users for continuous monitoring
+- Export large result sets in CSV format
+
+See the full list of available tools in the [MCP Tools reference](/mcp/tools/overview).
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get started with Xpoz in under 2 minutes
+  </Card>
+</CardGroup>

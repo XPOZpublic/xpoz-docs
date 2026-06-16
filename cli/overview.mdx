@@ -1,0 +1,73 @@
+---
+title: "CLI Overview"
+description: "Command-line interface for querying Twitter/X, Instagram, Reddit, and TikTok data from your terminal"
+---
+
+The Xpoz CLI gives you direct access to social media intelligence from your terminal. Search users, posts, comments, and communities across four platforms -- no code required.
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Dynamic Commands" icon="wand-magic-sparkles">
+    Commands are auto-generated from the Xpoz Python SDK via reflection. When new tools are added to the platform, they appear in the CLI automatically.
+  </Card>
+  <Card title="4 Platforms" icon="grid-2">
+    Twitter/X, Instagram, Reddit, and TikTok -- the same coverage as the MCP server and SDKs.
+  </Card>
+  <Card title="Pagination" icon="layer-group">
+    Walk through paginated results with `--all-pages`, or jump to a specific page with `--page`.
+  </Card>
+  <Card title="CSV Export" icon="file-csv">
+    Get a CSV download URL for any search result with `--export-csv-url` -- ideal for bulk data collection.
+  </Card>
+  <Card title="Cross-Platform Binaries" icon="desktop">
+    Native binaries for Linux (x86_64, arm64), macOS (Apple Silicon), and Windows (x86_64). Also available via pip, Homebrew, and winget.
+  </Card>
+  <Card title="JSON Output" icon="brackets-curly">
+    Structured JSON output by default, with a `--output pretty` option for human-readable formatting.
+  </Card>
+</CardGroup>
+
+## Quick Example
+
+```bash
+# Get a Twitter user profile
+xpoz-cli twitter get_user --identifier elonmusk
+
+# Search posts with boolean operators
+xpoz-cli twitter search_posts --query '"AI" AND ethics' --start-date 2025-01-01 --limit 20
+
+# Export results as CSV
+xpoz-cli twitter search_posts --query bitcoin --export-csv-url
+```
+
+## How It Works
+
+The CLI wraps the [Xpoz Python SDK](/sdks/python/quickstart), which connects to the [Xpoz MCP server](/mcp/overview). Every command maps directly to an MCP tool -- `twitter search_posts` calls the same `getTwitterPostsByKeywords` tool available through the MCP server and SDKs.
+
+```
+xpoz-cli twitter search_posts --query "AI"
+    |
+    v
+Xpoz Python SDK (xpoz)
+    |
+    v
+Xpoz MCP Server (mcp.xpoz.ai)
+    |
+    v
+Results (JSON / CSV)
+```
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Installation" icon="download" href="/cli/installation">
+    Install via script, Homebrew, pip, winget, or binary download.
+  </Card>
+  <Card title="Usage" icon="terminal" href="/cli/usage">
+    Platforms, global flags, pagination, and examples.
+  </Card>
+  <Card title="Authentication" icon="key" href="/cli/authentication">
+    Set up your access key and manage auth credentials.
+  </Card>
+</CardGroup>

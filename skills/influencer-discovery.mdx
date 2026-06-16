@@ -1,0 +1,54 @@
+---
+title: "Influencer Discovery"
+description: "Find and rank influencers by niche, engagement rate, reach, and authenticity on Twitter/X."
+---
+
+The Influencer Discovery skill finds and ranks influencers in any niche on Twitter/X. It evaluates candidates across engagement, reach, relevance, authenticity, and consistency, then categorizes them by tier and voice type.
+
+## Example Prompts
+
+- "Find top 20 AI agent influencers on Twitter"
+- "Find micro-influencers for sustainable fashion"
+- "Who are the most influential voices in cybersecurity on Twitter?"
+- "Discover crypto influencers with high engagement and low bot probability"
+
+## Scoring Formula
+
+| Factor | Weight | Description |
+| --- | --- | --- |
+| Relevance | 30% | How closely the influencer's content matches the target niche |
+| Engagement | 30% | Like, retweet, and reply rates relative to follower count |
+| Reach | 20% | Follower count and impression volume |
+| Authenticity | 10% | Bot probability score (lower is better, via `isInauthenticProbScore`) |
+| Consistency | 10% | Regular posting cadence in the target niche |
+
+## Influencer Tiers
+
+| Tier | Follower Range |
+| --- | --- |
+| Mega | 1M+ |
+| Macro | 100K - 1M |
+| Micro | 10K - 100K |
+| Nano | 1K - 10K |
+
+## Voice Types
+
+Each influencer is classified into a voice type based on their content style:
+
+- **Analyst**: Data-driven commentary and research
+- **Builder**: Hands-on creators sharing their work
+- **Educator**: Teaching and explaining concepts
+- **News**: Breaking news and industry updates
+- **Commentator**: Opinion and thought leadership
+- **Community**: Community building and curation
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getTwitterUsersByKeywords` | Find users relevant to the niche (returns `relevantTweetsCount`, `relevantTweetsLikesSum`, `relevantTweetsImpressionsSum`, `isInauthenticProbScore`) |
+| `getTwitterPostsByAuthor` | Analyze recent posts from candidate influencers |
+
+## Get Started
+
+Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.

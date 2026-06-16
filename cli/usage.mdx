@@ -1,0 +1,185 @@
+---
+title: "Usage"
+description: "Platform commands, global flags, pagination, output formats, and practical examples for the Xpoz CLI"
+---
+
+## Platform Subcommands
+
+The CLI organizes commands by platform. Each platform exposes the same tools available through the [MCP server](/mcp/tools/overview) and [SDKs](/sdks/typescript/quickstart).
+
+| Subcommand | Platform | Example tools |
+|---|---|---|
+| `twitter` | Twitter/X | `get_user`, `search_posts`, `get_post_comments`, `get_user_connections` |
+| `instagram` | Instagram | `get_user`, `search_posts`, `get_post_comments`, `search_users` |
+| `reddit` | Reddit | `get_user`, `search_posts`, `search_comments`, `get_subreddit` |
+| `tiktok` | TikTok | `get_user`, `search_posts`, `get_posts_by_hashtags`, `get_post_comments` |
+| `tracking` | Cross-platform | `add_tracked_items`, `get_tracked_items`, `remove_tracked_items` |
+
+Commands are dynamically generated from the [Python SDK](/sdks/python/quickstart) via reflection. When new tools are added to the platform, they appear in the CLI automatically.
+
+## Command Discovery
+
+Use `--help` at any level to explore available commands and parameters:
+
+```bash
+# List all platforms
+xpoz-cli --help
+
+# List commands for a platform
+xpoz-cli twitter --help
+
+# Show parameters for a specific command
+xpoz-cli twitter search_posts --help
+```
+
+## Global Flags
+
+These flags work with any command:
+
+| Flag | Environment Variable | Default | Description |
+|---|---|---|---|
+| `--api-key KEY` | `XPOZ_API_KEY` | Stored config | Override the stored access key |
+| `--server-url URL` | `XPOZ_SERVER_URL` | `https://mcp.xpoz.ai/mcp` | Custom MCP server endpoint |
+| `--output json\|pretty` | -- | `json` | Output format |
+| `--all-pages` | -- | Off | Automatically walk through all pages |
+| `--max-pages N` | -- | -- | Safety cap when using `--all-pages` |
+| `--page N` | -- | -- | Jump to a specific page |
+| `--export-csv-url` | -- | Off | Return a CSV download URL instead of rows |
+| `--timeout SECS` | -- | `300` | Operation timeout in seconds |
+
+## Examples
+
+### Twitter
+
+```bash
+# Look up a user profile
+xpoz-cli twitter get_user --identifier elonmusk
+
+# Search posts with boolean operators and date range
+xpoz-cli twitter search_posts --query '"AI" AND ethics' --start-date 2025-01-01 --limit 20
+
+# Get replies to a post
+xpoz-cli twitter get_post_comments --post-id 1234567890
+```
+
+### Instagram
+
+```bash
+# Look up a user profile
+xpoz-cli instagram get_user --identifier natgeo
+
+# Search posts by keyword
+xpoz-cli instagram search_posts --query "street photography" --limit 10
+```
+
+### Reddit
+
+```bash
+# Search posts in a specific subreddit, sorted by top of the month
+xpoz-cli reddit search_posts --query "python tutorial" --subreddit learnpython --sort top --time month
+
+# Paginate through all results
+xpoz-cli reddit search_posts --query "python tutorial" --subreddit learnpython --all-pages
+```
+
+### TikTok
+
+```bash
+# Look up a user profile
+xpoz-cli tiktok get_user --identifier charlidamelio
+
+# Search posts by hashtag
+xpoz-cli tiktok get_posts_by_hashtags --hashtags "cooking,recipe" --limit 20
+```
+
+### Tracking
+
+```bash
+# Add a keyword to track across platforms
+xpoz-cli tracking add_tracked_items --keywords "artificial intelligence"
+
+# List all tracked items
+xpoz-cli tracking get_tracked_items
+```
+
+## Output Formatting
+
+By default, the CLI outputs raw JSON. Use `--output pretty` for human-readable formatting:
+
+<Tabs>
+  <Tab title="JSON (default)">
+    ```bash
+    xpoz-cli twitter get_user --identifier elonmusk
+    ```
+
+    ```json
+    {"id":"123","username":"elonmusk","name":"Elon Musk","followersCount":200000000}
+    ```
+  </Tab>
+  <Tab title="Pretty">
+    ```bash
+    xpoz-cli twitter get_user --identifier elonmusk --output pretty
+    ```
+
+    ```json
+    {
+      "id": "123",
+      "username": "elonmusk",
+      "name": "Elon Musk",
+      "followersCount": 200000000
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Tip>
+  Pipe JSON output to `jq` for advanced filtering and transformation: `xpoz-cli twitter search_posts --query "AI" | jq '.data[].text'`
+</Tip>
+
+## Pagination
+
+Search commands return paginated results (100 items per page). You have three options for navigating pages:
+
+| Strategy | Flag | Use case |
+|---|---|---|
+| Walk all pages | `--all-pages` | Collect the full result set |
+| Capped walk | `--all-pages --max-pages 5` | Collect up to N pages as a safety limit |
+| Jump to page | `--page 3` | Resume or inspect a specific page |
+
+```bash
+# Get all pages of results
+xpoz-cli reddit search_posts --query "machine learning" --all-pages
+
+# Limit to 10 pages max
+xpoz-cli reddit search_posts --query "machine learning" --all-pages --max-pages 10
+
+# Jump directly to page 5
+xpoz-cli reddit search_posts --query "machine learning" --page 5
+```
+
+<Note>
+  When using `--all-pages` on broad queries, set `--max-pages` to avoid unexpectedly large result sets. Each page consumes one call.
+</Note>
+
+## CSV Export
+
+Use `--export-csv-url` to get a download URL for the full result set as a CSV file, hosted on S3. This is useful for bulk data collection and analysis in spreadsheet tools.
+
+```bash
+xpoz-cli twitter search_posts --query bitcoin --export-csv-url
+```
+
+The command returns a URL instead of JSON rows. The CSV file includes all fields and all matching results.
+
+For more details on CSV exports, see the [CSV Exports guide](/guides/csv-exports).
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/cli/authentication">
+    Manage your access key and auth credentials.
+  </Card>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/guides/query-syntax">
+    Write effective search queries with boolean operators and phrases.
+  </Card>
+</CardGroup>

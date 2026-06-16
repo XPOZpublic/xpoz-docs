@@ -1,0 +1,187 @@
+---
+title: "Python SDK Quickstart"
+description: "Install and configure the Xpoz Python SDK. Make your first call with sync or async clients."
+---
+
+## Installation
+
+```bash
+pip install xpoz
+```
+
+Requires Python 3.10+.
+
+## Get an Access Key
+
+Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+
+## Create a Client
+
+The Python SDK provides both synchronous and asynchronous clients.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from xpoz import XpozClient
+
+    # Pass access key directly
+    client = XpozClient("your-api-key")
+
+    # Or use the XPOZ_API_KEY environment variable
+    client = XpozClient()
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from xpoz import AsyncXpozClient
+
+    client = AsyncXpozClient("your-api-key")
+    await client.connect()
+    ```
+  </Tab>
+</Tabs>
+
+### Configuration Options
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `api_key` | `str` | `os.environ["XPOZ_API_KEY"]` | Access key for authentication |
+| `server_url` | `str` | `https://mcp.xpoz.ai/mcp` | MCP server URL |
+| `timeout` | `int` | `300` | Operation timeout in seconds |
+
+```python
+client = XpozClient(
+    "your-api-key",
+    server_url="https://mcp.xpoz.ai/mcp",
+    timeout=600,  # 10 minutes
+)
+```
+
+## Your First Call
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from xpoz import XpozClient
+
+    client = XpozClient("your-api-key")
+
+    # Get a Twitter user profile
+    user = client.twitter.get_user("elonmusk")
+    print(f"{user.name} — {user.followers_count:,} followers")
+
+    # Search for posts
+    results = client.twitter.search_posts("artificial intelligence", start_date="2025-01-01")
+    for tweet in results.data:
+        print(tweet.text, tweet.like_count)
+
+    client.close()
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    import asyncio
+    from xpoz import AsyncXpozClient
+
+    async def main():
+        async with AsyncXpozClient("your-api-key") as client:
+            # Get a Twitter user profile
+            user = await client.twitter.get_user("elonmusk")
+            print(f"{user.name} — {user.followers_count:,} followers")
+
+            # Search for posts
+            results = await client.twitter.search_posts(
+                "artificial intelligence", start_date="2025-01-01"
+            )
+            for tweet in results.data:
+                print(tweet.text, tweet.like_count)
+
+    asyncio.run(main())
+    ```
+  </Tab>
+</Tabs>
+
+## Context Managers
+
+Use context managers to automatically close the client when done.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    with XpozClient("your-api-key") as client:
+        user = client.twitter.get_user("elonmusk")
+        # client.close() is called automatically
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async with AsyncXpozClient("your-api-key") as client:
+        user = await client.twitter.get_user("elonmusk")
+        results = await client.twitter.search_posts("AI")
+        page2 = await results.next_page()
+        # client is closed automatically
+    ```
+  </Tab>
+</Tabs>
+
+## Field Selection
+
+All methods accept a `fields` parameter. Use snake_case field names -- the SDK automatically converts to camelCase for the API.
+
+```python
+results = client.twitter.search_posts(
+    "AI",
+    fields=["id", "text", "like_count", "retweet_count", "created_at_date"],
+)
+
+user = client.twitter.get_user(
+    "elonmusk",
+    fields=["id", "username", "name", "followers_count", "description"],
+)
+```
+
+<Tip>
+Requesting fewer fields significantly improves response time and reduces memory usage, especially for large result sets.
+</Tip>
+
+## Query Syntax
+
+The `query` parameter on `search_posts`, `get_users_by_keywords`, and similar methods supports Lucene-style full-text search:
+
+```python
+# Exact phrase
+client.twitter.search_posts('"machine learning"')
+
+# Boolean operators
+client.twitter.search_posts('"deep learning" AND python')
+client.twitter.search_posts("tensorflow OR pytorch")
+client.twitter.search_posts("climate AND policy")
+
+# Grouping
+client.twitter.search_posts('(AI OR "artificial intelligence") AND ethics')
+
+# Combined with filters
+results = client.twitter.search_posts(
+    '("machine learning" OR "deep learning") AND python',
+    start_date="2025-01-01",
+    language="en",
+)
+```
+
+<Note>
+Do not use `from:`, `lang:`, `since:`, or `until:` in the query string. Use the dedicated parameters (`author_username`, `language`, `start_date`, `end_date`) instead.
+</Note>
+
+## Environment Variables
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `XPOZ_API_KEY` | Access key for authentication | -- |
+| `XPOZ_SERVER_URL` | MCP server URL | `https://mcp.xpoz.ai/mcp` |
+
+## Next Steps
+
+- [Pagination](/sdks/python/pagination) -- navigate large result sets and export CSV
+- [Error Handling](/sdks/python/error-handling) -- handle errors gracefully
+- [SDK Reference](/sdks/python/reference) -- full list of methods and type models
+- [TypeScript SDK Quickstart](/sdks/typescript/quickstart) -- equivalent guide for the TypeScript SDK

@@ -1,0 +1,215 @@
+---
+title: "Python SDK Error Handling"
+description: "Handle authentication failures, timeouts, and operation errors in the Xpoz Python SDK."
+---
+
+## Exception Hierarchy
+
+All SDK exceptions extend from `XpozError`. Import them from the package:
+
+```python
+from xpoz import (
+    XpozError,
+    AuthenticationError,
+    ConnectionError,
+    OperationTimeoutError,
+    OperationFailedError,
+    OperationCancelledError,
+    NotFoundError,
+    ValidationError,
+)
+```
+
+| Exception Class | When It's Raised |
+| --- | --- |
+| `XpozError` | Base class for all Xpoz exceptions |
+| `AuthenticationError` | Invalid or missing access key |
+| `ConnectionError` | Cannot connect to the MCP server |
+| `OperationTimeoutError` | Operation exceeded the configured timeout |
+| `OperationFailedError` | Operation failed server-side |
+| `OperationCancelledError` | Operation was cancelled |
+| `NotFoundError` | Requested resource was not found |
+| `ValidationError` | Invalid parameters passed to a method |
+
+<Note>
+The Python SDK includes two additional exception types not present in the TypeScript SDK: `NotFoundError` and `ValidationError`. These provide more granular error handling for common input issues.
+</Note>
+
+## Catching Exceptions
+
+Use `except` clauses to handle specific exception types. Always catch more specific exceptions before the base `XpozError`:
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    try:
+        user = client.twitter.get_user("nonexistent_user_12345")
+    except OperationFailedError as e:
+        print(f"Operation {e.operation_id} failed: {e.error}")
+    except OperationTimeoutError as e:
+        print(f"Timed out after {e.elapsed_seconds}s")
+    except AuthenticationError:
+        print("Invalid access key")
+    except XpozError as e:
+        print(f"Xpoz error: {e}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    try:
+        user = await client.twitter.get_user("nonexistent_user_12345")
+    except OperationFailedError as e:
+        print(f"Operation {e.operation_id} failed: {e.error}")
+    except OperationTimeoutError as e:
+        print(f"Timed out after {e.elapsed_seconds}s")
+    except AuthenticationError:
+        print("Invalid access key")
+    except XpozError as e:
+        print(f"Xpoz error: {e}")
+    ```
+  </Tab>
+</Tabs>
+
+## Exception Details
+
+### AuthenticationError
+
+Raised when the access key is invalid, expired, or missing.
+
+```python
+try:
+    client = XpozClient("invalid-key")
+    client.twitter.get_user("elonmusk")
+except AuthenticationError as e:
+    print(e)  # "Invalid access key" or similar
+```
+
+### OperationTimeoutError
+
+Raised when an operation exceeds the configured timeout (default: 300 seconds). The exception includes the elapsed time.
+
+```python
+try:
+    results = client.twitter.search_posts("very broad query")
+except OperationTimeoutError as e:
+    print(f"Timed out after {e.elapsed_seconds}s")
+    # Consider narrowing your query or increasing the timeout
+```
+
+<Tip>
+If you frequently hit timeouts, increase the timeout when creating the client: `XpozClient("key", timeout=600)`. You can also narrow your queries with date filters, field selection, or more specific search terms.
+</Tip>
+
+### OperationFailedError
+
+Raised when an operation completes but with an error status. Includes the `operation_id` and error details.
+
+```python
+try:
+    results = client.twitter.search_posts("query")
+except OperationFailedError as e:
+    print(f"Operation: {e.operation_id}")
+    print(f"Error: {e.error}")
+```
+
+### OperationCancelledError
+
+Raised when an operation is cancelled, typically due to server-side resource management.
+
+```python
+try:
+    results = client.twitter.search_posts("query")
+except OperationCancelledError as e:
+    print(f"Operation {e.operation_id} was cancelled")
+```
+
+### NotFoundError
+
+Raised when a requested resource (user, post, subreddit) does not exist.
+
+```python
+try:
+    user = client.twitter.get_user("definitely_not_a_real_user_12345")
+except NotFoundError:
+    print("User not found")
+```
+
+### ValidationError
+
+Raised when invalid parameters are passed to a method.
+
+```python
+try:
+    results = client.twitter.search_posts("")  # empty query
+except ValidationError as e:
+    print(f"Invalid input: {e}")
+```
+
+## Practical Pattern
+
+A robust wrapper that handles all error cases:
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from xpoz import (
+        XpozClient,
+        XpozError,
+        AuthenticationError,
+        OperationTimeoutError,
+        OperationFailedError,
+        OperationCancelledError,
+    )
+
+    def search_with_handling(client: XpozClient, query: str) -> None:
+        try:
+            results = client.twitter.search_posts(query, start_date="2025-01-01")
+            print(f"Found {results.pagination.total_rows} results")
+            for post in results.data:
+                print(f"{post.author_username}: {post.text}")
+        except AuthenticationError:
+            raise  # Cannot recover — propagate to caller
+        except OperationTimeoutError:
+            print("Query timed out — try narrowing the date range or query")
+        except OperationFailedError as e:
+            print(f"Server error: {e.error}")
+        except OperationCancelledError:
+            print("Operation cancelled — retrying may help")
+        except XpozError as e:
+            print(f"Unexpected Xpoz error: {e}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from xpoz import (
+        AsyncXpozClient,
+        XpozError,
+        AuthenticationError,
+        OperationTimeoutError,
+        OperationFailedError,
+        OperationCancelledError,
+    )
+
+    async def search_with_handling(client: AsyncXpozClient, query: str) -> None:
+        try:
+            results = await client.twitter.search_posts(query, start_date="2025-01-01")
+            print(f"Found {results.pagination.total_rows} results")
+            for post in results.data:
+                print(f"{post.author_username}: {post.text}")
+        except AuthenticationError:
+            raise
+        except OperationTimeoutError:
+            print("Query timed out — try narrowing the date range or query")
+        except OperationFailedError as e:
+            print(f"Server error: {e.error}")
+        except OperationCancelledError:
+            print("Operation cancelled — retrying may help")
+        except XpozError as e:
+            print(f"Unexpected Xpoz error: {e}")
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+For the equivalent error handling patterns in TypeScript, see [TypeScript SDK Error Handling](/sdks/typescript/error-handling). The TypeScript SDK uses `try/catch` with `instanceof` checks instead of `try/except`.
+</Note>

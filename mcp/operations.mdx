@@ -1,0 +1,103 @@
+---
+title: "Operations"
+description: "Manage long-running async operations with status polling and cancellation"
+---
+
+Some queries -- especially large pagination or CSV export jobs -- run as background operations. The Xpoz MCP server provides two tools for managing these: `checkOperationStatus` and `cancelOperation`.
+
+## How Operations Work
+
+When a tool triggers a long-running task, it returns an operation ID instead of immediate results. Your agent then polls for completion using `checkOperationStatus`.
+
+```
+1. Agent calls a tool (e.g., large paging query)
+   └── Server returns: operationId, status: "running"
+
+2. Agent polls checkOperationStatus(operationId)
+   └── Server returns: status: "running"
+
+3. Agent polls again
+   └── Server returns: status: "completed", results: [...]
+```
+
+<Tip>
+Most AI agents handle this polling automatically. You typically don't need to manage operations manually — just call a tool and your agent retrieves the results when ready.
+</Tip>
+
+## Operation States
+
+| State | Description |
+|---|---|
+| `running` | Operation is actively executing |
+| `completed` | Successfully finished — results are available |
+| `failed` | An error occurred during execution |
+| `cancelled` | Gracefully stopped by a `cancelOperation` call |
+
+## checkOperationStatus
+
+Polls the status of an async operation and retrieves results when complete.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `operationId` | string | Yes | The operation ID returned by the initiating tool call |
+
+**What it returns by state:**
+
+<Tabs>
+  <Tab title="completed">
+    Returns the operation results:
+
+    - **For query operations:** Paginated results with data
+    - **For CSV export operations:** An S3 download URL
+
+    ```json
+    {
+      "status": "completed",
+      "message": "Operation completed successfully. Processed 487 items.",
+      "results": [...]
+    }
+    ```
+  </Tab>
+
+  <Tab title="running">
+    Returns the current status with elapsed time:
+
+    ```json
+    {
+      "status": "running",
+      "message": "Processing... 250 processed",
+      "duration": 12
+    }
+    ```
+  </Tab>
+
+  <Tab title="failed">
+    Returns the error details:
+
+    ```json
+    {
+      "status": "failed",
+      "message": "Operation failed: Connection timeout"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## cancelOperation
+
+Gracefully stops a running operation.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `operationId` | string | Yes | The operation ID to cancel |
+
+Only works on operations with `running` status. The operation stops at its next processing checkpoint.
+
+<Note>
+If you receive an error that an operation was not found, it may have expired. Re-issue the original query to start a new operation.
+</Note>
+
+## Related
+
+- [Response Modes](/mcp/response-modes) — CSV mode triggers async operations for large exports
+- [Pagination](/mcp/pagination) — Paging mode may trigger operations for large result sets

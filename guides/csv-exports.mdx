@@ -1,0 +1,191 @@
+---
+title: CSV Exports
+description: Export large social media datasets to CSV files via S3 download URLs.
+---
+
+Xpoz supports bulk data export to CSV for any search or paginated query. Instead of iterating through hundreds of pages, export the entire result set as a single downloadable file hosted on S3.
+
+## How it works
+
+1. Set the response mode to **CSV**
+2. The server runs the query asynchronously and writes results to S3
+3. You receive an S3 download URL when the export completes
+4. Download the CSV file for analysis, reporting, or archival
+
+<Note>
+  CSV exports can contain up to **500,000 rows**. For larger datasets, use date range filters to split your export into smaller batches.
+</Note>
+
+## SDK usage
+
+<Tabs>
+  <Tab title="TypeScript">
+    ### Direct CSV mode
+
+    Set `responseType: ResponseType.Csv` to initiate a CSV export directly:
+
+    ```typescript
+    import { XpozClient, ResponseType } from '@xpoz/xpoz';
+
+    const client = new XpozClient({ apiKey: 'your-api-key' });
+    await client.connect();
+
+    const results = await client.twitter.searchPosts('bitcoin', {
+      startDate: '2025-01-01',
+      responseType: ResponseType.Csv,
+    });
+
+    // Poll the export operation and get the download URL
+    const downloadUrl = await results.exportCsv();
+    console.log('Download:', downloadUrl);
+
+    await client.close();
+    ```
+
+    ### Export from a paginated result
+
+    Start with paging mode, review the first page, then export if needed:
+
+    ```typescript
+    const results = await client.twitter.searchPosts('AI', {
+      startDate: '2025-01-01',
+      responseType: ResponseType.Paging,
+    });
+
+    console.log(`${results.pagination.totalRows} total results`);
+
+    // Decide to export after seeing the count
+    if (results.pagination.totalRows > 1000) {
+      const csvUrl = await results.exportCsv();
+      console.log('Exported to:', csvUrl);
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ### Direct CSV mode
+
+    Set `response_type=ResponseType.CSV` to initiate a CSV export directly:
+
+    ```python
+    from xpoz import XpozClient, ResponseType
+
+    with XpozClient("your-api-key") as client:
+        results = client.twitter.search_posts(
+            "bitcoin",
+            start_date="2025-01-01",
+            response_type=ResponseType.CSV,
+        )
+
+        # Poll the export operation and get the download URL
+        download_url = results.export_csv()
+        print(f"Download: {download_url}")
+    ```
+
+    ### Export from a paginated result
+
+    Start with paging mode, review the first page, then export if needed:
+
+    ```python
+    results = client.twitter.search_posts(
+        "AI",
+        start_date="2025-01-01",
+        response_type=ResponseType.PAGING,
+    )
+
+    print(f"{results.pagination.total_rows} total results")
+
+    if results.pagination.total_rows > 1000:
+        csv_url = results.export_csv()
+        print(f"Exported to: {csv_url}")
+    ```
+
+    ### Async client
+
+    ```python
+    import asyncio
+    from xpoz import AsyncXpozClient, ResponseType
+
+    async def export_data():
+        async with AsyncXpozClient("your-api-key") as client:
+            results = await client.twitter.search_posts(
+                "bitcoin",
+                start_date="2025-01-01",
+                response_type=ResponseType.CSV,
+            )
+            download_url = await results.export_csv()
+            print(f"Download: {download_url}")
+
+    asyncio.run(export_data())
+    ```
+  </Tab>
+  <Tab title="CLI">
+    Use the `--export-csv-url` flag to export results to CSV:
+
+    ```bash
+    xpoz-cli twitter search_posts \
+      --query "bitcoin" \
+      --start-date 2025-01-01 \
+      --export-csv-url
+    ```
+
+    The CLI prints the S3 download URL when the export completes. Pipe it to `curl` or `wget` to download:
+
+    ```bash
+    URL=$(xpoz-cli twitter search_posts \
+      --query "bitcoin" \
+      --start-date 2025-01-01 \
+      --export-csv-url)
+
+    curl -o bitcoin_tweets.csv "$URL"
+    ```
+  </Tab>
+</Tabs>
+
+## CSV file format
+
+The exported CSV file includes:
+
+- **Header row** with column names matching the API field names
+- **UTF-8 encoding** for international characters
+- **Standard CSV escaping** (quoted fields for values containing commas or newlines)
+- **All available fields** unless you specified `fields` in the original query
+
+<Tip>
+  Use the `fields` parameter in your query to control which columns appear in the CSV. This reduces file size and speeds up the export.
+</Tip>
+
+## Methods supporting CSV export
+
+| Platform | Method | SDK (TS) | SDK (Python) |
+|----------|--------|----------|-------------|
+| Twitter | Search posts | `twitter.searchPosts()` | `twitter.search_posts()` |
+| Twitter | Posts by author | `twitter.getPostsByAuthor()` | `twitter.get_posts_by_author()` |
+| Twitter | Users by keywords | `twitter.getUsersByKeywords()` | `twitter.get_users_by_keywords()` |
+| Instagram | Search posts | `instagram.searchPosts()` | `instagram.search_posts()` |
+| Instagram | Posts by user | `instagram.getPostsByUser()` | `instagram.get_posts_by_user()` |
+| Instagram | Users by keywords | `instagram.getUsersByKeywords()` | `instagram.get_users_by_keywords()` |
+| Reddit | Search posts | `reddit.searchPosts()` | `reddit.search_posts()` |
+| TikTok | Search posts | `tiktok.searchPosts()` | `tiktok.search_posts()` |
+| TikTok | Posts by user | `tiktok.getPostsByUser()` | `tiktok.get_posts_by_user()` |
+| TikTok | Users by keywords | `tiktok.getUsersByKeywords()` | `tiktok.get_users_by_keywords()` |
+| TikTok | Posts by hashtags | `tiktok.getPostsByHashtags()` | `tiktok.get_posts_by_hashtags()` |
+| TikTok | Users by hashtags | `tiktok.getUsersByHashtags()` | `tiktok.get_users_by_hashtags()` |
+
+## Use cases
+
+- **Data analysis**: Import into pandas, Excel, or Google Sheets for in-depth analysis
+- **Reporting**: Generate periodic reports on brand mentions, sentiment, or engagement
+- **Archival**: Store snapshots of social media data for compliance or research
+- **ML training**: Build training datasets for sentiment analysis, topic classification, or trend prediction
+- **Cross-platform comparison**: Export data from multiple platforms and join in your analytics tool
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Response Modes" icon="gauge" href="/mcp/response-modes">
+    Compare fast, paging, and CSV modes
+  </Card>
+  <Card title="Best Practices" icon="lightbulb" href="/guides/best-practices">
+    Optimize queries and exports for performance
+  </Card>
+</CardGroup>

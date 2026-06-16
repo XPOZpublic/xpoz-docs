@@ -1,0 +1,116 @@
+---
+title: "Response Modes"
+description: "Choose between fast, paging, and CSV modes to control how results are returned"
+---
+
+Paginated tools support a `responseType` parameter that controls how results are delivered. The right mode depends on whether you need quick answers, full iteration, or bulk export.
+
+## The Three Modes
+
+<Tabs>
+  <Tab title="fast (default)">
+    Returns the first page of results immediately **without** creating a server-side pagination table.
+
+    ```json
+    {
+      "responseType": "fast"
+    }
+    ```
+
+    **Behavior:**
+    - Returns up to 100 results in a single response
+    - No `tableName` or pagination metadata is returned
+    - Cannot fetch additional pages -- this is a one-shot retrieval
+
+    **Best for:** Quick lookups where the first batch of results is sufficient. Most AI agent queries fall into this category.
+  </Tab>
+
+  <Tab title="paging">
+    Creates a server-side pagination table and returns page 1 with metadata for fetching subsequent pages.
+
+    ```json
+    {
+      "responseType": "paging"
+    }
+    ```
+
+    **Response includes:**
+    - `tableName` -- identifier for fetching additional pages
+    - `totalPages` -- total number of available pages
+    - `totalRows` -- total result count
+    - `pageSize` -- items per page (100)
+    - First page of results
+
+    **Best for:** Iterating through large result sets. Use when you need comprehensive data retrieval across multiple pages. See [Pagination](/mcp/pagination) for iteration patterns.
+  </Tab>
+
+  <Tab title="csv">
+    Returns an S3 download URL for bulk data export in CSV format.
+
+    ```json
+    {
+      "responseType": "csv"
+    }
+    ```
+
+    **Response includes:**
+    - S3 download URL for the CSV file
+    - Total row count
+
+    **Best for:** Bulk export for external analysis in spreadsheets, BI tools, or data pipelines.
+  </Tab>
+</Tabs>
+
+## Comparison
+
+| | `fast` | `paging` | `csv` |
+|---|---|---|---|
+| **Speed** | Fastest | Moderate (creates table) | Moderate (generates file) |
+| **Max results** | 100 (first page) | Unlimited (paginated) | Unlimited (single file) |
+| **Pagination** | No | Yes | No |
+| **Output format** | JSON in response | JSON per page | CSV file on S3 |
+| **Token cost** | Lowest | Higher (multiple calls) | Low (URL only) |
+| **Best for** | Quick lookups | Full data iteration | Bulk export |
+
+## When to Use Each Mode
+
+<AccordionGroup>
+  <Accordion title="Use fast when...">
+    - You need a quick answer and the first 100 results are enough
+    - You are doing exploratory queries to understand the data
+    - You want the lowest latency and token consumption
+    - The agent is answering a simple question like "What are the latest posts by @username?"
+  </Accordion>
+
+  <Accordion title="Use paging when...">
+    - You need to analyze a complete dataset (all posts matching a query)
+    - You are building aggregations or statistics across all results
+    - You need more than 100 results and want to iterate programmatically
+    - The agent is doing deep analysis like "Analyze all posts mentioning AI in the last month"
+  </Accordion>
+
+  <Accordion title="Use csv when...">
+    - You need to export data for use outside the AI agent
+    - You are feeding data into a spreadsheet, BI tool, or data pipeline
+    - You want a single downloadable file with all results
+    - The agent is fulfilling a request like "Export all posts by @username to a file"
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  When no `responseType` is specified, the server defaults to `fast`. This is intentional -- most agent interactions only need the first page of results, and `fast` mode avoids the overhead of creating a pagination table.
+</Tip>
+
+## Tools That Support Response Modes
+
+Response modes are available on all paginated tools:
+
+- **Twitter:** `getTwitterPostsByAuthor`, `getTwitterPostsByKeywords`, `getTwitterPostRetweets`, `getTwitterPostQuotes`, `getTwitterPostComments`, `getTwitterPostInteractingUsers`, `getTwitterUserConnections`, `getTwitterUsersByKeywords`
+- **Instagram:** `getInstagramPostsByUser`, `getInstagramPostsByKeywords`, `getInstagramUserConnections`, `getInstagramPostInteractingUsers`, `getInstagramUsersByKeywords`
+- **Reddit:** `getRedditPostsByKeywords`, `getRedditCommentsByKeywords`, `getRedditUsersByKeywords`
+- **TikTok:** `getTiktokPostsByUser`, `getTiktokPostsByKeywords`, `getTiktokPostsByHashtags`, `getTiktokUsersByKeywords`, `getTiktokUsersByHashtags`
+
+## Related
+
+- [Pagination](/mcp/pagination) -- How to iterate through pages in `paging` mode
+- [Field Selection](/mcp/field-selection) -- Reduce response size by selecting specific fields

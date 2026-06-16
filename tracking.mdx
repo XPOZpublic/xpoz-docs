@@ -1,0 +1,209 @@
+---
+title: Continuous Tracking
+description: Track keywords, users, subreddits, and hashtags across platforms for better data coverage and fresher results.
+---
+
+## What is continuous tracking?
+
+Continuous tracking lets you register keywords, users, subreddits, and hashtags that Xpoz monitors on a regular schedule. This results in:
+
+- **Better coverage** — regular monitoring captures more posts and updates, so your search results are more complete
+- **Fresher data** — tracked items are kept up to date, so you always get the most recent content
+
+## How it works
+
+<Steps>
+  <Step title="Add items to track">
+    Use `addTrackedItems` (MCP tool) or `client.tracking.addTrackedItems()` (SDK) to register keywords, users, subreddits, or hashtags for continuous tracking.
+  </Step>
+  <Step title="Xpoz monitors automatically">
+    Xpoz regularly collects new data for your tracked items across all configured platforms.
+  </Step>
+  <Step title="Results are more complete and up to date">
+    When you search for tracked keywords or query tracked users, you get broader coverage and fresher content.
+  </Step>
+</Steps>
+
+## What can you track?
+
+Every tracked item has three fields: `phrase` (the term to track), `type` (what kind of item), and `platform` (which social network).
+
+| Type | Description | Example `phrase` |
+|------|-------------|-----------------|
+| `keyword` | A search term in post content | `"artificial intelligence"`, `"Tesla"` |
+| `user` | A social media account by username | `"elonmusk"`, `"natgeo"` |
+| `subreddit` | A Reddit community (Reddit-only) | `"wallstreetbets"`, `"MachineLearning"` |
+| `hashtag` | A TikTok hashtag (TikTok-only) | `"fyp"`, `"sustainable_fashion"` |
+
+### Platform compatibility
+
+| Type | Twitter/X | Instagram | Reddit | TikTok |
+|------|-----------|-----------|--------|--------|
+| `keyword` | Yes | Yes | Yes | Yes |
+| `user` | Yes | Yes | Yes | Yes |
+| `subreddit` | — | — | Yes | — |
+| `hashtag` | — | — | — | Yes |
+
+## Best practices
+
+### Track strategically
+
+<Tip>
+Your plan has a limited number of tracking slots. Focus on high-value terms that you query regularly rather than tracking everything.
+</Tip>
+
+- **Track your brand** as a keyword on all four platforms — this is the most common use case
+- **Track competitor accounts** as users to monitor their posting activity
+- **Track relevant subreddits** where your industry or product is discussed
+- **Track campaign hashtags** on TikTok for time-limited campaigns
+
+### Manage your tracked items
+
+- Call `getTrackedItems` before removing items — the `phrase`, `type`, and `platform` must match exactly
+- Use `getAccountDetails` to check your plan's tracking limit and current usage
+- Remove tracked items you no longer need to free up slots for new ones
+
+### Choose the right type
+
+- Use `keyword` for topics and phrases — this tracks posts containing those words
+- Use `user` for specific accounts — this tracks their posting activity
+- Use `subreddit` for Reddit communities — this tracks all posts in that subreddit
+- Use `hashtag` for TikTok campaigns — this is more precise than keyword search for hashtag matching
+
+## Common workflows
+
+### Brand monitoring across platforms
+
+<Tabs>
+  <Tab title="MCP">
+    Ask your AI agent:
+    ```
+    Track my brand "Acme Corp" as a keyword on Twitter, Instagram, Reddit, and TikTok.
+    Also track our official accounts @acmecorp on Twitter and Instagram.
+    ```
+  </Tab>
+  <Tab title="TypeScript">
+    ```typescript
+    await client.tracking.addTrackedItems({
+      items: [
+        { phrase: "Acme Corp", type: "keyword", platform: "twitter" },
+        { phrase: "Acme Corp", type: "keyword", platform: "instagram" },
+        { phrase: "Acme Corp", type: "keyword", platform: "reddit" },
+        { phrase: "Acme Corp", type: "keyword", platform: "tiktok" },
+        { phrase: "acmecorp", type: "user", platform: "twitter" },
+        { phrase: "acmecorp", type: "user", platform: "instagram" },
+      ]
+    });
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    client.tracking.add_tracked_items(items=[
+        {"phrase": "Acme Corp", "type": "keyword", "platform": "twitter"},
+        {"phrase": "Acme Corp", "type": "keyword", "platform": "instagram"},
+        {"phrase": "Acme Corp", "type": "keyword", "platform": "reddit"},
+        {"phrase": "Acme Corp", "type": "keyword", "platform": "tiktok"},
+        {"phrase": "acmecorp", "type": "user", "platform": "twitter"},
+        {"phrase": "acmecorp", "type": "user", "platform": "instagram"},
+    ])
+    ```
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    xpoz-cli tracking add_tracked_items \
+      --items '[{"phrase":"Acme Corp","type":"keyword","platform":"twitter"},{"phrase":"Acme Corp","type":"keyword","platform":"instagram"},{"phrase":"Acme Corp","type":"keyword","platform":"reddit"},{"phrase":"Acme Corp","type":"keyword","platform":"tiktok"}]'
+    ```
+  </Tab>
+</Tabs>
+
+### Competitor tracking
+
+```typescript
+await client.tracking.addTrackedItems({
+  items: [
+    { phrase: "CompetitorBrand", type: "keyword", platform: "twitter" },
+    { phrase: "CompetitorBrand", type: "keyword", platform: "reddit" },
+    { phrase: "competitor_official", type: "user", platform: "twitter" },
+    { phrase: "competitor_official", type: "user", platform: "instagram" },
+  ]
+});
+```
+
+Then periodically search and compare using the [Competitive Intelligence](/skills/competitive-intel) skill.
+
+### Reddit community monitoring
+
+```typescript
+await client.tracking.addTrackedItems({
+  items: [
+    { phrase: "MachineLearning", type: "subreddit", platform: "reddit" },
+    { phrase: "artificial", type: "subreddit", platform: "reddit" },
+    { phrase: "machine learning", type: "keyword", platform: "reddit" },
+  ]
+});
+```
+
+### TikTok hashtag campaign
+
+```typescript
+await client.tracking.addTrackedItems({
+  items: [
+    { phrase: "myBrandChallenge", type: "hashtag", platform: "tiktok" },
+    { phrase: "my brand challenge", type: "keyword", platform: "tiktok" },
+    { phrase: "mybrand", type: "user", platform: "tiktok" },
+  ]
+});
+```
+
+<Tip>
+Track both the hashtag and related keywords. Users don't always include the hashtag, so keyword tracking captures posts that reference the campaign without tagging it.
+</Tip>
+
+### Listing and removing items
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    const tracked = await client.tracking.getTrackedItems();
+    console.log(tracked);
+
+    await client.tracking.removeTrackedItems({
+      items: [
+        { phrase: "old_keyword", type: "keyword", platform: "twitter" }
+      ]
+    });
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    tracked = client.tracking.get_tracked_items()
+    print(tracked)
+
+    client.tracking.remove_tracked_items(items=[
+        {"phrase": "old_keyword", "type": "keyword", "platform": "twitter"}
+    ])
+    ```
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    xpoz-cli tracking get_tracked_items
+
+    xpoz-cli tracking remove_tracked_items \
+      --items '[{"phrase":"old_keyword","type":"keyword","platform":"twitter"}]'
+    ```
+  </Tab>
+</Tabs>
+
+## Related
+
+<CardGroup cols={3}>
+  <Card title="Tracking Tools" icon="wrench" href="/mcp/tools/tracking">
+    MCP tool reference for getTrackedItems, addTrackedItems, removeTrackedItems
+  </Card>
+  <Card title="Social Tracking Skill" icon="wand-magic-sparkles" href="/skills/social-tracking">
+    Pre-built AI skill for managing tracked items
+  </Card>
+  <Card title="Account Details" icon="user" href="/mcp/tools/account">
+    Check your plan limits and tracking usage
+  </Card>
+</CardGroup>

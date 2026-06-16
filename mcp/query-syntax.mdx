@@ -1,0 +1,203 @@
+---
+title: "Query Syntax"
+description: "Write effective search queries using plain keywords, phrases, boolean operators, and grouping"
+---
+
+Tools that accept a `query` or `keywords` parameter support a Lucene-style search syntax. This gives you precise control over what results are returned.
+
+## Quick Reference
+
+| Syntax | Example | Meaning |
+|---|---|---|
+| Plain keywords | `bitcoin crypto` | Match either term (OR) |
+| Quoted phrase | `"machine learning"` | Exact phrase match |
+| AND | `AI AND robotics` | Both terms required |
+| OR | `Tesla OR SpaceX` | Either term matches |
+| Grouping | `(AI OR ML) AND healthcare` | Combine operators |
+| @handles | `@karpathy` | Match mentions |
+
+## Plain Keywords
+
+Space-separated keywords are treated as OR queries -- results matching **any** of the terms are returned.
+
+```
+artificial intelligence
+```
+
+This matches posts containing "artificial" OR "intelligence" (or both).
+
+## Quoted Phrases
+
+Wrap terms in double quotes to match an exact phrase:
+
+```
+"machine learning"
+```
+
+This only matches posts containing the exact phrase "machine learning" as a contiguous string.
+
+You can combine phrases with other terms:
+
+```
+"deep learning" AND python
+```
+
+## Boolean Operators
+
+Two boolean operators are supported: `AND` and `OR`. They are case-insensitive.
+
+<Tabs>
+  <Tab title="AND">
+    Both terms must be present in the result.
+
+    ```
+    AI AND crypto
+    ```
+
+    ```
+    "artificial intelligence" AND ethics
+    ```
+  </Tab>
+
+  <Tab title="OR">
+    Either term (or both) can be present. This is the default behavior for space-separated words.
+
+    ```
+    bitcoin OR ethereum
+    ```
+
+    ```
+    "climate change" OR "global warming"
+    ```
+  </Tab>
+</Tabs>
+
+## Grouping with Parentheses
+
+Use parentheses to control operator precedence:
+
+```
+(AI OR "artificial intelligence") AND ethics
+```
+
+```
+(bitcoin OR ethereum) AND (regulation OR policy)
+```
+
+<Note>
+  Without parentheses, operators are evaluated left to right. Use grouping to make your intent explicit, especially when mixing AND and OR.
+</Note>
+
+## Platform-Specific Search Scope
+
+Different tools search different fields depending on the platform:
+
+| Platform | Content Searched |
+|---|---|
+| **Twitter posts** | Post text |
+| **Instagram posts** | Captions and subtitles |
+| **Instagram comments** | Comment text |
+| **Reddit posts** | Title and selftext |
+| **Reddit comments** | Body text |
+| **TikTok posts** | Description and transcripts |
+
+## Examples by Platform
+
+<AccordionGroup>
+  <Accordion title="Twitter">
+    **Find posts about AI from specific conversations:**
+
+    ```
+    "artificial intelligence" AND (startup OR venture)
+    ```
+
+    **Find posts mentioning a user:**
+
+    ```
+    @elonmusk AND Tesla
+    ```
+
+  </Accordion>
+
+  <Accordion title="Instagram">
+    **Find fashion-related posts:**
+
+    ```
+    "street style" OR "fashion week"
+    ```
+
+    **Find food content in a specific cuisine:**
+
+    ```
+    (sushi OR ramen) AND Tokyo
+    ```
+  </Accordion>
+
+  <Accordion title="Reddit">
+    **Find technical discussions:**
+
+    ```
+    "rust programming" AND (async OR concurrency)
+    ```
+
+    **Find product reviews:**
+
+    ```
+    review AND (iPhone OR Pixel)
+    ```
+  </Accordion>
+
+  <Accordion title="TikTok">
+    **Find trending content:**
+
+    ```
+    "day in my life" AND (NYC OR "New York")
+    ```
+
+    **Find educational content:**
+
+    ```
+    (tutorial OR "how to") AND cooking
+    ```
+
+    <Tip>
+      For TikTok, also consider using `getTiktokPostsByHashtags` which searches the indexed hashtags column directly -- this is faster and more precise than keyword search for hashtag-based discovery.
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+## Syntax Rules
+
+<Warning>
+  These rules are enforced by the server. Queries that violate them will be rejected.
+</Warning>
+
+| Rule | Valid | Invalid |
+|---|---|---|
+| Operators need terms on both sides | `AI AND crypto` | `AND crypto` |
+| Cannot start with AND or OR | `bitcoin OR ethereum` | `OR bitcoin` |
+| Cannot end with an operator | `AI AND ML` | `AI AND` |
+| Max query length: 250 characters | -- | -- |
+
+## Unsupported Syntax
+
+The following are **not supported** and will be stripped or treated as spaces:
+
+| Syntax | Behavior |
+|---|---|
+| Field operators (`from:`, `lang:`, `since:`, `until:`) | Stripped from query |
+| Forward slashes (`/`) | Treated as spaces (`24/7` becomes `24 7`) |
+| Colons (`:`) | Treated as spaces |
+| Backslashes (`\`) | Removed |
+| Apostrophes (`'`) | Removed |
+| Square brackets (`[]`) | Removed |
+| Leading wildcards (`*term`) | Stripped |
+
+<Tip>
+  If you need to filter by date range, language, or author, use the dedicated tool parameters (e.g., `startDate`, `endDate`, `language`, `username`) instead of embedding them in the query string.
+</Tip>
+
+## Related
+
+- [Field Selection](/mcp/field-selection) -- Control which fields are returned in results
+- [Response Modes](/mcp/response-modes) -- Choose how results are delivered

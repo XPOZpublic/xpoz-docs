@@ -1,0 +1,162 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Xpoz",
+  "colors": {
+    "primary": "#4180F9",
+    "light": "#4180F9",
+    "dark": "#4180F9"
+  },
+  "logo": {
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png",
+    "href": "https://xpoz.ai"
+  },
+  "favicon": "/favicon.ico",
+  "description": "Social media intelligence platform. Access billions of posts and users across Twitter/X, Instagram, Reddit, and TikTok via MCP, SDKs, CLI, and Agent Skills.",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Getting Started",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["introduction", "quickstart", "authentication"]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/query-syntax",
+              "guides/csv-exports",
+              "tracking",
+              "guides/best-practices"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "MCP",
+        "groups": [
+          {
+            "group": "MCP Server",
+            "pages": [
+              "mcp/overview",
+              "mcp/installation",
+              "mcp/response-modes",
+              "mcp/pagination",
+              "mcp/field-selection",
+              "mcp/query-syntax",
+              "mcp/operations"
+            ]
+          },
+          {
+            "group": "MCP Tools",
+            "pages": [
+              "mcp/tools/overview",
+              "mcp/tools/twitter",
+              "mcp/tools/instagram",
+              "mcp/tools/reddit",
+              "mcp/tools/tiktok",
+              "mcp/tools/tracking",
+              "mcp/tools/account"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDKs",
+        "groups": [
+          {
+            "group": "TypeScript SDK",
+            "pages": [
+              "sdks/typescript/quickstart",
+              "sdks/typescript/pagination",
+              "sdks/typescript/error-handling",
+              "sdks/typescript/reference"
+            ]
+          },
+          {
+            "group": "Python SDK",
+            "pages": [
+              "sdks/python/quickstart",
+              "sdks/python/pagination",
+              "sdks/python/error-handling",
+              "sdks/python/reference"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "CLI",
+            "pages": [
+              "cli/overview",
+              "cli/installation",
+              "cli/usage",
+              "cli/authentication"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Agent Skills",
+        "groups": [
+          {
+            "group": "Agent Skills",
+            "pages": [
+              "skills/overview",
+              "skills/best-practices",
+              "skills/getting-started",
+              "skills/social-tracking",
+              "skills/sentiment-analyzer",
+              "skills/twitter-data-export",
+              "skills/influencer-discovery",
+              "skills/reddit-research",
+              "skills/competitive-intel",
+              "skills/security-osint"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Integrations",
+        "groups": [
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/overview",
+              "integrations/claude-code",
+              "integrations/gemini-cli",
+              "integrations/codex"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      { "label": "Blog", "href": "https://xpoz.ai/blog" }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get Access Key",
+      "href": "https://xpoz.ai"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/XPOZAI",
+      "github": "https://github.com/XPOZpublic",
+      "linkedin": "https://www.linkedin.com/company/xpozinc/"
+    }
+  },
+  "search": {
+    "prompt": "Search Xpoz docs..."
+  },
+  "seo": {
+    "indexing": "navigable"
+  }
+}

@@ -1,0 +1,336 @@
+---
+title: Best Practices
+description: Optimize your Xpoz queries for performance, reduce response times, and handle errors gracefully.
+---
+
+Follow these recommendations to get the most out of Xpoz's API, whether you are building an AI agent, a data pipeline, or an interactive application.
+
+## Use field selection
+
+Always specify the `fields` parameter to retrieve only the data you need. This dramatically improves response time and reduces memory usage.
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    // Slow: returns all 20+ fields per post
+    const results = await client.twitter.searchPosts('AI');
+
+    // Fast: returns only what you need
+    const results = await client.twitter.searchPosts('AI', {
+      fields: ['id', 'text', 'likeCount', 'authorUsername', 'createdAtDate'],
+    });
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    # Slow: returns all 20+ fields per post
+    results = client.twitter.search_posts("AI")
+
+    # Fast: returns only what you need
+    results = client.twitter.search_posts(
+        "AI",
+        fields=["id", "text", "like_count", "author_username", "created_at_date"],
+    )
+    ```
+  </Tab>
+</Tabs>
+
+<Tip>
+  For engagement analysis, use `["id", "text", "likeCount", "retweetCount", "replyCount", "createdAtDate"]`. For user discovery, use `["id", "username", "name", "followersCount", "description"]`.
+</Tip>
+
+## Choose the right response mode
+
+| Mode | When to use | Rows returned |
+|------|-------------|---------------|
+| **Fast** (default) | Quick lookups, UI previews, agent queries | Up to 300 |
+| **Paging** | Iterating through full result sets | 100 per page, unlimited total |
+| **CSV** | Bulk exports, data analysis, archival | Up to 500K |
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import { ResponseType } from '@xpoz/xpoz';
+
+    // Quick lookup: get top 50 results immediately
+    const fast = await client.twitter.searchPosts('AI', {
+      responseType: ResponseType.Fast,
+      limit: 50,
+    });
+
+    // Full iteration: paginate through all results
+    const paged = await client.twitter.searchPosts('AI', {
+      responseType: ResponseType.Paging,
+    });
+
+    // Bulk export: download as CSV
+    const csv = await client.twitter.searchPosts('AI', {
+      responseType: ResponseType.Csv,
+    });
+    const url = await csv.exportCsv();
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    from xpoz import ResponseType
+
+    # Quick lookup
+    fast = client.twitter.search_posts("AI",
+        response_type=ResponseType.FAST, limit=50)
+
+    # Full iteration
+    paged = client.twitter.search_posts("AI",
+        response_type=ResponseType.PAGING)
+
+    # Bulk export
+    csv = client.twitter.search_posts("AI",
+        response_type=ResponseType.CSV)
+    url = csv.export_csv()
+    ```
+  </Tab>
+</Tabs>
+
+## Pagination patterns
+
+Do not fetch all pages unless you actually need the full dataset. Common patterns:
+
+### Sample the first page, then decide
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    const results = await client.twitter.searchPosts('bitcoin', {
+      responseType: ResponseType.Paging,
+    });
+
+    console.log(`Total: ${results.pagination.totalRows} results`);
+
+    // Only fetch more if needed
+    if (results.pagination.totalRows < 500) {
+      let page = results;
+      while (page.hasNextPage()) {
+        page = await page.nextPage();
+        // process page.data
+      }
+    } else {
+      // Too many results -- export to CSV instead
+      const csvUrl = await results.exportCsv();
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    results = client.twitter.search_posts("bitcoin",
+        response_type=ResponseType.PAGING)
+
+    print(f"Total: {results.pagination.total_rows} results")
+
+    if results.pagination.total_rows < 500:
+        page = results
+        while page.has_next_page():
+            page = page.next_page()
+            # process page.data
+    else:
+        csv_url = results.export_csv()
+    ```
+  </Tab>
+</Tabs>
+
+### Jump to a specific page
+
+```typescript
+const page5 = await results.getPage(5);
+```
+
+```python
+page5 = results.get_page(5)
+```
+
+## Query optimization
+
+### Be specific with keywords
+
+```
+// Too broad: returns millions of results
+"AI"
+
+// Better: narrow with boolean operators
+"AI" AND "healthcare" AND 2025
+
+// Best: exact phrases with filters
+"AI-powered diagnostics" AND (healthcare OR medical)
+```
+
+### Use date ranges
+
+Always include `startDate` (and optionally `endDate`) to limit results to a relevant time window:
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    const results = await client.twitter.searchPosts('AI', {
+      startDate: '2025-06-01',
+      endDate: '2025-06-15',
+    });
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    results = client.twitter.search_posts("AI",
+        start_date="2025-06-01", end_date="2025-06-15")
+    ```
+  </Tab>
+</Tabs>
+
+### Use platform-specific filters
+
+Do not embed filters in the query string. Use dedicated parameters:
+
+| Parameter | TypeScript | Python |
+|-----------|-----------|--------|
+| Author filter | `authorUsername: "elonmusk"` | `author_username="elonmusk"` |
+| Language filter | `language: "en"` | `language="en"` |
+| Subreddit filter | `subreddit: "learnpython"` | `subreddit="learnpython"` |
+| Reddit sort | `sort: "top"` | `sort="top"` |
+| Reddit time | `time: "month"` | `time="month"` |
+
+## Error handling
+
+Build retry logic for timeouts and transient failures:
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import {
+      XpozError,
+      AuthenticationError,
+      OperationTimeoutError,
+      OperationFailedError,
+    } from '@xpoz/xpoz';
+
+    async function searchWithRetry(query: string, retries = 2) {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+          return await client.twitter.searchPosts(query, {
+            responseType: ResponseType.Fast,
+            limit: 100,
+          });
+        } catch (e) {
+          if (e instanceof AuthenticationError) {
+            throw e; // Don't retry auth errors
+          }
+          if (e instanceof OperationTimeoutError && attempt < retries) {
+            console.log(`Attempt ${attempt + 1} timed out, retrying...`);
+            continue;
+          }
+          throw e;
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    from xpoz import (
+        AuthenticationError,
+        OperationTimeoutError,
+        XpozError,
+        ResponseType,
+    )
+
+    def search_with_retry(query: str, retries: int = 2):
+        for attempt in range(retries + 1):
+            try:
+                return client.twitter.search_posts(
+                    query,
+                    response_type=ResponseType.FAST,
+                    limit=100,
+                )
+            except AuthenticationError:
+                raise  # Don't retry auth errors
+            except OperationTimeoutError:
+                if attempt < retries:
+                    print(f"Attempt {attempt + 1} timed out, retrying...")
+                    continue
+                raise
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  Authentication errors (`401`) should never be retried. Timeout errors are safe to retry. Failed operations may indicate a server-side issue -- check the `operationError` field for details.
+</Note>
+
+## Caching
+
+Xpoz caches operation results server-side with a TTL:
+
+- **Running operations**: 30-minute TTL (auto-expire if stalled)
+- **Completed operations**: 15-minute TTL (retrieve results within this window)
+- **Paginated tables**: Remain available for page navigation after creation
+
+<Tip>
+  For paging mode, the first call creates a server-side table with all results. Subsequent `nextPage()` and `getPage(n)` calls read from this cached table, making page navigation fast.
+</Tip>
+
+## Client lifecycle
+
+Always close the client when done to release resources:
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    // Option 1: async disposal (Node.js 18.2+)
+    await using client = new XpozClient({ apiKey: 'key' });
+    await client.connect();
+    // client.close() called automatically
+
+    // Option 2: try/finally
+    const client = new XpozClient({ apiKey: 'key' });
+    await client.connect();
+    try {
+      const user = await client.twitter.getUser('elonmusk');
+    } finally {
+      await client.close();
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    # Option 1: context manager
+    with XpozClient("key") as client:
+        user = client.twitter.get_user("elonmusk")
+    # client.close() called automatically
+
+    # Option 2: async context manager
+    async with AsyncXpozClient("key") as client:
+        user = await client.twitter.get_user("elonmusk")
+    ```
+  </Tab>
+</Tabs>
+
+## Summary checklist
+
+- Always specify `fields` to reduce response size
+- Use `Fast` mode for quick lookups, `Paging` for iteration, `CSV` for bulk export
+- Include date ranges to narrow results
+- Use dedicated filter parameters instead of embedding filters in queries
+- Handle `AuthenticationError` and `OperationTimeoutError` separately
+- Close the client when done
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/guides/query-syntax">
+    Master boolean operators and phrase matching
+  </Card>
+  <Card title="CSV Exports" icon="file-csv" href="/guides/csv-exports">
+    Export large datasets for offline analysis
+  </Card>
+  <Card title="Field Selection" icon="filter" href="/mcp/field-selection">
+    Full list of available fields per platform
+  </Card>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 available tools
+  </Card>
+</CardGroup>

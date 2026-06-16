@@ -1,0 +1,77 @@
+---
+title: Gemini CLI
+description: Connect Xpoz to Gemini CLI for social media intelligence powered by Google's Gemini models.
+---
+
+Gemini CLI supports MCP servers natively. Add the Xpoz MCP server to your settings file to access all [48 tools](/mcp/tools/overview) from the Gemini CLI.
+
+## Setup
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Configure the MCP server">
+    Add the Xpoz server to your Gemini CLI settings file at `~/.gemini/settings.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "uri": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    Replace `YOUR_API_KEY` with your actual Xpoz access key.
+
+    <Note>
+    If the file already contains other MCP servers, add the `"xpoz"` entry inside the existing `"mcpServers"` object.
+    </Note>
+  </Step>
+  <Step title="Restart Gemini CLI">
+    Close and reopen Gemini CLI to pick up the new configuration. The 48 Xpoz tools will be available in your next session.
+  </Step>
+  <Step title="Verify the connection">
+    Ask Gemini to run a query:
+
+    ```
+    Look up the Twitter user @elonmusk using Xpoz
+    ```
+
+    If Gemini calls `getTwitterUser` and returns profile data, the connection is working.
+  </Step>
+</Steps>
+
+## Example Queries
+
+Once connected, you can ask Gemini to perform social media research:
+
+```
+Search Reddit for posts about "rust programming" in the learnrust subreddit
+```
+
+```
+Find the top Instagram posts mentioning "sustainable fashion" this month
+```
+
+```
+Get TikTok user profile for @charlidamelio
+```
+
+Gemini will call the appropriate Xpoz MCP tools and return structured results.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Response Modes" icon="sliders" href="/mcp/response-modes">
+    Learn about fast, paging, and CSV response modes
+  </Card>
+</CardGroup>

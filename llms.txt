@@ -1,0 +1,67 @@
+# Xpoz Documentation
+> Social media intelligence platform with access to billions of posts and users across Twitter/X, Instagram, Reddit, and TikTok.
+
+## Getting Started
+- [Welcome](https://docs.xpoz.ai/introduction): Overview of the Xpoz platform, coverage, and capabilities
+- [Quickstart](https://docs.xpoz.ai/quickstart): Get started in 2 minutes with Claude Code, TypeScript SDK, Python SDK, or CLI
+- [Authentication](https://docs.xpoz.ai/authentication): access key, Google Sign-In, and bearer token authentication
+
+## Guides
+- [Query Syntax](https://docs.xpoz.ai/guides/query-syntax): Search with boolean operators, exact phrases, and grouping
+- [CSV Exports](https://docs.xpoz.ai/guides/csv-exports): Bulk data export up to 500K rows
+- [Continuous Tracking](https://docs.xpoz.ai/tracking): Track keywords, users, and hashtags for better data coverage and fresher results
+- [Best Practices](https://docs.xpoz.ai/guides/best-practices): Field selection, response modes, pagination, and performance tips
+
+## MCP Server
+- [Overview](https://docs.xpoz.ai/mcp/overview): 48 tools across 4 platforms via the Model Context Protocol
+- [Installation](https://docs.xpoz.ai/mcp/installation): Setup for Claude Code, Claude Desktop, Gemini CLI, Cursor, N8N
+- [Response Modes](https://docs.xpoz.ai/mcp/response-modes): Fast (immediate), paging (paginated), and CSV (bulk export) modes
+- [Pagination](https://docs.xpoz.ai/mcp/pagination): Server-side pagination with 100 items per page
+- [Field Selection](https://docs.xpoz.ai/mcp/field-selection): Request only the fields you need for faster responses
+- [Query Syntax](https://docs.xpoz.ai/mcp/query-syntax): Lucene-style search with boolean operators, exact phrases, grouping
+- [Operations](https://docs.xpoz.ai/mcp/operations): Async operation status checking and cancellation
+
+## MCP Tools (48 total)
+- [Tools Overview](https://docs.xpoz.ai/mcp/tools/overview): Complete list of all 48 MCP tools across 4 platforms
+- [Twitter/X Tools](https://docs.xpoz.ai/mcp/tools/twitter): 13 tools for users, posts, retweets, quotes, comments, engagement
+- [Instagram Tools](https://docs.xpoz.ai/mcp/tools/instagram): 9 tools for users, posts, comments, engagement
+- [Reddit Tools](https://docs.xpoz.ai/mcp/tools/reddit): 9 tools for users, posts, comments, subreddits
+- [TikTok Tools](https://docs.xpoz.ai/mcp/tools/tiktok): 10 tools for users, posts, comments, hashtags
+- [Tracking Tools](https://docs.xpoz.ai/mcp/tools/tracking): Track keywords, users, subreddits, and hashtags
+- [Account Tools](https://docs.xpoz.ai/mcp/tools/account): Plan details, billing, and usage information
+
+## TypeScript SDK (@xpoz/xpoz)
+- [Quickstart](https://docs.xpoz.ai/sdks/typescript/quickstart): Installation, authentication, first query
+- [Pagination](https://docs.xpoz.ai/sdks/typescript/pagination): PaginatedResult<T> and response type patterns
+- [Error Handling](https://docs.xpoz.ai/sdks/typescript/error-handling): Error hierarchy and retry patterns
+- [SDK Reference](https://docs.xpoz.ai/sdks/typescript/reference): Full method reference for all namespaces
+
+## Python SDK (xpoz)
+- [Quickstart](https://docs.xpoz.ai/sdks/python/quickstart): Installation, sync/async clients, first query
+- [Pagination](https://docs.xpoz.ai/sdks/python/pagination): PaginatedResult[T] and response type patterns
+- [Error Handling](https://docs.xpoz.ai/sdks/python/error-handling): Exception hierarchy and retry patterns
+- [SDK Reference](https://docs.xpoz.ai/sdks/python/reference): Full method reference for all namespaces
+
+## CLI
+- [Overview](https://docs.xpoz.ai/cli/overview): Command-line interface for social media queries
+- [Installation](https://docs.xpoz.ai/cli/installation): Homebrew, pip, winget, and binary installation
+- [Usage](https://docs.xpoz.ai/cli/usage): Commands, flags, output formats, scripting
+- [Authentication](https://docs.xpoz.ai/cli/authentication): Login, environment variables, config files
+
+## Agent Skills
+- [Overview](https://docs.xpoz.ai/skills/overview): Pre-built AI workflows for social media intelligence
+- [Sentiment Analyzer](https://docs.xpoz.ai/skills/sentiment-analyzer): Analyze sentiment across posts and comments
+- [Twitter Data Export](https://docs.xpoz.ai/skills/twitter-data-export): Export Twitter data at scale
+- [Influencer Discovery](https://docs.xpoz.ai/skills/influencer-discovery): Find influencers by topic and engagement
+- [Reddit Research](https://docs.xpoz.ai/skills/reddit-research): Deep research across subreddits
+- [Competitive Intel](https://docs.xpoz.ai/skills/competitive-intel): Monitor competitor social media presence
+- [Security OSINT](https://docs.xpoz.ai/skills/security-osint): Open-source intelligence gathering
+- [Best Practices](https://docs.xpoz.ai/skills/best-practices): Xpoz usage guidelines
+- [Getting Started](https://docs.xpoz.ai/skills/getting-started): Onboarding and setup skill
+- [Social Tracking](https://docs.xpoz.ai/skills/social-tracking): Track keywords and users across platforms
+
+## Integrations
+- [Overview](https://docs.xpoz.ai/integrations/overview): Supported MCP client integrations
+- [Claude Code](https://docs.xpoz.ai/integrations/claude-code): One-command setup
+- [Gemini CLI](https://docs.xpoz.ai/integrations/gemini-cli): Settings file configuration
+- [Codex](https://docs.xpoz.ai/integrations/codex): OpenAI Codex CLI setup

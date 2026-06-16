@@ -1,0 +1,76 @@
+---
+title: "Xpoz MCP Server"
+description: "Access Twitter/X, Instagram, Reddit, and TikTok data through the Model Context Protocol"
+---
+
+The Xpoz MCP server provides AI agents with structured access to social media data across four platforms. It exposes **48 tools** that let agents search posts, look up users, analyze engagement, and export data -- all through the standard [Model Context Protocol](https://modelcontextprotocol.io/).
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="4 Platforms, 48 Tools" icon="grid-2">
+    Twitter/X, Instagram, Reddit, and TikTok -- users, posts, comments, connections, and subreddits.
+  </Card>
+  <Card title="Server-Side Pagination" icon="layer-group">
+    Efficient pagination with cached tables -- 100 items per page, iterate through large result sets without re-querying.
+  </Card>
+  <Card title="Three Response Modes" icon="sliders">
+    Choose between fast (immediate results), paging (iterate through pages), and CSV (bulk export up to 500K rows).
+  </Card>
+  <Card title="Field Selection" icon="filter">
+    Request only the fields you need to reduce response size and improve performance.
+  </Card>
+</CardGroup>
+
+## Platform Coverage
+
+| Platform | Users | Posts | Comments | Other |
+|---|---|---|---|---|
+| **Twitter/X** | 5 tools | 8 tools | -- | -- |
+| **Instagram** | 5 tools | 3 tools | 1 tool | -- |
+| **Reddit** | 3 tools | 2 tools | 1 tool | 3 subreddit tools |
+| **TikTok** | 4 tools | 4 tools | 1 tool | -- |
+| **Tracking** | -- | -- | -- | 3 tools |
+| **Account** | -- | -- | -- | 3 tools |
+
+## How It Works
+
+```
+Your AI Agent (Claude, Gemini, Cursor, N8N, etc.)
+        │
+        │  MCP Protocol
+        ▼
+┌─────────────────────┐
+│   Xpoz MCP Server   │
+│   mcp.xpoz.ai/mcp   │
+│                     │
+│  48 tools across    │
+│  4 platforms        │
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────┐
+│  Xpoz Data Platform │
+│  Billions of posts  │
+│  and users          │
+└─────────────────────┘
+```
+
+Your AI agent connects to the hosted Xpoz MCP server at `https://mcp.xpoz.ai/mcp` using your access key. The server handles data retrieval, pagination, caching, and data freshness -- your agent just calls tools and gets structured results.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/mcp/installation">
+    Connect the MCP server to your preferred AI client.
+  </Card>
+  <Card title="Browse Tools" icon="wrench" href="/mcp/tools/overview">
+    See all 48 tools organized by platform.
+  </Card>
+  <Card title="Response Modes" icon="sliders" href="/mcp/response-modes">
+    Learn when to use fast, paging, or CSV mode.
+  </Card>
+  <Card title="Field Selection" icon="filter" href="/mcp/field-selection">
+    Optimize performance by requesting only the fields you need.
+  </Card>
+</CardGroup>

@@ -1,0 +1,144 @@
+---
+title: "Installation"
+description: "Connect the Xpoz MCP server to Claude Code, Claude Desktop, Gemini CLI, Cursor, N8N, and other clients"
+---
+
+The Xpoz MCP server is hosted at `https://mcp.xpoz.ai/mcp`. You need an access key to authenticate -- get one from your [Xpoz dashboard](https://xpoz.ai).
+
+<Tabs>
+  <Tab title="Claude Code">
+    Run a single command in your terminal:
+
+    ```bash
+    claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer YOUR_API_KEY"
+    ```
+
+    Claude Code will automatically discover all 48 tools on the next conversation.
+
+    <Tip>
+      You can verify the connection by asking Claude: "What Xpoz tools are available?"
+    </Tip>
+  </Tab>
+
+  <Tab title="Claude Desktop">
+    1. Open Claude Desktop
+    2. Go to **Settings** > **Developer** > **Edit Config**
+    3. Add the following to your configuration file:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "url": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    4. Restart Claude Desktop
+
+    <Note>
+      Replace `YOUR_API_KEY` with your actual Xpoz access key. You can find it in your [Xpoz dashboard](https://xpoz.ai).
+    </Note>
+  </Tab>
+
+  <Tab title="Gemini CLI">
+    Add the MCP server to your Gemini CLI settings file (`~/.gemini/settings.json`):
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "uri": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    Restart Gemini CLI to pick up the new configuration.
+  </Tab>
+
+  <Tab title="Cursor">
+    1. Open Cursor Settings (`Cmd+,` / `Ctrl+,`)
+    2. Navigate to **MCP** section
+    3. Click **Add new MCP server**
+    4. Configure:
+       - **Name**: `xpoz`
+       - **Type**: `http`
+       - **URL**: `https://mcp.xpoz.ai/mcp`
+
+    Alternatively, add to your `.cursor/mcp.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "url": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    <Note>
+      Set the `Authorization` header with your bearer token. Cursor supports HTTP transport natively.
+    </Note>
+  </Tab>
+
+  <Tab title="N8N">
+    1. Create an **AI Agent** node in your workflow
+    2. Add a tool: **MCP Client Tool**
+    3. Configure the MCP Client Tool:
+
+    | Setting | Value |
+    |---|---|
+    | **Endpoint** | `https://mcp.xpoz.ai/mcp` |
+    | **Server Transport** | HTTP Streamable |
+    | **Authentication Type** | Bearer Auth |
+    | **Credential for Bearer Auth** | Your Xpoz access key |
+
+    4. Click **Refresh** to load the available tools
+    5. Select which tools to include in your agent's toolset
+
+    <Tip>
+      If you can see the tools list after clicking Refresh, you are successfully connected to the MCP server.
+    </Tip>
+  </Tab>
+</Tabs>
+
+## Getting Your Access Key
+
+1. Sign up or log in at [xpoz.ai](https://xpoz.ai)
+2. Navigate to your dashboard
+3. Copy your access key
+
+You can also retrieve your access key programmatically using the `getUserAccessKey` tool if you are authenticated via OAuth, or check its status with `checkAccessKeyStatus`.
+
+## Verify the Connection
+
+After setup, test the connection by asking your AI agent to run a simple query:
+
+```
+Search for Twitter user @elonmusk
+```
+
+If the agent successfully calls `getTwitterUser` and returns profile data, your connection is working.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Browse Tools" icon="wrench" href="/mcp/tools/overview">
+    See all 48 tools organized by platform.
+  </Card>
+  <Card title="Response Modes" icon="sliders" href="/mcp/response-modes">
+    Choose between fast, paging, and CSV response modes.
+  </Card>
+</CardGroup>

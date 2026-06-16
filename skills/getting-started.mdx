@@ -1,0 +1,91 @@
+---
+title: "Getting Started"
+description: "Set up Xpoz agent skills with your preferred integration path, verify your account, and discover available capabilities."
+---
+
+The Getting Started skill guides you through setting up Xpoz with your preferred integration, verifying your account, and discovering what you can do. Follow the steps below to get up and running.
+
+## Choose Your Integration
+
+<Tabs>
+  <Tab title="MCP Server (Recommended)">
+    For Claude Code, add the Xpoz MCP server to `~/.claude.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "url": "https://mcp.xpoz.ai/mcp",
+          "transport": "http-stream"
+        }
+      }
+    }
+    ```
+
+    OAuth authentication happens automatically on first use.
+  </Tab>
+  <Tab title="Python SDK">
+    ```bash
+    pip install xpoz
+    export XPOZ_API_KEY=your-key-here
+    ```
+  </Tab>
+  <Tab title="TypeScript SDK">
+    ```bash
+    npm install @xpoz/xpoz
+    export XPOZ_API_KEY=your-key-here
+    ```
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    brew install xpoz-ai/tap/xpoz-cli
+    xpoz-cli auth login
+    ```
+  </Tab>
+</Tabs>
+
+Get a free access key (100K results/month) at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+
+## Verify Your Setup
+
+<Steps>
+  <Step title="Check access key status">
+    Run `checkAccessKeyStatus` to confirm your key is valid and see your current usage.
+  </Step>
+  <Step title="Get account details">
+    Run `getAccountDetails` to see your plan, remaining quota, and tracked items.
+  </Step>
+  <Step title="Run a test query">
+    Try a simple search like "Search Twitter for posts about AI agents" to confirm everything works end-to-end.
+  </Step>
+</Steps>
+
+## Set Up Tracking
+
+Tracking gives you fresher data by continuously collecting results for your keywords, users, and hashtags. We recommend starting by tracking your brand name and key competitors. See [Social Tracking](/skills/social-tracking) for full details on how to configure and manage tracked items.
+
+## Skill Routing
+
+| If you want to...                          | Use this skill                                              |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| Analyze sentiment around a brand or topic  | [Sentiment Analyzer](/skills/sentiment-analyzer)            |
+| Export Twitter data to CSV                 | [Twitter Data Export](/skills/twitter-data-export)          |
+| Find influencers in a niche               | [Influencer Discovery](/skills/influencer-discovery)        |
+| Research what Reddit thinks about something | [Reddit Research](/skills/reddit-research)                 |
+| Compare brands head-to-head               | [Competitive Intelligence](/skills/competitive-intel)       |
+| Monitor security threats and CVEs          | [Security OSINT](/skills/security-osint)                   |
+| Learn query syntax and best practices      | [Best Practices](/skills/best-practices)                   |
+| Track keywords, users, or hashtags         | [Social Tracking](/skills/social-tracking)                 |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Browse All Skills" icon="wand-magic-sparkles" href="/skills/overview">
+  </Card>
+  <Card title="MCP Tools Reference" icon="wrench" href="/mcp/tools/overview">
+  </Card>
+  <Card title="Query Syntax Guide" icon="magnifying-glass" href="/mcp/query-syntax">
+  </Card>
+  <Card title="Response Modes" icon="sliders" href="/mcp/response-modes">
+  </Card>
+</CardGroup>

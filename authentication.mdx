@@ -1,0 +1,139 @@
+---
+title: Authentication
+description: Authenticate with Xpoz using an access key, Google sign-in, or bearer token.
+---
+
+Every request to Xpoz requires authentication. Choose the method that fits your use case:
+
+| Method | Best for | Complexity |
+|--------|----------|------------|
+| **Access Key** | SDKs, CLI, scripts, quick prototyping | Simplest |
+| **Google Sign-In** | Claude Desktop, browser-based clients | Automatic |
+| **Bearer Token** | Claude Code, N8N, programmatic MCP access | One-time setup |
+
+## Credential precedence
+
+When multiple credentials are available, Xpoz resolves them in this order:
+
+1. **Explicit parameter** passed to the client constructor (`apiKey` / `api_key`)
+2. **Environment variable** (`XPOZ_API_KEY`)
+3. **Stored configuration** (from CLI `auth login` or prior sign-in)
+
+<Tabs>
+  <Tab title="Access Key">
+    ## Access Key authentication
+
+    The simplest way to authenticate. Get your key and start querying immediately.
+
+    ### Step 1: Get your access key
+
+    Sign up at [xpoz.ai](https://xpoz.ai) and navigate to the dashboard. Your access key is available on the **Get Token** page at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+
+    ### Step 2: Use the key
+
+    Pass the key directly or set it as an environment variable:
+
+    ```bash
+    export XPOZ_API_KEY=your-api-key
+    ```
+
+    <Tabs>
+      <Tab title="TypeScript">
+        ```typescript
+        import { XpozClient } from '@xpoz/xpoz';
+
+        const client = new XpozClient({ apiKey: 'your-api-key' });
+
+        await client.connect();
+        ```
+      </Tab>
+      <Tab title="Python">
+        ```python
+        from xpoz import XpozClient
+
+        client = XpozClient("your-api-key")
+        ```
+      </Tab>
+      <Tab title="CLI">
+        ```bash
+        export XPOZ_API_KEY=your-api-key
+        xpoz-cli twitter get_user --identifier elonmusk
+        ```
+      </Tab>
+    </Tabs>
+
+    <Note>
+      Never commit access keys to version control. Use environment variables or a secrets manager in production.
+    </Note>
+  </Tab>
+  <Tab title="Google Sign-In">
+    ## Google Sign-In
+
+    When you connect via Claude Desktop or other browser-based MCP clients, authentication happens automatically through Google Sign-In.
+
+    ### How it works
+
+    1. Your MCP client (e.g., Claude Desktop) initiates the sign-in flow when connecting to Xpoz
+    2. A Google sign-in prompt appears in your browser
+    3. After signing in, the connection is established automatically
+    4. All subsequent requests are authenticated — no manual token management required
+
+    <Tip>
+      This is the recommended method for Claude Desktop. Just add the Xpoz MCP server and the sign-in flow handles everything.
+    </Tip>
+
+    See [Installation](/mcp/installation) for step-by-step setup with Claude Desktop.
+  </Tab>
+  <Tab title="Bearer Token">
+    ## Bearer token authentication
+
+    For programmatic access from Claude Code, N8N, or any HTTP client. Pass your access key as a bearer token in the `Authorization` header.
+
+    ### Get your access key
+
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the dashboard.
+
+    ### Connect from your client
+
+    <Tabs>
+      <Tab title="Claude Code">
+        ```bash
+        claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
+          -t http \
+          -H "Authorization: Bearer YOUR_API_KEY"
+        ```
+      </Tab>
+      <Tab title="N8N">
+        Create an **AI Agent** node and add a **Tool** > **MCP Client Tool**:
+
+        - **Endpoint**: `https://mcp.xpoz.ai/mcp`
+        - **Server Transport**: HTTP Streamable
+        - **Authentication Type**: Bearer Auth
+        - **Credential for Bearer Auth**: Your access key
+
+        If you can see the tools list, you are connected.
+      </Tab>
+      <Tab title="Any HTTP Client">
+        Include the bearer token in the `Authorization` header:
+
+        ```bash
+        curl -X POST https://mcp.xpoz.ai/mcp \
+          -H "Authorization: Bearer YOUR_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"getTwitterUser","arguments":{"identifier":"elonmusk","identifierType":"username"}},"id":1}'
+        ```
+      </Tab>
+    </Tabs>
+  </Tab>
+</Tabs>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Start querying with your credentials
+  </Card>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 available tools
+  </Card>
+</CardGroup>

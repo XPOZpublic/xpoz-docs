@@ -1,0 +1,72 @@
+---
+title: "Twitter Data Export"
+description: "Export Twitter/X data to CSV with up to 500K rows per export, with keyword and author-based search."
+---
+
+The Twitter Data Export skill handles bulk data extraction from Twitter/X. It supports keyword-based search, author-based search, date filtering, and boolean query syntax. Results are exported as CSV files with up to 500K rows per export.
+
+## Example Prompts
+
+- "Export tweets about Claude Code to CSV"
+- "Download @OpenAI tweets from January 2026"
+- "Export all tweets mentioning 'artificial intelligence' AND 'healthcare' to CSV"
+- "Get a CSV of tweets from @elonmusk in the last 30 days"
+
+## Available Fields
+
+| Field | Description |
+| --- | --- |
+| `id` | Tweet unique identifier |
+| `text` | Full tweet text |
+| `authorUsername` | Author's Twitter handle |
+| `authorId` | Author's unique identifier |
+| `createdAtDate` | Publication date |
+| `likeCount` | Number of likes |
+| `retweetCount` | Number of retweets |
+| `quoteCount` | Number of quote tweets |
+| `impressionCount` | Number of impressions |
+| `replyCount` | Number of replies |
+| `language` | Tweet language code |
+| `isRetweet` | Whether this is a retweet |
+| `isReply` | Whether this is a reply |
+
+## How It Works
+
+<Steps>
+  <Step title="Build query">
+    Constructs a search query using keywords, boolean operators, date ranges, or author filters.
+  </Step>
+  <Step title="Execute search">
+    Calls Xpoz tools with `responseType="csv"` for bulk export or standard mode for smaller datasets.
+  </Step>
+  <Step title="Monitor export">
+    For large exports, monitors the async operation via `checkOperationStatus` until the CSV file is ready.
+  </Step>
+  <Step title="Deliver results">
+    Returns the CSV download link or displays results inline for smaller datasets.
+  </Step>
+</Steps>
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getTwitterPostsByKeywords` | Search Twitter posts by keyword query |
+| `getTwitterPostsByAuthor` | Get posts from a specific Twitter user |
+| `checkOperationStatus` | Monitor async CSV export progress |
+
+## Query Syntax
+
+Boolean operators let you build precise queries:
+
+| Syntax | Example |
+| --- | --- |
+| Simple | `artificial intelligence` |
+| Phrase | `"machine learning"` |
+| AND | `AI AND healthcare` |
+| OR | `ChatGPT OR "Claude AI"` |
+| Combined | `("generative AI" OR LLM) AND startup` |
+
+## Get Started
+
+Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.

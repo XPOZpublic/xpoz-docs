@@ -1,0 +1,161 @@
+---
+title: "TypeScript SDK Error Handling"
+description: "Handle authentication failures, timeouts, and operation errors in the Xpoz TypeScript SDK."
+---
+
+## Error Hierarchy
+
+All SDK errors extend from `XpozError`. Import them from the package:
+
+```typescript
+import {
+  XpozError,
+  AuthenticationError,
+  XpozConnectionError,
+  OperationTimeoutError,
+  OperationFailedError,
+  OperationCancelledError,
+} from "@xpoz/xpoz";
+```
+
+| Error Class | When It's Thrown |
+| --- | --- |
+| `XpozError` | Base class for all Xpoz errors |
+| `AuthenticationError` | Invalid or missing access key |
+| `XpozConnectionError` | Cannot connect to the MCP server |
+| `OperationTimeoutError` | Operation exceeded the configured timeout |
+| `OperationFailedError` | Operation failed server-side |
+| `OperationCancelledError` | Operation was cancelled |
+
+## Catching Errors
+
+Use `instanceof` checks to handle specific error types. Always catch more specific errors before the base `XpozError`:
+
+```typescript
+try {
+  const user = await client.twitter.getUser("nonexistent_user_12345");
+} catch (e) {
+  if (e instanceof OperationFailedError) {
+    console.log(`Operation ${e.operationId} failed: ${e.operationError}`);
+  } else if (e instanceof OperationTimeoutError) {
+    console.log(`Timed out after ${Math.round(e.elapsedMs / 1000)}s`);
+  } else if (e instanceof AuthenticationError) {
+    console.log("Invalid access key");
+  } else if (e instanceof XpozConnectionError) {
+    console.log("Cannot connect to MCP server");
+  } else if (e instanceof XpozError) {
+    console.log(`Xpoz error: ${e.message}`);
+  }
+}
+```
+
+## Error Details
+
+### AuthenticationError
+
+Thrown when the access key is invalid, expired, or missing.
+
+```typescript
+try {
+  const client = new XpozClient({ apiKey: "invalid-key" });
+  await client.connect();
+  await client.twitter.getUser("elonmusk");
+} catch (e) {
+  if (e instanceof AuthenticationError) {
+    console.log(e.message); // "Invalid access key" or similar
+  }
+}
+```
+
+### OperationTimeoutError
+
+Thrown when an operation exceeds the configured timeout (default: 300,000ms / 5 minutes). The error includes the elapsed time.
+
+```typescript
+try {
+  const results = await client.twitter.searchPosts("very broad query");
+} catch (e) {
+  if (e instanceof OperationTimeoutError) {
+    console.log(`Timed out after ${Math.round(e.elapsedMs / 1000)}s`);
+    // Consider narrowing your query or increasing timeoutMs
+  }
+}
+```
+
+<Tip>
+If you frequently hit timeouts, increase the timeout when creating the client: `new XpozClient({ timeoutMs: 600_000 })`. You can also narrow your queries with date filters, field selection, or more specific search terms.
+</Tip>
+
+### OperationFailedError
+
+Thrown when an operation completes but with an error status. Includes the `operationId` and error details.
+
+```typescript
+try {
+  const results = await client.twitter.searchPosts("query");
+} catch (e) {
+  if (e instanceof OperationFailedError) {
+    console.log(`Operation: ${e.operationId}`);
+    console.log(`Error: ${e.operationError}`);
+  }
+}
+```
+
+### OperationCancelledError
+
+Thrown when an operation is cancelled, typically due to server-side resource management.
+
+```typescript
+try {
+  const results = await client.twitter.searchPosts("query");
+} catch (e) {
+  if (e instanceof OperationCancelledError) {
+    console.log(`Operation ${e.operationId} was cancelled`);
+  }
+}
+```
+
+## Practical Pattern
+
+A robust wrapper that handles all error cases:
+
+```typescript
+import {
+  XpozClient,
+  XpozError,
+  AuthenticationError,
+  OperationTimeoutError,
+  OperationFailedError,
+  OperationCancelledError,
+} from "@xpoz/xpoz";
+
+async function searchWithRetry(client: XpozClient, query: string): Promise<void> {
+  try {
+    const results = await client.twitter.searchPosts(query, {
+      startDate: "2025-01-01",
+    });
+    console.log(`Found ${results.pagination.totalRows} results`);
+    for (const post of results.data) {
+      console.log(`${post.authorUsername}: ${post.text}`);
+    }
+  } catch (e) {
+    if (e instanceof AuthenticationError) {
+      throw e; // Cannot recover — propagate to caller
+    } else if (e instanceof OperationTimeoutError) {
+      console.log("Query timed out — try narrowing the date range or query");
+    } else if (e instanceof OperationFailedError) {
+      console.log(`Server error: ${e.operationError}`);
+    } else if (e instanceof OperationCancelledError) {
+      console.log("Operation cancelled — retrying may help");
+    } else if (e instanceof XpozError) {
+      console.log(`Unexpected Xpoz error: ${e.message}`);
+    } else {
+      throw e; // Not an Xpoz error — rethrow
+    }
+  }
+}
+```
+
+<Note>
+For the equivalent error handling patterns in Python, see [Python SDK Error Handling](/sdks/python/error-handling). The Python SDK uses `try/except` with the same error hierarchy but Python exception classes (`OperationFailedError`, `OperationTimeoutError`, etc.).
+</Note>

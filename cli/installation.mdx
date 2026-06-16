@@ -1,0 +1,156 @@
+---
+title: "Installation"
+description: "Install the Xpoz CLI on Linux, macOS, or Windows via install script, Homebrew, pip, winget, or binary download"
+---
+
+## Requirements
+
+- **Linux**: x86_64 or arm64
+- **macOS**: Apple Silicon (M1+). Intel Macs should use the pip install method.
+- **Windows**: x86_64
+- **Python**: 3.10+ (only required for pip install or build from source)
+
+## Install
+
+<Tabs>
+  <Tab title="Install Script">
+    **Linux / macOS**
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/XPOZpublic/xpoz-cli/main/install.sh | sh
+    ```
+
+    The script auto-detects your OS and architecture, downloads the correct binary, verifies the SHA256 checksum, and installs to `~/.local/bin/xpoz-cli`.
+
+    Override the install directory or pin a specific version:
+
+    ```bash
+    XPOZ_INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/XPOZpublic/xpoz-cli/main/install.sh | sh
+
+    XPOZ_VERSION=1.2.0 curl -fsSL https://raw.githubusercontent.com/XPOZpublic/xpoz-cli/main/install.sh | sh
+    ```
+
+    <Note>
+      Ensure `~/.local/bin` is in your `PATH`. Add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile if needed.
+    </Note>
+
+    ---
+
+    **Windows (PowerShell)**
+
+    ```powershell
+    iwr -useb https://raw.githubusercontent.com/XPOZpublic/xpoz-cli/main/install.ps1 | iex
+    ```
+
+    Installs to `%LOCALAPPDATA%\xpoz-cli\xpoz-cli.exe`. The script adds this directory to your user `PATH` automatically.
+  </Tab>
+
+  <Tab title="Homebrew">
+    Available on macOS and Linux:
+
+    ```bash
+    brew install XPOZpublic/xpoz/xpoz-cli
+    ```
+
+    Or add the tap first, then install:
+
+    ```bash
+    brew tap XPOZpublic/xpoz
+    brew install xpoz-cli
+    ```
+
+    Update to the latest version:
+
+    ```bash
+    brew upgrade xpoz-cli
+    ```
+  </Tab>
+
+  <Tab title="pip">
+    Works on any platform with Python 3.10+:
+
+    ```bash
+    pip install xpoz-cli
+    ```
+
+    <Tip>
+      This is the recommended method for macOS Intel, which does not have a pre-built binary.
+    </Tip>
+
+    Update to the latest version:
+
+    ```bash
+    pip install --upgrade xpoz-cli
+    ```
+  </Tab>
+
+  <Tab title="winget">
+    Available on Windows:
+
+    ```powershell
+    winget install Xpoz.XpozCli
+    ```
+
+    Update to the latest version:
+
+    ```powershell
+    winget upgrade Xpoz.XpozCli
+    ```
+  </Tab>
+
+  <Tab title="Manual Download">
+    Download the binary for your platform from [GitHub Releases](https://github.com/XPOZpublic/xpoz-cli/releases):
+
+    | Platform | File |
+    |---|---|
+    | Linux x86_64 | `xpoz-cli-linux-amd64` |
+    | Linux arm64 | `xpoz-cli-linux-arm64` |
+    | macOS Apple Silicon | `xpoz-cli-macos-arm64` |
+    | Windows x86_64 | `xpoz-cli-windows-amd64.exe` |
+
+    Every release includes a `SHA256SUMS` file. Verify the download:
+
+    ```bash
+    sha256sum -c SHA256SUMS --ignore-missing
+    ```
+
+    Make the binary executable and move it to your PATH:
+
+    ```bash
+    chmod +x xpoz-cli-linux-amd64
+    mv xpoz-cli-linux-amd64 ~/.local/bin/xpoz-cli
+    ```
+
+    <Note>
+      macOS Intel is not available as a pre-built binary. Use `pip install xpoz-cli` instead.
+    </Note>
+  </Tab>
+
+  <Tab title="Build from Source">
+    Requires Python 3.10+ and pip:
+
+    ```bash
+    pip install xpoz pyinstaller
+    pyinstaller --onefile --name xpoz-cli xpoz_cli.py
+    ```
+
+    The compiled binary will be in the `dist/` directory.
+  </Tab>
+</Tabs>
+
+## Verify Installation
+
+```bash
+xpoz-cli --version
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/cli/authentication">
+    Log in with your access key to start making queries.
+  </Card>
+  <Card title="Usage" icon="terminal" href="/cli/usage">
+    Learn about platforms, commands, and global flags.
+  </Card>
+</CardGroup>
