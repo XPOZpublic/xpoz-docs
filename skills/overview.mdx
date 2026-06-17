@@ -34,62 +34,25 @@ Each skill knows which Xpoz tools to call, how to process results, and how to fo
 
 ## Setup
 
-<Tabs>
-  <Tab title="skills.sh (Recommended)">
-    Install all Xpoz skills with a single command:
+Install all Xpoz skills with a single command:
 
-    ```bash
-    npx skills add XPOZpublic/xpoz-agent-skills --all
-    ```
+```bash
+npx skills add XPOZpublic/xpoz-agent-skills --all
+```
 
-    Or install a specific skill:
+Or install a specific skill:
 
-    ```bash
-    npx skills add XPOZpublic/xpoz-agent-skills --skill social-sentiment-analyzer
-    ```
+```bash
+npx skills add XPOZpublic/xpoz-agent-skills --skill social-sentiment-analyzer
+```
 
-    This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https://www.skills.sh/). Skills are installed directly into your agent's skills directory — no further configuration needed.
+This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https://www.skills.sh/). Skills are installed directly into your agent's skills directory — no further configuration needed.
 
-    **Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `reddit-research`, `competitive-intel`, `security-osint`
+**Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `reddit-research`, `competitive-intel`, `security-osint`
 
-    <Tip>
-      You still need to configure Xpoz access (MCP server or access key) to use the skills. See the MCP Server or SDK tabs for auth setup.
-    </Tip>
-  </Tab>
-  <Tab title="MCP Server">
-    For Claude Code users, add to `~/.claude.json`:
-
-    ```json
-    {
-      "mcpServers": {
-        "xpoz": {
-          "url": "https://mcp.xpoz.ai/mcp",
-          "transport": "http-stream"
-        }
-      }
-    }
-    ```
-
-    OAuth authentication happens on first use.
-  </Tab>
-  <Tab title="SDK">
-    **Python:**
-
-    ```bash
-    pip install xpoz
-    export XPOZ_API_KEY=your-key-here
-    ```
-
-    **TypeScript:**
-
-    ```bash
-    npm install @xpoz/xpoz
-    export XPOZ_API_KEY=your-key-here
-    ```
-
-    Get a free access key (100K results/month) at [xpoz.ai/get-token](https://xpoz.ai/get-token).
-  </Tab>
-</Tabs>
+<Tip>
+  You still need to configure Xpoz access (MCP server or access key) to use the skills. See the [MCP Installation](/mcp/installation) or [Authentication](/authentication) guide.
+</Tip>
 
 ## Explore Skills
 

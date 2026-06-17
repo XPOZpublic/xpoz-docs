@@ -12,7 +12,7 @@ One command connects any MCP-compatible agent to all 48 Xpoz tools:
 claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-Get a free API key at [xpoz.ai](https://xpoz.ai) (100K results/month, no credit card required).
+Get a free API key at [xpoz.ai](https://xpoz.ai) (no credit card required).
 
 Then ask your agent:
 
@@ -105,6 +105,6 @@ All requests require an access key passed as a bearer token:
 - **SDK**: Pass as `apiKey` (TypeScript) or `api_key` (Python) to the client constructor
 - **CLI**: Run `xpoz-cli auth login` for interactive login
 
-Get your key at [xpoz.ai](https://xpoz.ai). Free tier: 100K results/month.
+Get your key at [xpoz.ai](https://xpoz.ai). A free tier is available.
 
 See [Authentication](https://docs.xpoz.ai/authentication) for details.

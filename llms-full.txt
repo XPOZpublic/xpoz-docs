@@ -10,7 +10,7 @@ For the agent setup guide, see: https://docs.xpoz.ai/agents.md
 # Welcome to Xpoz
 Source: https://docs.xpoz.ai/introduction
 
-
+  **For AI agents:** Start with [agents.md](https://docs.xpoz.ai/agents.md) for the setup and tool-choice guide, or [llms.txt](https://docs.xpoz.ai/llms.txt) for the full documentation index.
 ## What is Xpoz?
 
 Xpoz is a social media intelligence platform that gives you structured access to **billions of posts and users** across Twitter/X, Instagram, Reddit, and TikTok. Search users, posts, comments, and communities using natural language or structured queries.
@@ -63,7 +63,7 @@ Source: https://docs.xpoz.ai/quickstart
 
 ## 1. Get your access key
 
-Sign up at [xpoz.ai](https://xpoz.ai) and get your access key from the dashboard. Free tier includes 100K results per month.
+Sign up at [xpoz.ai](https://xpoz.ai) and get your access key from the dashboard. A free tier is available.
 
 ## 2. Choose your integration
   
@@ -5226,54 +5226,23 @@ Each skill knows which Xpoz tools to call, how to process results, and how to fo
 - Any agent supporting the SKILL.md standard
 
 ## Setup
-  
-    Install all Xpoz skills with a single command:
 
-    ```bash
-    npx skills add XPOZpublic/xpoz-agent-skills --all
-    ```
+Install all Xpoz skills with a single command:
 
-    Or install a specific skill:
+```bash
+npx skills add XPOZpublic/xpoz-agent-skills --all
+```
 
-    ```bash
-    npx skills add XPOZpublic/xpoz-agent-skills --skill social-sentiment-analyzer
-    ```
+Or install a specific skill:
 
-    This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https://www.skills.sh/). Skills are installed directly into your agent's skills directory — no further configuration needed.
+```bash
+npx skills add XPOZpublic/xpoz-agent-skills --skill social-sentiment-analyzer
+```
 
-    **Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `reddit-research`, `competitive-intel`, `security-osint`
-      You still need to configure Xpoz access (MCP server or access key) to use the skills. See the MCP Server or SDK tabs for auth setup.
-  
-    For Claude Code users, add to `~/.claude.json`:
+This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https://www.skills.sh/). Skills are installed directly into your agent's skills directory — no further configuration needed.
 
-    ```json
-    {
-      "mcpServers": {
-        "xpoz": {
-          "url": "https://mcp.xpoz.ai/mcp",
-          "transport": "http-stream"
-        }
-      }
-    }
-    ```
-
-    OAuth authentication happens on first use.
-    **Python:**
-
-    ```bash
-    pip install xpoz
-    export XPOZ_API_KEY=your-key-here
-    ```
-
-    **TypeScript:**
-
-    ```bash
-    npm install @xpoz/xpoz
-    export XPOZ_API_KEY=your-key-here
-    ```
-
-    Get a free access key (100K results/month) at [xpoz.ai/get-token](https://xpoz.ai/get-token).
-
+**Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `reddit-research`, `competitive-intel`, `security-osint`
+  You still need to configure Xpoz access (MCP server or access key) to use the skills. See the [MCP Installation](/mcp/installation) or [Authentication](/authentication) guide.
 ## Explore Skills
   
     Reference guide for Xpoz query syntax, response modes, and patterns.
@@ -5406,7 +5375,7 @@ The Getting Started skill guides you through setting up Xpoz with your preferred
     xpoz-cli auth login
     ```
 
-Get a free access key (100K results/month) at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token).
 
 ## Verify Your Setup
   
@@ -5491,7 +5460,7 @@ The Social Tracking skill manages continuous tracking across all four platforms.
 
 ## Get Started
 
-Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
 
 ---
 
@@ -5533,7 +5502,7 @@ The Sentiment Analyzer skill searches Twitter, Reddit, and Instagram for posts a
 
 ## Get Started
 
-Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
 
 ---
 
@@ -5597,7 +5566,7 @@ Boolean operators let you build precise queries:
 
 ## Get Started
 
-Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
 
 ---
 
@@ -5653,7 +5622,7 @@ Each influencer is classified into a voice type based on their content style:
 
 ## Get Started
 
-Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
 
 ---
 
@@ -5697,7 +5666,7 @@ The skill extracts and categorizes themes into:
 
 ## Get Started
 
-Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
 
 ---
 
@@ -5740,7 +5709,7 @@ The Competitive Intelligence skill compares 2-5 brands head-to-head across socia
 
 ## Get Started
 
-Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
 
 ---
 
@@ -5784,7 +5753,7 @@ The Security OSINT skill monitors Twitter and Reddit for security-related discus
 
 ## Get Started
 
-Get a free access key with 100K results/month at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
 
 ---
 
