@@ -7,6 +7,7 @@ Every request to Xpoz requires authentication. Choose the method that fits your 
 
 | Method | Best for | Complexity |
 |--------|----------|------------|
+| **Trial Token** | Trying Xpoz with no sign-up | Simplest |
 | **Access Key** | SDKs, CLI, scripts, quick prototyping | Simplest |
 | **Google Sign-In** | Claude Desktop, browser-based clients | Automatic |
 | **Bearer Token** | Claude Code, N8N, programmatic MCP access | One-time setup |
@@ -20,6 +21,40 @@ When multiple credentials are available, Xpoz resolves them in this order:
 3. **Stored configuration** (from CLI `auth login` or prior sign-in)
 
 <Tabs>
+  <Tab title="Trial Token">
+    ## Trial token (no sign-up)
+
+    Want to try Xpoz before creating an account? Mint a free **trial token** — no sign-in required. It is valid for 5 days.
+
+    ### Step 1: Mint a trial token
+
+    ```bash
+    curl -X POST https://api.xpoz.ai/api/trial/token
+    ```
+
+    The response contains a token that starts with `TRIAL`:
+
+    ```json
+    {
+      "success": true,
+      "data": { "accessKey": "TRIAL...", "expiresInSeconds": 432000 },
+      "message": "Trial access token created."
+    }
+    ```
+
+    ### Step 2: Use it as your API key
+
+    Pass the `TRIAL...` token exactly like an access key — as the SDK `apiKey`, the `XPOZ_API_KEY` env var, or a bearer token.
+
+    ```bash
+    export XPOZ_API_KEY=TRIAL...
+    xpoz-cli twitter get_user --identifier elonmusk
+    ```
+
+    <Note>
+      Trial tokens are intentionally limited: read-only data tools only, up to 5 cached results per call (no pagination or CSV export), and no live crawling. [Get your own access key](https://xpoz.ai/get-token) for full results, pagination, CSV export, and live data.
+    </Note>
+  </Tab>
   <Tab title="Access Key">
     ## Access Key authentication
 
