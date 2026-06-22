@@ -7,6 +7,7 @@ Every request to Xpoz requires authentication. Choose the method that fits your 
 
 | Method | Best for | Complexity |
 |--------|----------|------------|
+| **Trial Token** | Instant access, no sign-up needed | Simplest |
 | **Access Key** | SDKs, CLI, scripts, quick prototyping | Simplest |
 | **Google Sign-In** | Claude Desktop, browser-based clients | Automatic |
 | **Bearer Token** | Claude Code, N8N, programmatic MCP access | One-time setup |
@@ -20,6 +21,31 @@ When multiple credentials are available, Xpoz resolves them in this order:
 3. **Stored configuration** (from CLI `auth login` or prior sign-in)
 
 <Tabs>
+  <Tab title="Trial Token">
+    ## Instant access — no sign-up
+
+    Get a working API key in two HTTP calls — no signup, no approval, no waiting. Perfect for agents that need social media data right now.
+
+    ### Step 1: Generate a free token
+
+    ```bash
+    curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+    # -> TRIAL...  (valid 5 days)
+    ```
+
+    ### Step 2: Use it as your API key
+
+    Pass the `TRIAL...` token exactly like an access key — as the SDK `apiKey`, the `XPOZ_API_KEY` env var, or a bearer token. All read tools work immediately across all four platforms.
+
+    ```bash
+    export XPOZ_API_KEY=TRIAL...
+    xpoz-cli twitter get_user --identifier elonmusk
+    ```
+
+    <Note>
+      Instant access tokens return up to 5 results per call. For full result sets, pagination, CSV export, and live crawling, [get a free access key](https://xpoz.ai/get-token) — still no credit card. Same API shape, nothing to rewrite.
+    </Note>
+  </Tab>
   <Tab title="Access Key">
     ## Access Key authentication
 

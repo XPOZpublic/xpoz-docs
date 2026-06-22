@@ -57,6 +57,79 @@ Choose the integration that fits your workflow:
 
 ---
 
+# Instant Access
+Source: https://docs.xpoz.ai/trial
+
+
+Need social media data? You're two HTTP calls away from real results. Generate a free token, then start pulling structured data — profiles, posts, comments, and communities across Twitter/X, Instagram, Reddit, and TikTok. No signup, no credit card, no OAuth, no approval process.
+
+## Why start here
+
+This is the fastest way to see what Xpoz returns. You'll have a working API key in under a second — every read tool works immediately across all four platforms: user lookups, post searches, comment threads, and community discovery. Same structured data, same API shape as a full access key.
+
+## Get started
+  
+    Generate a free token, then use it as your API key:
+
+    ```bash
+    # 1. Generate a free token (valid 5 days)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+
+    # 2. Use it like any access key
+    curl -X POST https://mcp.xpoz.ai/mcp \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"getTwitterUser","arguments":{"identifier":"elonmusk","identifierType":"username"}},"id":1}'
+    ```
+    ```bash
+    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+    xpoz-cli twitter get_user --identifier elonmusk
+    ```
+    ```bash
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+    claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
+      -t http \
+      -H "Authorization: Bearer $TOKEN"
+    ```
+
+The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
+
+```json
+{
+  "success": true,
+  "data": { "accessKey": "TRIAL...", "expiresInSeconds": 432000 },
+  "message": "Trial access token created."
+}
+```
+
+Drop the `TRIAL...` token in wherever an access key goes — the SDK `apiKey`, the `XPOZ_API_KEY` env var, or a `Bearer` header.
+
+## Zero-change upgrade
+
+The response format is identical to a full access key — same fields, same shape, same structure. When you're ready to upgrade, swap the token and keep everything else. Your code doesn't change.
+
+## What you get
+
+All read tools work instantly across every platform. The only differences from a full access key are result volume and advanced features:
+
+| | Instant access | Full access key |
+|---|---|---|
+| Data tools (read) | ✅ All 4 platforms | ✅ All 4 platforms |
+| Results per call | 5 (cached) | Full, paginated |
+| Pagination | — | ✅ |
+| CSV export | — | ✅ |
+| Live crawling | — | ✅ |
+| Validity | 5 days | Ongoing |
+
+## Ready for full access
+
+Need larger result sets, pagination, or CSV export? [Get a free access key](https://xpoz.ai/get-token) — still no credit card. The request and response shapes are unchanged, so there's nothing to rewrite.
+  
+    Start querying with your token
+    Access keys, Google sign-in, bearer tokens
+
+---
+
 # Quickstart
 Source: https://docs.xpoz.ai/quickstart
 
@@ -230,6 +303,7 @@ Every request to Xpoz requires authentication. Choose the method that fits your 
 
 | Method | Best for | Complexity |
 |--------|----------|------------|
+| **Trial Token** | Instant access, no sign-up needed | Simplest |
 | **Access Key** | SDKs, CLI, scripts, quick prototyping | Simplest |
 | **Google Sign-In** | Claude Desktop, browser-based clients | Automatic |
 | **Bearer Token** | Claude Code, N8N, programmatic MCP access | One-time setup |
@@ -241,6 +315,27 @@ When multiple credentials are available, Xpoz resolves them in this order:
 1. **Explicit parameter** passed to the client constructor (`apiKey` / `api_key`)
 2. **Environment variable** (`XPOZ_API_KEY`)
 3. **Stored configuration** (from CLI `auth login` or prior sign-in)
+  
+    ## Instant access — no sign-up
+
+    Get a working API key in two HTTP calls — no signup, no approval, no waiting. Perfect for agents that need social media data right now.
+
+    ### Step 1: Generate a free token
+
+    ```bash
+    curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+    # -> TRIAL...  (valid 5 days)
+    ```
+
+    ### Step 2: Use it as your API key
+
+    Pass the `TRIAL...` token exactly like an access key — as the SDK `apiKey`, the `XPOZ_API_KEY` env var, or a bearer token. All read tools work immediately across all four platforms.
+
+    ```bash
+    export XPOZ_API_KEY=TRIAL...
+    xpoz-cli twitter get_user --identifier elonmusk
+    ```
+      Instant access tokens return up to 5 cached results per call. For full result sets, pagination, CSV export, and live crawling, [get a free access key](https://xpoz.ai/get-token) — still no credit card. Same API shape, nothing to rewrite.
   
     ## Access Key authentication
 
@@ -1228,7 +1323,14 @@ Source: https://docs.xpoz.ai/mcp/installation
 
 
 The Xpoz MCP server is hosted at `https://mcp.xpoz.ai/mcp`. You need an access key to authenticate -- get one from your [Xpoz dashboard](https://xpoz.ai).
-  
+  **Start instantly — no account needed.** Generate a free token and use it in place of `YOUR_API_KEY` below:
+
+  ```bash
+  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
+  ```
+
+  This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
     Run a single command in your terminal:
 
     ```bash
@@ -2753,7 +2855,14 @@ Requires Node.js 18+.
 ## Get an Access Key
 
 Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+  **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
+  ```bash
+  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
+  ```
+
+  This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
 ## Create a Client
 
 ```typescript
@@ -3858,7 +3967,14 @@ Requires Python 3.10+.
 ## Get an Access Key
 
 Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
+  **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
+  ```bash
+  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
+  ```
+
+  This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
 ## Create a Client
 
 The Python SDK provides both synchronous and asynchronous clients.
@@ -5126,7 +5242,15 @@ Source: https://docs.xpoz.ai/cli/authentication
 
 
 The CLI requires an access key to authenticate with the Xpoz MCP server. Get your key from the [Xpoz dashboard](https://www.xpoz.ai/settings).
+  **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
+  ```bash
+  TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+  export XPOZ_API_KEY=$TOKEN
+  xpoz-cli twitter get_user --identifier elonmusk
+  ```
+
+  This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
 ## Login
   
     Sign up or log in at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Settings page](https://www.xpoz.ai/settings).

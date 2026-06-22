@@ -1,0 +1,85 @@
+---
+title: Instant Access
+description: Start querying social media data in seconds — no account, no credit card, nothing to install.
+---
+
+Need social media data? You're two HTTP calls away from real results. Generate a free token, then start pulling structured data — profiles, posts, comments, and communities across Twitter/X, Instagram, Reddit, and TikTok. No signup, no credit card, no OAuth, no approval process.
+
+## Why start here
+
+This is the fastest way to see what Xpoz returns. You'll have a working API key in under a second — every read tool works immediately across all four platforms: user lookups, post searches, comment threads, and community discovery. Same structured data, same API shape as a full access key.
+
+## Get started
+
+<Tabs>
+  <Tab title="cURL">
+    Generate a free token, then use it as your API key:
+
+    ```bash
+    # 1. Generate a free token (valid 5 days)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+
+    # 2. Use it like any access key
+    curl -X POST https://mcp.xpoz.ai/mcp \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"getTwitterUser","arguments":{"identifier":"elonmusk","identifierType":"username"}},"id":1}'
+    ```
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+    xpoz-cli twitter get_user --identifier elonmusk
+    ```
+  </Tab>
+  <Tab title="MCP (Claude Code)">
+    ```bash
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+    claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
+      -t http \
+      -H "Authorization: Bearer $TOKEN"
+    ```
+  </Tab>
+</Tabs>
+
+The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
+
+```json
+{
+  "success": true,
+  "data": { "accessKey": "TRIAL...", "expiresInSeconds": 432000 },
+  "message": "Trial access token created."
+}
+```
+
+Drop the `TRIAL...` token in wherever an access key goes — the SDK `apiKey`, the `XPOZ_API_KEY` env var, or a `Bearer` header.
+
+## Zero-change upgrade
+
+The response format is identical to a full access key — same fields, same shape, same structure. When you're ready to upgrade, swap the token and keep everything else. Your code doesn't change.
+
+## What you get
+
+All read tools work instantly across every platform. The only differences from a full access key are result volume and advanced features:
+
+| | Instant access | Full access key |
+|---|---|---|
+| Data tools (read) | ✅ All 4 platforms | ✅ All 4 platforms |
+| Results per call | Up to 5 | Full, paginated |
+| Pagination | — | ✅ |
+| CSV export | — | ✅ |
+| Live crawling | — | ✅ |
+| Validity | 5 days | Ongoing |
+
+## Ready for full access
+
+Need larger result sets, pagination, or CSV export? [Get a free access key](https://xpoz.ai/get-token) — still no credit card. The request and response shapes are unchanged, so there's nothing to rewrite.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Start querying with your token
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Access keys, Google sign-in, bearer tokens
+  </Card>
+</CardGroup>
