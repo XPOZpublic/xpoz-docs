@@ -1,22 +1,22 @@
 ---
-title: Trial Access
-description: Test-drive Xpoz with a free trial token — no account, no card, nothing to install.
+title: Instant Access
+description: Start querying social media data in seconds — no account, no credit card, nothing to install.
 ---
 
-Want to see what Xpoz returns before you sign up? Mint a **trial token** and start pulling social data in a single command. No account, no credit card, no waiting on approval.
+Need social media data? You're two HTTP calls away from real results. Generate a free token, then start pulling structured data — profiles, posts, comments, and communities across Twitter/X, Instagram, Reddit, and TikTok. No signup, no credit card, no OAuth, no approval process.
 
-## When to use this
+## Why start here
 
-A trial token is the fastest way to evaluate Xpoz — perfect for kicking the tires in a notebook, wiring up a quick proof-of-concept, or letting an agent try a real query during setup. For anything beyond a quick look (full result sets, exports, live data), grab a free access key instead.
+This is the fastest way to see what Xpoz returns. You'll have a working API key in under a second — every read tool works immediately across all four platforms: user lookups, post searches, comment threads, and community discovery. Same structured data, same API shape as a full access key.
 
 ## Get started
 
 <Tabs>
   <Tab title="cURL">
-    Mint a trial token, then use it as your API key:
+    Generate a free token, then use it as your API key:
 
     ```bash
-    # 1. Mint a trial token (valid 5 days)
+    # 1. Generate a free token (valid 5 days)
     TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
 
     # 2. Use it like any access key
@@ -42,7 +42,7 @@ A trial token is the fastest way to evaluate Xpoz — perfect for kicking the ti
   </Tab>
 </Tabs>
 
-The mint endpoint needs no auth and hands back a token that starts with `TRIAL`:
+The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
 
 ```json
 {
@@ -54,26 +54,26 @@ The mint endpoint needs no auth and hands back a token that starts with `TRIAL`:
 
 Drop the `TRIAL...` token in wherever an access key goes — the SDK `apiKey`, the `XPOZ_API_KEY` env var, or a `Bearer` header.
 
-## Upgrading is a no-op
+## Zero-change upgrade
 
-A trial token returns the same fields, in the same shape, as a full access key. When you move up, your code stays exactly as it is — replace the token and keep going.
+The response format is identical to a full access key — same fields, same shape, same structure. When you're ready to upgrade, swap the token and keep everything else. Your code doesn't change.
 
-## What's capped
+## What you get
 
-Trial tokens are deliberately scoped down:
+All read tools work instantly across every platform. The only differences from a full access key are result volume and advanced features:
 
-| | Trial token | Access key |
+| | Instant access | Full access key |
 |---|---|---|
-| Data tools (read) | ✅ | ✅ |
-| Results per call | 5 (cached) | Full, paginated |
-| Pagination | ❌ | ✅ |
-| CSV export | ❌ | ✅ |
-| Live crawling | ❌ | ✅ |
+| Data tools (read) | ✅ All 4 platforms | ✅ All 4 platforms |
+| Results per call | Up to 5 | Full, paginated |
+| Pagination | — | ✅ |
+| CSV export | — | ✅ |
+| Live crawling | — | ✅ |
 | Validity | 5 days | Ongoing |
 
-## Ready for more
+## Ready for full access
 
-Hit a cap, or done evaluating? [Grab a free access key](https://xpoz.ai/get-token) — still no credit card. Auth stays a `Bearer` token, and the request and response shapes are unchanged.
+Need larger result sets, pagination, or CSV export? [Get a free access key](https://xpoz.ai/get-token) — still no credit card. The request and response shapes are unchanged, so there's nothing to rewrite.
 
 <CardGroup cols={2}>
   <Card title="Quickstart" icon="rocket" href="/quickstart">

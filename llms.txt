@@ -11,6 +11,7 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 
 ## Getting Started
 - [Welcome](https://docs.xpoz.ai/introduction): Overview of the Xpoz platform, coverage, and capabilities
+- [Instant Access](https://docs.xpoz.ai/trial): Start querying in seconds — generate a free token with one POST, no account or credit card needed
 - [Quickstart](https://docs.xpoz.ai/quickstart): Get started in 2 minutes with Claude Code, TypeScript SDK, Python SDK, or CLI
 - [Authentication](https://docs.xpoz.ai/authentication): access key, Google Sign-In, and bearer token authentication
 

@@ -16,14 +16,14 @@ Requires Node.js 18+.
 Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
 
 <Tip>
-  Want to try without signing up? Mint a free trial token (valid 5 days), then use it as your API key:
+  **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
   ```bash
-  curl -X POST https://api.xpoz.ai/api/trial/token
-  # -> { "success": true, "data": { "accessKey": "TRIAL...", "expiresInSeconds": 432000 }, ... }
+  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
   ```
 
-  Trial tokens return up to 5 cached results per call. See [Authentication](/authentication) for the full trial limits.
+  This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
 </Tip>
 
 ## Create a Client

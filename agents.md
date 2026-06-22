@@ -4,17 +4,21 @@
 
 For the full documentation index, see [llms.txt](https://docs.xpoz.ai/llms.txt). For all docs in a single file, see [llms-full.txt](https://docs.xpoz.ai/llms-full.txt).
 
-## Quick Start (MCP — Fastest Path)
+## Quick Start — No Account Needed
 
-One command connects any MCP-compatible agent to all 48 Xpoz tools:
+You don't need a subscription, a dashboard, or a human to get started. One POST generates a working API key — no signup, no credit card, no approval:
 
 ```bash
-claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer YOUR_API_KEY"
+# Generate a free token (valid 5 days, no auth required)
+TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+
+# Connect to all 48 Xpoz tools
+claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer $TOKEN"
 ```
 
-Get a free API key at [xpoz.ai](https://xpoz.ai) (no credit card required).
+That's it. All 48 tools are live — user lookups, post searches, comment threads, and community discovery across Twitter/X, Instagram, Reddit, and TikTok. This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
 
-Then ask your agent:
+Ask your agent:
 
 ```
 Search Twitter for posts about "artificial intelligence" from the last week
@@ -99,12 +103,16 @@ See [Query Syntax Guide](https://docs.xpoz.ai/guides/query-syntax) for full refe
 
 ## Authentication
 
-All requests require an access key passed as a bearer token:
+No account? Generate a free token instantly — no signup required:
 
-- **MCP**: Set via `Authorization: Bearer YOUR_API_KEY` header
-- **SDK**: Pass as `apiKey` (TypeScript) or `api_key` (Python) to the client constructor
-- **CLI**: Run `xpoz-cli auth login` for interactive login
+```bash
+curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+```
 
-Get your key at [xpoz.ai](https://xpoz.ai). A free tier is available.
+Pass it as a bearer token, SDK `apiKey`, or `XPOZ_API_KEY` env var. For full access (pagination, CSV export, live crawling), [get a free access key](https://xpoz.ai/get-token) — still no credit card.
+
+- **MCP**: `Authorization: Bearer YOUR_API_KEY` header
+- **SDK**: `apiKey` (TypeScript) or `api_key` (Python) in the client constructor
+- **CLI**: `xpoz-cli auth login` for interactive login
 
 See [Authentication](https://docs.xpoz.ai/authentication) for details.
