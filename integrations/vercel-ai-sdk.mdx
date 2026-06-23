@@ -1,0 +1,194 @@
+---
+title: Vercel AI SDK
+description: Build AI-powered apps with social media intelligence using the Vercel AI SDK and Xpoz.
+---
+
+The [`@xpoz/ai-sdk`](https://www.npmjs.com/package/@xpoz/ai-sdk) package provides 32 ready-made tools for the [Vercel AI SDK](https://sdk.vercel.ai). Use them with `generateText`, `streamText`, or any AI SDK-compatible framework to give your AI agent access to Twitter/X, Instagram, Reddit, and TikTok data.
+
+## Setup
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Install the package">
+    ```bash
+    npm install @xpoz/ai-sdk ai zod
+    ```
+
+    You also need an AI provider. For example, with Anthropic:
+
+    ```bash
+    npm install @ai-sdk/anthropic
+    ```
+  </Step>
+  <Step title="Set your access key">
+    ```bash
+    export XPOZ_API_KEY=your-access-key
+    ```
+  </Step>
+  <Step title="Use with generateText">
+    ```typescript
+    import { generateText, stepCountIs } from "ai";
+    import { anthropic } from "@ai-sdk/anthropic";
+    import { xpozTools } from "@xpoz/ai-sdk";
+
+    const result = await generateText({
+      model: anthropic("claude-sonnet-4-5-20250929"),
+      tools: xpozTools(),
+      stopWhen: stepCountIs(3),
+      prompt: "What are people saying about AI agents on Twitter?",
+    });
+
+    console.log(result.text);
+    ```
+
+    The AI model automatically discovers all 32 tools and decides which ones to call based on the prompt.
+  </Step>
+</Steps>
+
+## Using Individual Tools
+
+If you only need specific tools, import them directly instead of the full bundle:
+
+```typescript
+import { xpozTwitterSearch, xpozInstagramUser } from "@xpoz/ai-sdk";
+
+const result = await generateText({
+  model: anthropic("claude-sonnet-4-5-20250929"),
+  tools: {
+    twitterSearch: xpozTwitterSearch(),
+    instagramUser: xpozInstagramUser(),
+  },
+  prompt: "Look up the NASA Instagram profile",
+});
+```
+
+## Field Selection
+
+Every tool supports an optional `fields` parameter to control which fields are returned. Each tool's description lists all available fields for that entity type.
+
+```typescript
+import { xpozTwitterUser } from "@xpoz/ai-sdk";
+
+const tool = xpozTwitterUser();
+const user = await tool.execute(
+  { identifier: "elonmusk", fields: ["username", "followersCount", "description"] },
+  { toolCallId: "demo", messages: [] }
+);
+```
+
+<Note>
+Field names differ across platforms. For example, Twitter uses `followersCount` while Instagram and TikTok use `followerCount`. Each tool's description lists the correct field names.
+</Note>
+
+## TypeScript Types
+
+The package exports response types for all entity types:
+
+```typescript
+import {
+  type TwitterUser,
+  type TwitterPost,
+  type InstagramUser,
+  type InstagramPost,
+  type RedditUser,
+  type RedditPost,
+  type TiktokUser,
+  type TiktokPost,
+} from "@xpoz/ai-sdk";
+```
+
+All tools also define an `outputSchema` for typed results via the AI SDK's `TypedToolResult` system.
+
+## Available Tools
+
+### Twitter/X
+
+| Tool | Description |
+|------|-------------|
+| `xpozTwitterSearch` | Search posts by keywords, hashtags, or phrases |
+| `xpozTwitterUser` | Get a user profile by username or ID |
+| `xpozTwitterUserPosts` | Get posts by a specific user |
+| `xpozTwitterPostComments` | Get replies on a post |
+| `xpozTwitterSearchUsers` | Search users by name |
+| `xpozTwitterUserConnections` | Get a user's followers or following |
+| `xpozTwitterUsersByKeywords` | Find users who posted about a topic |
+| `xpozTwitterCountPosts` | Count posts matching a phrase |
+
+### Instagram
+
+| Tool | Description |
+|------|-------------|
+| `xpozInstagramSearch` | Search posts by keywords |
+| `xpozInstagramUser` | Get a user profile by username or ID |
+| `xpozInstagramUserPosts` | Get posts by a specific user |
+| `xpozInstagramPostComments` | Get comments on a post |
+| `xpozInstagramSearchUsers` | Search users by name |
+| `xpozInstagramUsersByKeywords` | Find users who posted about a topic |
+
+### Reddit
+
+| Tool | Description |
+|------|-------------|
+| `xpozRedditSearch` | Search posts by keywords |
+| `xpozRedditUser` | Get a user profile |
+| `xpozRedditPostWithComments` | Get a post with its comment thread |
+| `xpozRedditSearchComments` | Search comments by keywords |
+| `xpozRedditSearchSubreddits` | Search subreddits by name or topic |
+| `xpozRedditSubreddit` | Get a subreddit's info and recent posts |
+| `xpozRedditUsersByKeywords` | Find users who posted about a topic |
+
+### TikTok
+
+| Tool | Description |
+|------|-------------|
+| `xpozTiktokSearch` | Search videos by keywords |
+| `xpozTiktokUser` | Get a creator profile by username or ID |
+| `xpozTiktokUserPosts` | Get videos by a specific creator |
+| `xpozTiktokPostComments` | Get comments on a video |
+| `xpozTiktokSearchUsers` | Search creators by name |
+| `xpozTiktokPostsByHashtags` | Search videos by hashtags |
+| `xpozTiktokUsersByKeywords` | Find creators who posted about a topic |
+
+### Tracking & Account
+
+| Tool | Description |
+|------|-------------|
+| `xpozGetTrackedItems` | List all tracked keywords, users, and hashtags |
+| `xpozAddTrackedItems` | Add items to track across platforms |
+| `xpozRemoveTrackedItems` | Stop tracking items |
+| `xpozAccountDetails` | Get account plan, usage, and billing info |
+
+## Configuration
+
+All tools accept an optional configuration object:
+
+```typescript
+import { xpozTools } from "@xpoz/ai-sdk";
+
+const tools = xpozTools({
+  apiKey: "your-access-key",    // defaults to XPOZ_API_KEY env var
+  serverUrl: "https://mcp.xpoz.ai/mcp",  // default
+  timeoutMs: 300000,            // default: 5 minutes
+});
+```
+
+## What You Can Do
+
+- Search posts by keyword across Twitter, Instagram, Reddit, and TikTok
+- Look up user profiles and follower counts
+- Analyze engagement metrics and trends
+- Track keywords and users for continuous monitoring
+- Build AI agents that autonomously research social media topics
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="npm Package" icon="npm" href="https://www.npmjs.com/package/@xpoz/ai-sdk">
+    View the package on npm
+  </Card>
+</CardGroup>

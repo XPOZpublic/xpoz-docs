@@ -129,7 +129,8 @@
               "integrations/overview",
               "integrations/claude-code",
               "integrations/gemini-cli",
-              "integrations/codex"
+              "integrations/codex",
+              "integrations/vercel-ai-sdk"
             ]
           }
         ]
