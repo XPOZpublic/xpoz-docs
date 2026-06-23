@@ -58,7 +58,7 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [Authentication](https://docs.xpoz.ai/cli/authentication): Login, environment variables, config files
 
 ## Agent Skills
-- [Overview](https://docs.xpoz.ai/skills/overview): Pre-built AI workflows for social media intelligence
+- [Overview](https://docs.xpoz.ai/skills/overview): Official pre-built Xpoz skills that define best practices, adding social media intelligence expertise to any AI agent
 - [Sentiment Analyzer](https://docs.xpoz.ai/skills/sentiment-analyzer): Analyze sentiment across posts and comments
 - [Twitter Data Export](https://docs.xpoz.ai/skills/twitter-data-export): Export Twitter data at scale
 - [Influencer Discovery](https://docs.xpoz.ai/skills/influencer-discovery): Find influencers by topic and engagement
