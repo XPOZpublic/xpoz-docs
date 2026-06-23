@@ -115,7 +115,7 @@ All read tools work instantly across every platform. The only differences from a
 | | Instant access | Full access key |
 |---|---|---|
 | Data tools (read) | ✅ All 4 platforms | ✅ All 4 platforms |
-| Results per call | 5 (cached) | Full, paginated |
+| Results per call | Up to 5 | Full, paginated |
 | Pagination | — | ✅ |
 | CSV export | — | ✅ |
 | Live crawling | — | ✅ |
@@ -335,7 +335,7 @@ When multiple credentials are available, Xpoz resolves them in this order:
     export XPOZ_API_KEY=TRIAL...
     xpoz-cli twitter get_user --identifier elonmusk
     ```
-      Instant access tokens return up to 5 cached results per call. For full result sets, pagination, CSV export, and live crawling, [get a free access key](https://xpoz.ai/get-token) — still no credit card. Same API shape, nothing to rewrite.
+      Instant access tokens return up to 5 results per call. For full result sets, pagination, CSV export, and live crawling, [get a free access key](https://xpoz.ai/get-token) — still no credit card. Same API shape, nothing to rewrite.
   
     ## Access Key authentication
 
@@ -5322,9 +5322,9 @@ Source: https://docs.xpoz.ai/skills/overview
 
 ## What are Agent Skills?
 
-Agent Skills are pre-built AI workflows that combine Xpoz tools into end-to-end social media intelligence tasks. They run inside AI agents like Claude Code, OpenAI Codex CLI, ChatGPT, and any agent supporting the SKILL.md standard.
+Agent Skills are pre-written instructions that teach AI agents how to perform specific tasks correctly. They package domain expertise into a format that any compatible agent can absorb — so the agent knows the right tools to use, the right order to use them, and the right way to interpret results.
 
-Each skill knows which Xpoz tools to call, how to process results, and how to format output.
+Xpoz provides skills for specific social media intelligence tasks like sentiment analysis, influencer discovery, and data export, as well as general best practices for using Xpoz effectively.
 
 ## Available Skills
 
