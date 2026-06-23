@@ -34,7 +34,7 @@ The [`@xpoz/ai-sdk`](https://www.npmjs.com/package/@xpoz/ai-sdk) package provide
     import { xpozTools } from "@xpoz/ai-sdk";
 
     const result = await generateText({
-      model: anthropic("claude-sonnet-4-5-20250929"),
+      model: anthropic("claude-sonnet-4-6"),
       tools: xpozTools(),
       stopWhen: stepCountIs(3),
       prompt: "What are people saying about AI agents on Twitter?",
@@ -55,7 +55,7 @@ If you only need specific tools, import them directly instead of the full bundle
 import { xpozTwitterSearch, xpozInstagramUser } from "@xpoz/ai-sdk";
 
 const result = await generateText({
-  model: anthropic("claude-sonnet-4-5-20250929"),
+  model: anthropic("claude-sonnet-4-6"),
   tools: {
     twitterSearch: xpozTwitterSearch(),
     instagramUser: xpozInstagramUser(),
@@ -115,6 +115,11 @@ All tools also define an `outputSchema` for typed results via the AI SDK's `Type
 | `xpozTwitterUserConnections` | Get a user's followers or following |
 | `xpozTwitterUsersByKeywords` | Find users who posted about a topic |
 | `xpozTwitterCountPosts` | Count posts matching a phrase |
+| `xpozTwitterPostsByIds` | Get specific posts by their IDs |
+| `xpozTwitterPostRetweets` | Get retweets of a post |
+| `xpozTwitterPostQuotes` | Get quote tweets of a post |
+| `xpozTwitterPostInteractingUsers` | Get users who liked, retweeted, or quoted a post |
+| `xpozTwitterUsers` | Get multiple user profiles by usernames or IDs |
 
 ### Instagram
 
@@ -126,6 +131,9 @@ All tools also define an `outputSchema` for typed results via the AI SDK's `Type
 | `xpozInstagramPostComments` | Get comments on a post |
 | `xpozInstagramSearchUsers` | Search users by name |
 | `xpozInstagramUsersByKeywords` | Find users who posted about a topic |
+| `xpozInstagramPostsByIds` | Get specific posts by their IDs |
+| `xpozInstagramUserConnections` | Get a user's followers or following |
+| `xpozInstagramPostInteractingUsers` | Get users who liked or commented on a post |
 
 ### Reddit
 
@@ -138,6 +146,8 @@ All tools also define an `outputSchema` for typed results via the AI SDK's `Type
 | `xpozRedditSearchSubreddits` | Search subreddits by name or topic |
 | `xpozRedditSubreddit` | Get a subreddit's info and recent posts |
 | `xpozRedditUsersByKeywords` | Find users who posted about a topic |
+| `xpozRedditSearchUsers` | Search users by name |
+| `xpozRedditSubredditsByKeywords` | Find subreddits related to a topic |
 
 ### TikTok
 
@@ -150,6 +160,8 @@ All tools also define an `outputSchema` for typed results via the AI SDK's `Type
 | `xpozTiktokSearchUsers` | Search creators by name |
 | `xpozTiktokPostsByHashtags` | Search videos by hashtags |
 | `xpozTiktokUsersByKeywords` | Find creators who posted about a topic |
+| `xpozTiktokPostsByIds` | Get specific videos by their IDs |
+| `xpozTiktokUsersByHashtags` | Find creators who posted with specific hashtags |
 
 ### Tracking & Account
 
