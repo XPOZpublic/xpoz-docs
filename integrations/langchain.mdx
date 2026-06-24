@@ -1,0 +1,182 @@
+---
+title: LangChain
+description: Build AI agents with social media intelligence using LangChain and Xpoz.
+---
+
+The [`langchain-xpoz`](https://pypi.org/project/langchain-xpoz/) Python package provides 44 LangChain tools for social media intelligence. Use them with any LangChain-compatible model to give your AI agent access to Twitter/X, Instagram, Reddit, and TikTok data.
+
+## Setup
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Install the package">
+    ```bash
+    pip install langchain-xpoz
+    ```
+
+    You also need a model provider. For example, with Anthropic:
+
+    ```bash
+    pip install langchain-anthropic
+    ```
+  </Step>
+  <Step title="Set your access key">
+    ```bash
+    export XPOZ_API_KEY=your-access-key
+    ```
+  </Step>
+  <Step title="Use with a LangChain agent">
+    ```python
+    from langchain_xpoz import XpozTwitterSearch, XpozInstagramUser, XpozRedditSearch
+    from langchain_anthropic import ChatAnthropic
+    from langchain.agents import create_tool_calling_agent, AgentExecutor
+    from langchain_core.prompts import ChatPromptTemplate
+
+    tools = [
+        XpozTwitterSearch(),
+        XpozInstagramUser(),
+        XpozRedditSearch(),
+    ]
+
+    llm = ChatAnthropic(model="claude-sonnet-4-6")
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are a social media research assistant."),
+        ("human", "{input}"),
+        ("placeholder", "{agent_scratchpad}"),
+    ])
+
+    agent = create_tool_calling_agent(llm=llm, tools=tools, prompt=prompt)
+    executor = AgentExecutor(agent=agent, tools=tools)
+
+    result = executor.invoke({
+        "input": "What are people saying about AI agents on Twitter?"
+    })
+
+    print(result["output"])
+    ```
+  </Step>
+</Steps>
+
+## Using Individual Tools
+
+You can also use tools directly without an agent:
+
+```python
+from langchain_xpoz import XpozTwitterSearch
+
+tool = XpozTwitterSearch()
+result = tool.invoke({"query": "AI agents", "max_results": 5})
+print(result)
+```
+
+Or pass `api_key` explicitly instead of using the environment variable:
+
+```python
+tool = XpozTwitterSearch(api_key="your-access-key")
+```
+
+## Available Tools
+
+### Twitter/X
+
+| Tool | Description |
+|------|-------------|
+| `XpozTwitterSearch` | Search posts by keywords, hashtags, or phrases |
+| `XpozTwitterUser` | Get a user profile by username or ID |
+| `XpozTwitterUserPosts` | Get posts by a specific user |
+| `XpozTwitterPostComments` | Get replies on a post |
+| `XpozTwitterSearchUsers` | Search users by name |
+| `XpozTwitterUserConnections` | Get a user's followers or following |
+| `XpozTwitterUsersByKeywords` | Find users who posted about a topic |
+| `XpozTwitterCountPosts` | Count posts matching a phrase |
+| `XpozTwitterPostsByIds` | Get specific posts by their IDs |
+| `XpozTwitterPostRetweets` | Get retweets of a post |
+| `XpozTwitterPostQuotes` | Get quote tweets of a post |
+| `XpozTwitterPostInteractingUsers` | Get users who retweeted, quoted, or commented on a post |
+| `XpozTwitterUsers` | Get multiple user profiles by usernames or IDs |
+
+### Instagram
+
+| Tool | Description |
+|------|-------------|
+| `XpozInstagramSearch` | Search posts by keywords |
+| `XpozInstagramUser` | Get a user profile by username or ID |
+| `XpozInstagramUserPosts` | Get posts by a specific user |
+| `XpozInstagramPostComments` | Get comments on a post |
+| `XpozInstagramSearchUsers` | Search users by name |
+| `XpozInstagramUsersByKeywords` | Find users who posted about a topic |
+| `XpozInstagramPostsByIds` | Get specific posts by their IDs |
+| `XpozInstagramUserConnections` | Get a user's followers or following |
+| `XpozInstagramPostInteractingUsers` | Get users who liked or commented on a post |
+
+### Reddit
+
+| Tool | Description |
+|------|-------------|
+| `XpozRedditSearch` | Search posts by keywords |
+| `XpozRedditUser` | Get a user profile |
+| `XpozRedditPostWithComments` | Get a post with its comment thread |
+| `XpozRedditSearchComments` | Search comments by keywords |
+| `XpozRedditSearchSubreddits` | Search subreddits by name or topic |
+| `XpozRedditSubreddit` | Get a subreddit's info and recent posts |
+| `XpozRedditUsersByKeywords` | Find users who posted about a topic |
+| `XpozRedditSearchUsers` | Search users by name |
+| `XpozRedditSubredditsByKeywords` | Find subreddits related to a topic |
+
+### TikTok
+
+| Tool | Description |
+|------|-------------|
+| `XpozTiktokSearch` | Search videos by keywords |
+| `XpozTiktokUser` | Get a creator profile by username or ID |
+| `XpozTiktokUserPosts` | Get videos by a specific creator |
+| `XpozTiktokPostComments` | Get comments on a video |
+| `XpozTiktokSearchUsers` | Search creators by name |
+| `XpozTiktokPostsByHashtags` | Search videos by hashtags |
+| `XpozTiktokUsersByKeywords` | Find creators who posted about a topic |
+| `XpozTiktokPostsByIds` | Get specific videos by their IDs |
+| `XpozTiktokUsersByHashtags` | Find creators who posted with specific hashtags |
+
+### Tracking & Account
+
+| Tool | Description |
+|------|-------------|
+| `XpozGetTrackedItems` | List all tracked keywords, users, and hashtags |
+| `XpozAddTrackedItems` | Add items to track across platforms |
+| `XpozRemoveTrackedItems` | Stop tracking items |
+| `XpozAccountDetails` | Get account plan, usage, and billing info |
+
+## Configuration
+
+All tools accept an optional `api_key` parameter. If not provided, the `XPOZ_API_KEY` environment variable is used:
+
+```python
+from langchain_xpoz import XpozTwitterSearch
+
+# Using environment variable (recommended)
+tool = XpozTwitterSearch()
+
+# Passing API key explicitly
+tool = XpozTwitterSearch(api_key="your-access-key")
+```
+
+## What You Can Do
+
+- Search posts by keyword across Twitter, Instagram, Reddit, and TikTok
+- Look up user profiles and follower counts
+- Analyze engagement metrics and trends
+- Track keywords and users for continuous monitoring
+- Build AI agents that autonomously research social media topics
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="PyPI Package" icon="python" href="https://pypi.org/project/langchain-xpoz/">
+    View the package on PyPI
+  </Card>
+</CardGroup>
