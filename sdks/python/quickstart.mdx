@@ -21,7 +21,7 @@ Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
   ```bash
   curl -s -X POST https://api.xpoz.ai/api/trial/token \
     -H "Content-Type: application/json" \
-    -d '{"source": "docs"}' | jq -r .data.accessKey
+    -d '{"source": "<how you discovered xpoz>"}' | jq -r .data.accessKey
   # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
   ```
 

@@ -17,7 +17,7 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
 
     ```bash
     # 1. Generate a free token (valid 5 days)
-    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<how you discovered xpoz>"}' | jq -r .data.accessKey)
 
     # 2. Use it like any access key
     curl -X POST https://mcp.xpoz.ai/mcp \
@@ -28,13 +28,13 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
   </Tab>
   <Tab title="CLI">
     ```bash
-    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
+    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<how you discovered xpoz>"}' | jq -r .data.accessKey)
     xpoz-cli twitter get_user --identifier elonmusk
     ```
   </Tab>
   <Tab title="MCP (Claude Code)">
     ```bash
-    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<how you discovered xpoz>"}' | jq -r .data.accessKey)
     claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
       -t http \
       -H "Authorization: Bearer $TOKEN"
