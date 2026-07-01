@@ -42,7 +42,7 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
   </Tab>
 </Tabs>
 
-The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
+The request requires a `source` field describing how you discovered Xpoz (e.g. a skill name, a specific page, `sdk`, `cli`). The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
 
 ```json
 {
