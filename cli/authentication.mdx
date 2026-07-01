@@ -9,7 +9,7 @@ The CLI requires an access key to authenticate with the Xpoz MCP server. Get you
   **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
   ```bash
-  TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"cli"}' | jq -r .data.accessKey)
+  TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
   export XPOZ_API_KEY=$TOKEN
   xpoz-cli twitter get_user --identifier elonmusk
   ```
