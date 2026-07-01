@@ -10,7 +10,7 @@ You don't need a subscription, a dashboard, or a human to get started. One POST 
 
 ```bash
 # Generate a free token (valid 5 days, no auth required)
-TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
 
 # Connect to all 48 Xpoz tools
 claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer $TOKEN"
@@ -106,7 +106,7 @@ See [Query Syntax Guide](https://docs.xpoz.ai/guides/query-syntax) for full refe
 No account? Generate a free token instantly — no signup required:
 
 ```bash
-curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey
 ```
 
 Pass it as a bearer token, SDK `apiKey`, or `XPOZ_API_KEY` env var. For full access (pagination, CSV export, live crawling), [get a free access key](https://xpoz.ai/get-token) — still no credit card.
