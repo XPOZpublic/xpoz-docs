@@ -19,7 +19,9 @@ Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
   **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
   ```bash
-  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  curl -s -X POST https://api.xpoz.ai/api/trial/token \
+    -H "Content-Type: application/json" \
+    -d '{"source": "docs"}' | jq -r .data.accessKey
   # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
   ```
 
