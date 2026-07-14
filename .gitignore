@@ -1,3 +1,4 @@
 node_modules/
 .mintlify/
 .playwright-mcp/
+.DS_Store

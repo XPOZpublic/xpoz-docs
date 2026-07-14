@@ -21,7 +21,7 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["introduction", "trial", "quickstart", "authentication"]
+            "pages": ["introduction", "trial", "quickstart", "authentication", "pricing"]
           },
           {
             "group": "Guides",

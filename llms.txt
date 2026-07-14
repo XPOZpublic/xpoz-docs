@@ -14,6 +14,7 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [Instant Access](https://docs.xpoz.ai/trial): Start querying in seconds — generate a free token with one POST, no account or credit card needed
 - [Quickstart](https://docs.xpoz.ai/quickstart): Get started in 2 minutes with Claude Code, TypeScript SDK, Python SDK, or CLI
 - [Authentication](https://docs.xpoz.ai/authentication): access key, Google Sign-In, and bearer token authentication
+- [Pricing & Credits](https://docs.xpoz.ai/pricing): plans, what a search costs per platform, and how credits translate into searches and results
 
 ## Guides
 - [Query Syntax](https://docs.xpoz.ai/guides/query-syntax): Search with boolean operators, exact phrases, and grouping
