@@ -1,0 +1,61 @@
+---
+title: "Claude (Web)"
+description: "Connect Xpoz to Claude on claude.ai as a custom connector and search live Twitter/X, Instagram, Reddit, and TikTok data in your chats."
+---
+
+Claude on claude.ai connects to the Xpoz MCP server as a custom connector. Once added, Claude can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview), in any conversation where you enable it.
+
+## Setup
+
+<Steps>
+  <Step title="Open the connector settings">
+    Go to **Customize > Connectors** on [claude.ai](https://claude.ai).
+  </Step>
+  <Step title="Add the custom connector">
+    Click **+**, then **Add custom connector**, and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+  </Step>
+  <Step title="Authenticate">
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Enable it in a chat">
+    In a conversation, click the **+** button at the lower left of the chat box, choose **Connectors**, and turn on Xpoz.
+  </Step>
+  <Step title="Verify the connection">
+    Ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Claude calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+  </Step>
+</Steps>
+
+## Setup notes
+
+- Connectors are tied to your Claude account: a connector added here is also available in [Claude Desktop](/integrations/claude-desktop), [Claude Cowork](/integrations/claude-cowork), and the mobile apps.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+- On Team and Enterprise plans, an owner adds the connector under **Organization settings > Connectors**; members then connect it from **Customize > Connectors**.
+
+## What you can ask
+
+- "What is Reddit saying about my brand today?"
+- "Find the most-liked tweets about our product launch this week"
+- "Which TikTok creators posted about skincare in the last 48 hours?"
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/guides/query-syntax">
+    Write effective search queries with boolean operators
+  </Card>
+</CardGroup>

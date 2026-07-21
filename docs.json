@@ -26,7 +26,6 @@
           {
             "group": "Guides",
             "pages": [
-              "guides/connect-claude-chatgpt-social-media-data",
               "guides/query-syntax",
               "guides/csv-exports",
               "tracking",
@@ -128,7 +127,11 @@
             "group": "Integrations",
             "pages": [
               "integrations/overview",
+              "integrations/claude-web",
+              "integrations/claude-desktop",
+              "integrations/claude-cowork",
               "integrations/claude-code",
+              "integrations/chatgpt",
               "integrations/gemini-cli",
               "integrations/codex",
               "integrations/vercel-ai-sdk",

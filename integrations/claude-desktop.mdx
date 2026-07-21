@@ -1,0 +1,58 @@
+---
+title: "Claude Desktop"
+description: "Connect Xpoz to Claude Desktop as a custom connector and search live Twitter/X, Instagram, Reddit, and TikTok data from the desktop app."
+---
+
+Claude Desktop connects to the Xpoz MCP server as a custom connector, the same account-level connector used by claude.ai. Once added, Claude can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview).
+
+## Setup
+
+<Steps>
+  <Step title="Open the connector settings">
+    In Claude Desktop, go to **Settings > Connectors**.
+  </Step>
+  <Step title="Add the custom connector">
+    Click **Add custom connector** and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+  </Step>
+  <Step title="Authenticate">
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Verify the connection">
+    Start a new conversation and ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Claude calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+  </Step>
+</Steps>
+
+## Setup notes
+
+- Connectors are tied to your Claude account: a connector added on claude.ai or in Cowork appears here automatically, and vice versa. If you already added Xpoz in [Claude (Web)](/integrations/claude-web), there is nothing to configure.
+- The connection to the Xpoz server is brokered through your Claude account from Anthropic's infrastructure, not from your machine, so no local install, Node.js, or config file is required.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+
+## What you can ask
+
+- "Summarize the top complaints about our product on Reddit this month"
+- "Compare engagement on our last 10 tweets with our main competitor's"
+- "Find Instagram posts mentioning our brand with the highest engagement this week"
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Tracking" icon="satellite-dish" href="/tracking">
+    Monitor keywords and accounts continuously
+  </Card>
+</CardGroup>

@@ -497,139 +497,6 @@ Both are documented in [Account Tools](/mcp/tools/account).
 
 ---
 
-# Connect Claude or ChatGPT to Live Social Media Data
-Source: https://docs.xpoz.ai/guides/connect-claude-chatgpt-social-media-data
-
-
-Claude and ChatGPT can both read live social media data through an MCP (Model Context Protocol) server. With Xpoz, the connection is a hosted URL plus an access key: add `https://mcp.xpoz.ai/mcp` as a connector, authenticate, and your assistant can search live Twitter/X, Instagram, Reddit, and TikTok data in natural language. Setup takes about 2 minutes and requires no code, no scraping, and no platform API keys.
-
-"Live" here means the data behind the connector is continuously collected: billions of posts and users across the four platforms, refreshed as new content appears, with a rolling historical window. Your assistant queries that index directly instead of relying on its training data.
-  **No account needed to try it.** Generate a free 5-day token and use it as the access key in any of the setups below:
-
-  ```bash
-  curl -s -X POST https://api.xpoz.ai/api/trial/token \
-    -H "Content-Type: application/json" \
-    -d '{"source": "docs"}' | jq -r .data.accessKey
-  ```
-
-  Trial tokens return up to 5 results per call. A [free account](https://xpoz.ai/get-token) lifts that to full results, pagination, and CSV export.
-## Connect Claude to live social media data
-
-Claude supports MCP connectors in three places. Each takes a minute or two:
-  
-    1. Open **Settings** > **Connectors** (paid Claude plans)
-    2. Click **Add custom connector**
-    3. Enter the URL `https://mcp.xpoz.ai/mcp`
-    4. Authenticate when prompted (sign in with Google, or use your access key)
-
-    The Xpoz tools appear in Claude's tool menu in every new conversation.
-  
-    1. Go to **Settings** > **Connectors**
-    2. Click **Add custom connector**
-    3. Enter the URL `https://mcp.xpoz.ai/mcp` and authenticate
-
-    Desktop and web share the same connector flow; a connector added in one is available in the other.
-  
-    Run one command in your terminal:
-
-    ```bash
-    claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer YOUR_API_KEY"
-    ```
-
-    Claude Code discovers all 48 tools on the next conversation.
-
-Once connected, ask Claude things like:
-
-```
-Find the most-liked tweets about our product launch this week
-```
-
-```
-What is Reddit saying about my brand today?
-```
-
-```
-Which TikTok creators posted about skincare in the last 48 hours?
-```
-
-## Connect ChatGPT to live social media data
-
-ChatGPT connects to MCP servers through developer mode, available on paid ChatGPT plans (see [OpenAI's developer mode guide](https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt) for current plan availability):
-
-1. Open **Settings** > **Connectors**, and under **Advanced** enable **Developer mode**
-2. Back in **Connectors**, click **Create**
-3. Name the connector (for example `Xpoz`), set the server URL to `https://mcp.xpoz.ai/mcp`, and complete authentication
-4. In a new chat, open the **+** menu, choose **Developer mode**, and enable the Xpoz connector for that conversation
-
-Then ask ChatGPT the same kinds of questions:
-
-```
-Summarize the top complaints about [brand] on Twitter and Reddit this week
-```
-
-```
-Find Instagram posts mentioning [product] with the highest engagement this month
-```
-
-## Connect Gemini CLI to live social media data
-
-Add the server to `~/.gemini/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "xpoz": {
-      "uri": "https://mcp.xpoz.ai/mcp",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_KEY"
-      }
-    }
-  }
-}
-```
-
-Restart Gemini CLI to pick up the configuration. Full per-client steps for Cursor, N8N, and other MCP clients are in [Installation](/mcp/installation).
-
-## What you can do once connected
-
-The connector exposes 48 tools across Twitter/X, Instagram, Reddit, and TikTok: user lookup and search, post search by keyword, comments, engagement, subreddit discovery, hashtag discovery, and continuous [tracking](/tracking) of keywords and accounts. Your assistant picks the right tool from your question; you never call tools by name.
-
-Common workflows:
-
-- **Brand monitoring**: "What are people saying about [brand] across all four platforms today?"
-- **Competitor research**: "Compare engagement on [competitor]'s last 20 tweets with ours"
-- **Trend research**: "What topics are spiking in r/skincareaddiction this week?"
-- **Influencer discovery**: "Find TikTok creators in fitness with high engagement in the last month"
-
-Browse the full list in the [MCP Tools Overview](/mcp/tools/overview).
-
-## Frequently asked questions
-
-### Can ChatGPT access live social media data?
-
-Yes. ChatGPT cannot browse Twitter/X, Instagram, Reddit, or TikTok on its own, but with an MCP connector like Xpoz added through developer mode it queries a continuously collected index of those platforms and answers with current posts, comments, and profiles.
-
-### Can Claude search Twitter or Reddit?
-
-Yes. Claude's built-in web search does not reach most social platforms, but with the Xpoz MCP connector added in Settings > Connectors, Claude searches live Twitter/X, Reddit, Instagram, and TikTok data directly and can filter by keyword, author, date, and engagement.
-
-### What is an MCP server?
-
-MCP (Model Context Protocol) is an open standard that lets AI assistants call external tools. An MCP server hosts those tools; the assistant discovers and calls them automatically. Xpoz's MCP server is hosted (nothing to install) and exposes 48 social media data tools to any MCP-compatible assistant.
-
-### Do I need API keys for each social platform?
-
-No. One Xpoz access key covers all four platforms. Xpoz collects the data on its side; you never register developer accounts with Twitter/X, Meta, Reddit, or TikTok.
-
-## Next steps
-  
-    Per-client setup for Cursor, N8N, and every other MCP client.
-    Get your access key and run your first search.
-    All 48 tools, organized by platform.
-    Continuously monitor keywords, users, subreddits, and hashtags.
-
----
-
 # Query Syntax
 Source: https://docs.xpoz.ai/guides/query-syntax
 
@@ -6127,6 +5994,140 @@ For details on authentication methods (access key, OAuth 2.1, token-based), see 
 
 ---
 
+# Claude (Web)
+Source: https://docs.xpoz.ai/integrations/claude-web
+
+
+Claude on claude.ai connects to the Xpoz MCP server as a custom connector. Once added, Claude can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview), in any conversation where you enable it.
+
+## Setup
+  
+    Go to **Customize > Connectors** on [claude.ai](https://claude.ai).
+    Click **+**, then **Add custom connector**, and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+    In a conversation, click the **+** button at the lower left of the chat box, choose **Connectors**, and turn on Xpoz.
+    Ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Claude calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+
+## Setup notes
+
+- Connectors are tied to your Claude account: a connector added here is also available in [Claude Desktop](/integrations/claude-desktop), [Claude Cowork](/integrations/claude-cowork), and the mobile apps.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+- On Team and Enterprise plans, an owner adds the connector under **Organization settings > Connectors**; members then connect it from **Customize > Connectors**.
+
+## What you can ask
+
+- "What is Reddit saying about my brand today?"
+- "Find the most-liked tweets about our product launch this week"
+- "Which TikTok creators posted about skincare in the last 48 hours?"
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Write effective search queries with boolean operators
+
+---
+
+# Claude Desktop
+Source: https://docs.xpoz.ai/integrations/claude-desktop
+
+
+Claude Desktop connects to the Xpoz MCP server as a custom connector, the same account-level connector used by claude.ai. Once added, Claude can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview).
+
+## Setup
+  
+    In Claude Desktop, go to **Settings > Connectors**.
+    Click **Add custom connector** and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+    Start a new conversation and ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Claude calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+
+## Setup notes
+
+- Connectors are tied to your Claude account: a connector added on claude.ai or in Cowork appears here automatically, and vice versa. If you already added Xpoz in [Claude (Web)](/integrations/claude-web), there is nothing to configure.
+- The connection to the Xpoz server is brokered through your Claude account from Anthropic's infrastructure, not from your machine, so no local install, Node.js, or config file is required.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+
+## What you can ask
+
+- "Summarize the top complaints about our product on Reddit this month"
+- "Compare engagement on our last 10 tweets with our main competitor's"
+- "Find Instagram posts mentioning our brand with the highest engagement this week"
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Monitor keywords and accounts continuously
+
+---
+
+# Claude Cowork
+Source: https://docs.xpoz.ai/integrations/claude-cowork
+
+
+Claude Cowork uses the same account-level custom connectors as claude.ai and Claude Desktop. Adding the Xpoz MCP server once makes live social media data across Twitter/X, Instagram, Reddit, and TikTok available to your Cowork sessions with all [48 tools](/mcp/tools/overview).
+
+## Setup
+  
+    Go to **Customize > Connectors** (in Cowork or on claude.ai; they share the same connector list).
+    Click **+**, then **Add custom connector**, and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+    In a Cowork session, ask:
+
+    ```
+    What are people saying about our brand on Reddit and Twitter today?
+    ```
+
+    If the agent calls Xpoz tools and returns posts, the connection is working.
+
+## Setup notes
+
+- Connectors are tied to your Claude account and shared across claude.ai, Claude Desktop, Cowork, and the mobile apps; add Xpoz once and every surface has it.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+- On Team and Enterprise plans, an owner adds the connector under **Organization settings > Connectors**; members then connect it from **Customize > Connectors**.
+- Long-running Cowork tasks pair well with [continuous tracking](/tracking): tracked keywords and accounts give agents fresher, deeper coverage.
+
+## What you can ask
+
+- "Run a weekly digest: mentions of our brand across all four platforms, sorted by risk"
+- "Build a report on the top 20 creators posting about our category this month"
+- "Watch r/oursubreddit and summarize new complaint threads each morning"
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Pre-built social media research workflows
+
+---
+
 # Claude Code
 Source: https://docs.xpoz.ai/integrations/claude-code
 
@@ -6194,6 +6195,51 @@ Once connected, ask Claude to perform any social media research task:
 - Export large datasets in CSV format
 
 See the full list of available tools in the [MCP Tools reference](/mcp/tools/overview), or explore pre-built research workflows in [Agent Skills](/skills/overview).
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Write effective search queries with boolean operators
+
+---
+
+# ChatGPT
+Source: https://docs.xpoz.ai/integrations/chatgpt
+
+
+ChatGPT connects to the Xpoz MCP server through developer mode connectors. Once added, ChatGPT can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview) in conversations where the connector is enabled.
+
+## Setup
+  
+    Open **Settings > Connectors**, and under **Advanced** turn on **Developer mode**.
+    Back in **Settings > Connectors**, click **Create** and configure:
+
+    | Field | Value |
+    |---|---|
+    | **Name** | `Xpoz` |
+    | **MCP server URL** | `https://mcp.xpoz.ai/mcp` |
+
+    Complete authentication (sign in with Google, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page), confirm the trust prompt, and click **Create**.
+    In a new conversation, open the **+** menu, choose **Developer mode**, and enable the Xpoz connector. Connectors are enabled per conversation.
+    Ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If ChatGPT calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+
+## Setup notes
+
+- Developer mode is available on paid ChatGPT plans; see [OpenAI's developer mode guide](https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt) for current plan availability.
+- The connector must be enabled in each conversation where you want to use it (the **+** menu > **Developer mode**).
+- Without developer mode, ChatGPT only accepts connectors that implement its deep-research interface; the full Xpoz toolset requires developer mode.
+
+## What you can ask
+
+- "Summarize the top complaints about [brand] on Twitter and Reddit this week"
+- "Find Instagram posts mentioning [product] with the highest engagement this month"
+- "Which subreddits are discussing our product category the most right now?"
 
 ## Next Steps
   
