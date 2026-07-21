@@ -1,0 +1,59 @@
+---
+title: "Claude Cowork"
+description: "Connect Xpoz to Claude Cowork as a custom connector so agents in your workspace can use live Twitter/X, Instagram, Reddit, and TikTok data."
+---
+
+Claude Cowork uses the same account-level custom connectors as claude.ai and Claude Desktop. Adding the Xpoz MCP server once makes live social media data across Twitter/X, Instagram, Reddit, and TikTok available to your Cowork sessions with all [48 tools](/mcp/tools/overview).
+
+## Setup
+
+<Steps>
+  <Step title="Open the connector settings">
+    Go to **Customize > Connectors** (in Cowork or on claude.ai; they share the same connector list).
+  </Step>
+  <Step title="Add the custom connector">
+    Click **+**, then **Add custom connector**, and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+  </Step>
+  <Step title="Authenticate">
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Verify the connection">
+    In a Cowork session, ask:
+
+    ```
+    What are people saying about our brand on Reddit and Twitter today?
+    ```
+
+    If the agent calls Xpoz tools and returns posts, the connection is working.
+  </Step>
+</Steps>
+
+## Setup notes
+
+- Connectors are tied to your Claude account and shared across claude.ai, Claude Desktop, Cowork, and the mobile apps; add Xpoz once and every surface has it.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+- On Team and Enterprise plans, an owner adds the connector under **Organization settings > Connectors**; members then connect it from **Customize > Connectors**.
+- Long-running Cowork tasks pair well with [continuous tracking](/tracking): tracked keywords and accounts give agents fresher, deeper coverage.
+
+## What you can ask
+
+- "Run a weekly digest: mentions of our brand across all four platforms, sorted by risk"
+- "Build a report on the top 20 creators posting about our category this month"
+- "Watch r/oursubreddit and summarize new complaint threads each morning"
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Agent Skills" icon="robot" href="/skills/overview">
+    Pre-built social media research workflows
+  </Card>
+</CardGroup>

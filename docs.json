@@ -127,9 +127,13 @@
             "group": "Integrations",
             "pages": [
               "integrations/overview",
+              "integrations/claude-web",
+              "integrations/claude-desktop",
+              "integrations/claude-cowork",
               "integrations/claude-code",
-              "integrations/gemini-cli",
+              "integrations/chatgpt",
               "integrations/codex",
+              "integrations/gemini-cli",
               "integrations/vercel-ai-sdk",
               "integrations/langchain"
             ]

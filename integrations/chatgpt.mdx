@@ -1,0 +1,59 @@
+---
+title: "ChatGPT"
+description: "Connect Xpoz to ChatGPT as an MCP connector in developer mode and search live Twitter/X, Instagram, Reddit, and TikTok data in your chats."
+---
+
+ChatGPT connects to the Xpoz MCP server through developer mode connectors. Once added, ChatGPT can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview) in conversations where the connector is enabled.
+
+## Setup
+
+<Steps>
+  <Step title="Enable developer mode">
+    Open **Settings > Connectors**, and under **Advanced** turn on **Developer mode**.
+  </Step>
+  <Step title="Create the connector">
+    Back in **Settings > Connectors**, click **Create** and configure:
+
+    | Field | Value |
+    |---|---|
+    | **Name** | `Xpoz` |
+    | **MCP server URL** | `https://mcp.xpoz.ai/mcp` |
+
+    Complete authentication (sign in with Google, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page), confirm the trust prompt, and click **Create**.
+  </Step>
+  <Step title="Enable it in a chat">
+    In a new conversation, open the **+** menu, choose **Developer mode**, and enable the Xpoz connector. Connectors are enabled per conversation.
+  </Step>
+  <Step title="Verify the connection">
+    Ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If ChatGPT calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+  </Step>
+</Steps>
+
+## Setup notes
+
+- Developer mode is available on paid ChatGPT plans; see [OpenAI's developer mode guide](https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt) for current plan availability.
+- The connector must be enabled in each conversation where you want to use it (the **+** menu > **Developer mode**).
+- Without developer mode, ChatGPT only accepts connectors that implement its deep-research interface; the full Xpoz toolset requires developer mode.
+
+## What you can ask
+
+- "Summarize the top complaints about [brand] on Twitter and Reddit this week"
+- "Find Instagram posts mentioning [product] with the highest engagement this month"
+- "Which subreddits are discussing our product category the most right now?"
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/guides/query-syntax">
+    Write effective search queries with boolean operators
+  </Card>
+</CardGroup>

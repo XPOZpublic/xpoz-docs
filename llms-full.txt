@@ -73,7 +73,7 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
 
     ```bash
     # 1. Generate a free token (valid 5 days)
-    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
 
     # 2. Use it like any access key
     curl -X POST https://mcp.xpoz.ai/mcp \
@@ -82,17 +82,17 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
       -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"getTwitterUser","arguments":{"identifier":"elonmusk","identifierType":"username"}},"id":1}'
     ```
     ```bash
-    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
     xpoz-cli twitter get_user --identifier elonmusk
     ```
     ```bash
-    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
     claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
       -t http \
       -H "Authorization: Bearer $TOKEN"
     ```
 
-The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
+The request requires a `source` field identifying where the token was requested from (e.g. `skills`, a specific page, `sdk`, `cli`). The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
 
 ```json
 {
@@ -323,7 +323,9 @@ When multiple credentials are available, Xpoz resolves them in this order:
     ### Step 1: Generate a free token
 
     ```bash
-    curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+    curl -s -X POST https://api.xpoz.ai/api/trial/token \
+      -H "Content-Type: application/json" \
+      -d '{"source": "docs"}' | jq -r .data.accessKey
     # -> TRIAL...  (valid 5 days)
     ```
 
@@ -419,6 +421,79 @@ When multiple credentials are available, Xpoz resolves them in this order:
   
     Start querying with your credentials
     Browse all 48 available tools
+
+---
+
+# Pricing & Credits
+Source: https://docs.xpoz.ai/pricing
+
+
+Every Xpoz plan includes credits. Credits are spent per search, not per result: a search costs a flat number of credits based on the platform, and returns up to 300 results at no extra charge. You pay for the questions you ask, not the data you get back.
+
+## What a search costs
+
+| Platform  | Credits per search |
+| --------- | ------------------ |
+| Reddit    | 2                  |
+| Twitter/X | 2                  |
+| TikTok    | 5                  |
+| Instagram | 12                 |
+
+Only data queries spend credits. Account, tracking, auth, and operation tools (`getAccountDetails`, `getCreditsUsageHistory`, `getTrackedItems`, `addTrackedItems`, `removeTrackedItems`, `checkOperationStatus`, and the rest) are always free.
+  Each tool call is charged, including pagination: fetching page 2 of a paged result set is a new call at the same platform rate. Fast mode returns up to 300 results in a single call, so it is the most credit-efficient way to search. See [Response Modes](/mcp/response-modes).
+## Plans
+
+| Plan       | Price                        | Credits          | Extra credits |
+| ---------- | ---------------------------- | ---------------- | ------------- |
+| Free       | \$0                           | 500 (one-time)   | —             |
+| Pro        | \$20/mo (\$16/mo billed annually)  | 30,000/month     | \$0.80 per 1,000 |
+| Max        | \$200/mo (\$160/mo billed annually) | 600,000/month    | \$0.40 per 1,000 |
+| Enterprise | Custom                       | Custom           | Custom        |
+
+Free tier credits are a one-time allocation and do not refresh. When they run out, Free users hit a hard stop; Pro and Max users continue at the extra-credit rate, or can upgrade at any time.
+
+## What credits translate to
+
+A search returns up to 300 results for a flat credit price, so credits go a long way: up to 5 million results per month on Pro, and up to 100 million results per month on Max.
+
+## CSV export rows
+
+CSV export is the one place rows are metered separately from credits. An export is charged twice: the query itself at the normal platform rate (2-12 credits), plus every exported row against your plan's row allowance:
+
+| Plan | Included export rows        | Extra rows      |
+| ---- | --------------------------- | --------------- |
+| Free | 10,000 total (500 per file) | —               |
+| Pro  | 50,000/month                | \$1 per 1,000    |
+| Max  | 250,000/month               | \$1 per 1,000    |
+
+See [CSV Exports](/guides/csv-exports) for how exports work.
+
+## Tracked keywords and users
+
+[Continuous tracking](/tracking) slots per plan:
+
+| Plan       | Tracked keywords/users | Extra slots        |
+| ---------- | ---------------------- | ------------------ |
+| Free       | 1                      | —                  |
+| Pro        | 10                     | \$5 per keyword/user |
+| Max        | 30                     | \$2 per keyword/user |
+| Enterprise | Unlimited              | —                  |
+
+## Instant access costs nothing
+
+[Instant access tokens](/trial) spend no credits at all. They return up to 5 results per call for 5 days — enough to evaluate the data before creating an account.
+
+## Check your usage
+
+Ask your agent, or check the [usage dashboard](https://xpoz.ai/usage):
+
+- `getAccountDetails` — plan, billing, and remaining subscription and extra credits
+- `getCreditsUsageHistory` — credits and export rows spent over time, by hour or day
+
+Both are documented in [Account Tools](/mcp/tools/account).
+  
+    Full plan comparison and checkout on xpoz.ai
+    Get your access key and run your first search
 
 ---
 
@@ -1326,7 +1401,9 @@ The Xpoz MCP server is hosted at `https://mcp.xpoz.ai/mcp`. You need an access k
   **Start instantly — no account needed.** Generate a free token and use it in place of `YOUR_API_KEY` below:
 
   ```bash
-  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  curl -s -X POST https://api.xpoz.ai/api/trial/token \
+    -H "Content-Type: application/json" \
+    -d '{"source": "docs"}' | jq -r .data.accessKey
   # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
   ```
 
@@ -2858,7 +2935,9 @@ Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
   **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
   ```bash
-  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  curl -s -X POST https://api.xpoz.ai/api/trial/token \
+    -H "Content-Type: application/json" \
+    -d '{"source": "docs"}' | jq -r .data.accessKey
   # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
   ```
 
@@ -3970,7 +4049,9 @@ Sign up and get your token at [xpoz.ai/get-token](https://xpoz.ai/get-token).
   **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
   ```bash
-  curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey
+  curl -s -X POST https://api.xpoz.ai/api/trial/token \
+    -H "Content-Type: application/json" \
+    -d '{"source": "docs"}' | jq -r .data.accessKey
   # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
   ```
 
@@ -5245,7 +5326,7 @@ The CLI requires an access key to authenticate with the Xpoz MCP server. Get you
   **Start instantly — no account needed.** Generate a free token and use it as your API key:
 
   ```bash
-  TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token | jq -r .data.accessKey)
+  TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"docs"}' | jq -r .data.accessKey)
   export XPOZ_API_KEY=$TOKEN
   xpoz-cli twitter get_user --identifier elonmusk
   ```
@@ -5892,6 +5973,8 @@ All Xpoz integrations connect to the same hosted MCP server at `https://mcp.xpoz
     One-command setup via `claude mcp add`. Supports bearer token and OAuth authentication.
     Add Xpoz to your Gemini CLI settings file with bearer token auth.
     Configure the Xpoz MCP server in the Codex CLI for agentic social media research.
+    npm package for building AI apps with social media tools using generateText, streamText, and agents.
+    Python package for building LangChain agents with social media intelligence tools.
 
 ## Common Setup Pattern
 
@@ -5908,6 +5991,140 @@ For details on authentication methods (access key, OAuth 2.1, token-based), see 
     Learn about the MCP server architecture and capabilities
     Browse all 48 tools across 4 platforms
     Pre-built AI workflows for common research tasks
+
+---
+
+# Claude (Web)
+Source: https://docs.xpoz.ai/integrations/claude-web
+
+
+Claude on claude.ai connects to the Xpoz MCP server as a custom connector. Once added, Claude can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview), in any conversation where you enable it.
+
+## Setup
+  
+    Go to **Customize > Connectors** on [claude.ai](https://claude.ai).
+    Click **+**, then **Add custom connector**, and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+    In a conversation, click the **+** button at the lower left of the chat box, choose **Connectors**, and turn on Xpoz.
+    Ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Claude calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+
+## Setup notes
+
+- Connectors are tied to your Claude account: a connector added here is also available in [Claude Desktop](/integrations/claude-desktop), [Claude Cowork](/integrations/claude-cowork), and the mobile apps.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+- On Team and Enterprise plans, an owner adds the connector under **Organization settings > Connectors**; members then connect it from **Customize > Connectors**.
+
+## What you can ask
+
+- "What is Reddit saying about my brand today?"
+- "Find the most-liked tweets about our product launch this week"
+- "Which TikTok creators posted about skincare in the last 48 hours?"
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Write effective search queries with boolean operators
+
+---
+
+# Claude Desktop
+Source: https://docs.xpoz.ai/integrations/claude-desktop
+
+
+Claude Desktop connects to the Xpoz MCP server as a custom connector, the same account-level connector used by claude.ai. Once added, Claude can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview).
+
+## Setup
+  
+    In Claude Desktop, go to **Settings > Connectors**.
+    Click **Add custom connector** and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+    Start a new conversation and ask:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Claude calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+
+## Setup notes
+
+- Connectors are tied to your Claude account: a connector added on claude.ai or in Cowork appears here automatically, and vice versa. If you already added Xpoz in [Claude (Web)](/integrations/claude-web), there is nothing to configure.
+- The connection to the Xpoz server is brokered through your Claude account from Anthropic's infrastructure, not from your machine, so no local install, Node.js, or config file is required.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+
+## What you can ask
+
+- "Summarize the top complaints about our product on Reddit this month"
+- "Compare engagement on our last 10 tweets with our main competitor's"
+- "Find Instagram posts mentioning our brand with the highest engagement this week"
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Monitor keywords and accounts continuously
+
+---
+
+# Claude Cowork
+Source: https://docs.xpoz.ai/integrations/claude-cowork
+
+
+Claude Cowork uses the same account-level custom connectors as claude.ai and Claude Desktop. Adding the Xpoz MCP server once makes live social media data across Twitter/X, Instagram, Reddit, and TikTok available to your Cowork sessions with all [48 tools](/mcp/tools/overview).
+
+## Setup
+  
+    Go to **Customize > Connectors** (in Cowork or on claude.ai; they share the same connector list).
+    Click **+**, then **Add custom connector**, and set the URL to:
+
+    ```
+    https://mcp.xpoz.ai/mcp
+    ```
+
+    Click **Add**.
+    Sign in with your Google account when prompted, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page.
+    In a Cowork session, ask:
+
+    ```
+    What are people saying about our brand on Reddit and Twitter today?
+    ```
+
+    If the agent calls Xpoz tools and returns posts, the connection is working.
+
+## Setup notes
+
+- Connectors are tied to your Claude account and shared across claude.ai, Claude Desktop, Cowork, and the mobile apps; add Xpoz once and every surface has it.
+- Custom connectors are available on Free, Pro, Max, Team, and Enterprise plans; the Free plan is limited to one custom connector.
+- On Team and Enterprise plans, an owner adds the connector under **Organization settings > Connectors**; members then connect it from **Customize > Connectors**.
+- Long-running Cowork tasks pair well with [continuous tracking](/tracking): tracked keywords and accounts give agents fresher, deeper coverage.
+
+## What you can ask
+
+- "Run a weekly digest: mentions of our brand across all four platforms, sorted by risk"
+- "Build a report on the top 20 creators posting about our category this month"
+- "Watch r/oursubreddit and summarize new complaint threads each morning"
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Pre-built social media research workflows
 
 ---
 
@@ -5986,64 +6203,48 @@ See the full list of available tools in the [MCP Tools reference](/mcp/tools/ove
 
 ---
 
-# Gemini CLI
-Source: https://docs.xpoz.ai/integrations/gemini-cli
+# ChatGPT
+Source: https://docs.xpoz.ai/integrations/chatgpt
 
 
-Gemini CLI supports MCP servers natively. Add the Xpoz MCP server to your settings file to access all [48 tools](/mcp/tools/overview) from the Gemini CLI.
+ChatGPT connects to the Xpoz MCP server through developer mode connectors. Once added, ChatGPT can search live social media data across Twitter/X, Instagram, Reddit, and TikTok with all [48 tools](/mcp/tools/overview) in conversations where the connector is enabled.
 
 ## Setup
   
-    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
-    Add the Xpoz server to your Gemini CLI settings file at `~/.gemini/settings.json`:
+    Open **Settings > Connectors**, and under **Advanced** turn on **Developer mode**.
+    Back in **Settings > Connectors**, click **Create** and configure:
 
-    ```json
-    {
-      "mcpServers": {
-        "xpoz": {
-          "uri": "https://mcp.xpoz.ai/mcp",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
+    | Field | Value |
+    |---|---|
+    | **Name** | `Xpoz` |
+    | **MCP server URL** | `https://mcp.xpoz.ai/mcp` |
 
-    Replace `YOUR_API_KEY` with your actual Xpoz access key.
-    If the file already contains other MCP servers, add the `"xpoz"` entry inside the existing `"mcpServers"` object.
-  
-    Close and reopen Gemini CLI to pick up the new configuration. The 48 Xpoz tools will be available in your next session.
-    Ask Gemini to run a query:
+    Complete authentication (sign in with Google, or use your Xpoz access key from the [Get Token](https://xpoz.ai/get-token) page), confirm the trust prompt, and click **Create**.
+    In a new conversation, open the **+** menu, choose **Developer mode**, and enable the Xpoz connector. Connectors are enabled per conversation.
+    Ask:
 
     ```
-    Look up the Twitter user @elonmusk using Xpoz
+    Search Twitter for posts about "artificial intelligence" from the last week
     ```
 
-    If Gemini calls `getTwitterUser` and returns profile data, the connection is working.
+    If ChatGPT calls `getTwitterPostsByKeywords` and returns results, the connection is working.
 
-## Example Queries
+## Setup notes
 
-Once connected, you can ask Gemini to perform social media research:
+- Developer mode is available on paid ChatGPT plans; see [OpenAI's developer mode guide](https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt) for current plan availability.
+- The connector must be enabled in each conversation where you want to use it (the **+** menu > **Developer mode**).
+- Without developer mode, ChatGPT only accepts connectors that implement its deep-research interface; the full Xpoz toolset requires developer mode.
 
-```
-Search Reddit for posts about "rust programming" in the learnrust subreddit
-```
+## What you can ask
 
-```
-Find the top Instagram posts mentioning "sustainable fashion" this month
-```
-
-```
-Get TikTok user profile for @charlidamelio
-```
-
-Gemini will call the appropriate Xpoz MCP tools and return structured results.
+- "Summarize the top complaints about [brand] on Twitter and Reddit this week"
+- "Find Instagram posts mentioning [product] with the highest engagement this month"
+- "Which subreddits are discussing our product category the most right now?"
 
 ## Next Steps
   
     Browse all 48 tools across 4 platforms
-    Learn about fast, paging, and CSV response modes
+    Write effective search queries with boolean operators
 
 ---
 
@@ -6106,4 +6307,421 @@ See the full list of available tools in the [MCP Tools reference](/mcp/tools/ove
   
     Browse all 48 tools across 4 platforms
     Get started with Xpoz in under 2 minutes
+
+---
+
+# Gemini CLI
+Source: https://docs.xpoz.ai/integrations/gemini-cli
+
+
+Gemini CLI supports MCP servers natively. Add the Xpoz MCP server to your settings file to access all [48 tools](/mcp/tools/overview) from the Gemini CLI.
+
+## Setup
+  
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+    Add the Xpoz server to your Gemini CLI settings file at `~/.gemini/settings.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "uri": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    Replace `YOUR_API_KEY` with your actual Xpoz access key.
+    If the file already contains other MCP servers, add the `"xpoz"` entry inside the existing `"mcpServers"` object.
+  
+    Close and reopen Gemini CLI to pick up the new configuration. The 48 Xpoz tools will be available in your next session.
+    Ask Gemini to run a query:
+
+    ```
+    Look up the Twitter user @elonmusk using Xpoz
+    ```
+
+    If Gemini calls `getTwitterUser` and returns profile data, the connection is working.
+
+## Example Queries
+
+Once connected, you can ask Gemini to perform social media research:
+
+```
+Search Reddit for posts about "rust programming" in the learnrust subreddit
+```
+
+```
+Find the top Instagram posts mentioning "sustainable fashion" this month
+```
+
+```
+Get TikTok user profile for @charlidamelio
+```
+
+Gemini will call the appropriate Xpoz MCP tools and return structured results.
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Learn about fast, paging, and CSV response modes
+
+---
+
+# Vercel AI SDK
+Source: https://docs.xpoz.ai/integrations/vercel-ai-sdk
+
+
+The [`@xpoz/ai-sdk`](https://www.npmjs.com/package/@xpoz/ai-sdk) package provides 44 ready-made tools for the [Vercel AI SDK](https://sdk.vercel.ai). Use them with `generateText`, `streamText`, or any AI SDK-compatible framework to give your AI agent access to Twitter/X, Instagram, Reddit, and TikTok data.
+
+## Setup
+  
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+    ```bash
+    npm install @xpoz/ai-sdk ai zod
+    ```
+
+    You also need an AI provider. For example, with Anthropic:
+
+    ```bash
+    npm install @ai-sdk/anthropic
+    ```
+    ```bash
+    export XPOZ_API_KEY=your-access-key
+    ```
+    ```typescript
+    import { generateText, stepCountIs } from "ai";
+    import { anthropic } from "@ai-sdk/anthropic";
+    import { xpozTools } from "@xpoz/ai-sdk";
+
+    const result = await generateText({
+      model: anthropic("claude-sonnet-4-6"),
+      tools: xpozTools(),
+      stopWhen: stepCountIs(3),
+      prompt: "What are people saying about AI agents on Twitter?",
+    });
+
+    console.log(result.text);
+    ```
+
+    The AI model automatically discovers all 44 tools and decides which ones to call based on the prompt.
+
+## Using Individual Tools
+
+If you only need specific tools, import them directly instead of the full bundle:
+
+```typescript
+import { xpozTwitterSearch, xpozInstagramUser } from "@xpoz/ai-sdk";
+
+const result = await generateText({
+  model: anthropic("claude-sonnet-4-6"),
+  tools: {
+    twitterSearch: xpozTwitterSearch(),
+    instagramUser: xpozInstagramUser(),
+  },
+  prompt: "Look up the NASA Instagram profile",
+});
+```
+
+## Field Selection
+
+Every tool supports an optional `fields` parameter to control which fields are returned. Each tool's description lists all available fields for that entity type.
+
+```typescript
+import { xpozTwitterUser } from "@xpoz/ai-sdk";
+
+const tool = xpozTwitterUser();
+const user = await tool.execute(
+  { identifier: "elonmusk", fields: ["username", "followersCount", "description"] },
+  { toolCallId: "demo", messages: [] }
+);
+```
+Field names differ across platforms. For example, Twitter uses `followersCount` while Instagram and TikTok use `followerCount`. Each tool's description lists the correct field names.
+## TypeScript Types
+
+The package exports response types for all entity types:
+
+```typescript
+import {
+  type TwitterUser,
+  type TwitterPost,
+  type InstagramUser,
+  type InstagramPost,
+  type RedditUser,
+  type RedditPost,
+  type TiktokUser,
+  type TiktokPost,
+} from "@xpoz/ai-sdk";
+```
+
+All tools also define an `outputSchema` for typed results via the AI SDK's `TypedToolResult` system.
+
+## Available Tools
+
+### Twitter/X
+
+| Tool | Description |
+|------|-------------|
+| `xpozTwitterSearch` | Search posts by keywords, hashtags, or phrases |
+| `xpozTwitterUser` | Get a user profile by username or ID |
+| `xpozTwitterUserPosts` | Get posts by a specific user |
+| `xpozTwitterPostComments` | Get replies on a post |
+| `xpozTwitterSearchUsers` | Search users by name |
+| `xpozTwitterUserConnections` | Get a user's followers or following |
+| `xpozTwitterUsersByKeywords` | Find users who posted about a topic |
+| `xpozTwitterCountPosts` | Count posts matching a phrase |
+| `xpozTwitterPostsByIds` | Get specific posts by their IDs |
+| `xpozTwitterPostRetweets` | Get retweets of a post |
+| `xpozTwitterPostQuotes` | Get quote tweets of a post |
+| `xpozTwitterPostInteractingUsers` | Get users who liked, retweeted, or quoted a post |
+| `xpozTwitterUsers` | Get multiple user profiles by usernames or IDs |
+
+### Instagram
+
+| Tool | Description |
+|------|-------------|
+| `xpozInstagramSearch` | Search posts by keywords |
+| `xpozInstagramUser` | Get a user profile by username or ID |
+| `xpozInstagramUserPosts` | Get posts by a specific user |
+| `xpozInstagramPostComments` | Get comments on a post |
+| `xpozInstagramSearchUsers` | Search users by name |
+| `xpozInstagramUsersByKeywords` | Find users who posted about a topic |
+| `xpozInstagramPostsByIds` | Get specific posts by their IDs |
+| `xpozInstagramUserConnections` | Get a user's followers or following |
+| `xpozInstagramPostInteractingUsers` | Get users who liked or commented on a post |
+
+### Reddit
+
+| Tool | Description |
+|------|-------------|
+| `xpozRedditSearch` | Search posts by keywords |
+| `xpozRedditUser` | Get a user profile |
+| `xpozRedditPostWithComments` | Get a post with its comment thread |
+| `xpozRedditSearchComments` | Search comments by keywords |
+| `xpozRedditSearchSubreddits` | Search subreddits by name or topic |
+| `xpozRedditSubreddit` | Get a subreddit's info and recent posts |
+| `xpozRedditUsersByKeywords` | Find users who posted about a topic |
+| `xpozRedditSearchUsers` | Search users by name |
+| `xpozRedditSubredditsByKeywords` | Find subreddits related to a topic |
+
+### TikTok
+
+| Tool | Description |
+|------|-------------|
+| `xpozTiktokSearch` | Search videos by keywords |
+| `xpozTiktokUser` | Get a creator profile by username or ID |
+| `xpozTiktokUserPosts` | Get videos by a specific creator |
+| `xpozTiktokPostComments` | Get comments on a video |
+| `xpozTiktokSearchUsers` | Search creators by name |
+| `xpozTiktokPostsByHashtags` | Search videos by hashtags |
+| `xpozTiktokUsersByKeywords` | Find creators who posted about a topic |
+| `xpozTiktokPostsByIds` | Get specific videos by their IDs |
+| `xpozTiktokUsersByHashtags` | Find creators who posted with specific hashtags |
+
+### Tracking & Account
+
+| Tool | Description |
+|------|-------------|
+| `xpozGetTrackedItems` | List all tracked keywords, users, and hashtags |
+| `xpozAddTrackedItems` | Add items to track across platforms |
+| `xpozRemoveTrackedItems` | Stop tracking items |
+| `xpozAccountDetails` | Get account plan, usage, and billing info |
+
+## Configuration
+
+All tools accept an optional configuration object:
+
+```typescript
+import { xpozTools } from "@xpoz/ai-sdk";
+
+const tools = xpozTools({
+  apiKey: "your-access-key",    // defaults to XPOZ_API_KEY env var
+  serverUrl: "https://mcp.xpoz.ai/mcp",  // default
+  timeoutMs: 300000,            // default: 5 minutes
+});
+```
+
+## What You Can Do
+
+- Search posts by keyword across Twitter, Instagram, Reddit, and TikTok
+- Look up user profiles and follower counts
+- Analyze engagement metrics and trends
+- Track keywords and users for continuous monitoring
+- Build AI agents that autonomously research social media topics
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    View the package on npm
+
+---
+
+# LangChain
+Source: https://docs.xpoz.ai/integrations/langchain
+
+
+The [`langchain-xpoz`](https://pypi.org/project/langchain-xpoz/) Python package provides 44 LangChain tools for social media intelligence. Use them with any LangChain-compatible model to give your AI agent access to Twitter/X, Instagram, Reddit, and TikTok data.
+
+## Setup
+  
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+    ```bash
+    pip install langchain-xpoz
+    ```
+
+    You also need a model provider. For example, with Anthropic:
+
+    ```bash
+    pip install langchain-anthropic
+    ```
+    ```bash
+    export XPOZ_API_KEY=your-access-key
+    ```
+    ```python
+    from langchain_xpoz import XpozTwitterSearch, XpozInstagramUser, XpozRedditSearch
+    from langchain_anthropic import ChatAnthropic
+    from langchain.agents import create_tool_calling_agent, AgentExecutor
+    from langchain_core.prompts import ChatPromptTemplate
+
+    tools = [
+        XpozTwitterSearch(),
+        XpozInstagramUser(),
+        XpozRedditSearch(),
+    ]
+
+    llm = ChatAnthropic(model="claude-sonnet-4-6")
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are a social media research assistant."),
+        ("human", "{input}"),
+        ("placeholder", "{agent_scratchpad}"),
+    ])
+
+    agent = create_tool_calling_agent(llm=llm, tools=tools, prompt=prompt)
+    executor = AgentExecutor(agent=agent, tools=tools)
+
+    result = executor.invoke({
+        "input": "What are people saying about AI agents on Twitter?"
+    })
+
+    print(result["output"])
+    ```
+
+## Using Individual Tools
+
+You can also use tools directly without an agent:
+
+```python
+from langchain_xpoz import XpozTwitterSearch
+
+tool = XpozTwitterSearch()
+result = tool.invoke({"query": "AI agents", "max_results": 5})
+print(result)
+```
+
+Or pass `api_key` explicitly instead of using the environment variable:
+
+```python
+tool = XpozTwitterSearch(api_key="your-access-key")
+```
+
+## Available Tools
+
+### Twitter/X
+
+| Tool | Description |
+|------|-------------|
+| `XpozTwitterSearch` | Search posts by keywords, hashtags, or phrases |
+| `XpozTwitterUser` | Get a user profile by username or ID |
+| `XpozTwitterUserPosts` | Get posts by a specific user |
+| `XpozTwitterPostComments` | Get replies on a post |
+| `XpozTwitterSearchUsers` | Search users by name |
+| `XpozTwitterUserConnections` | Get a user's followers or following |
+| `XpozTwitterUsersByKeywords` | Find users who posted about a topic |
+| `XpozTwitterCountPosts` | Count posts matching a phrase |
+| `XpozTwitterPostsByIds` | Get specific posts by their IDs |
+| `XpozTwitterPostRetweets` | Get retweets of a post |
+| `XpozTwitterPostQuotes` | Get quote tweets of a post |
+| `XpozTwitterPostInteractingUsers` | Get users who retweeted, quoted, or commented on a post |
+| `XpozTwitterUsers` | Get multiple user profiles by usernames or IDs |
+
+### Instagram
+
+| Tool | Description |
+|------|-------------|
+| `XpozInstagramSearch` | Search posts by keywords |
+| `XpozInstagramUser` | Get a user profile by username or ID |
+| `XpozInstagramUserPosts` | Get posts by a specific user |
+| `XpozInstagramPostComments` | Get comments on a post |
+| `XpozInstagramSearchUsers` | Search users by name |
+| `XpozInstagramUsersByKeywords` | Find users who posted about a topic |
+| `XpozInstagramPostsByIds` | Get specific posts by their IDs |
+| `XpozInstagramUserConnections` | Get a user's followers or following |
+| `XpozInstagramPostInteractingUsers` | Get users who liked or commented on a post |
+
+### Reddit
+
+| Tool | Description |
+|------|-------------|
+| `XpozRedditSearch` | Search posts by keywords |
+| `XpozRedditUser` | Get a user profile |
+| `XpozRedditPostWithComments` | Get a post with its comment thread |
+| `XpozRedditSearchComments` | Search comments by keywords |
+| `XpozRedditSearchSubreddits` | Search subreddits by name or topic |
+| `XpozRedditSubreddit` | Get a subreddit's info and recent posts |
+| `XpozRedditUsersByKeywords` | Find users who posted about a topic |
+| `XpozRedditSearchUsers` | Search users by name |
+| `XpozRedditSubredditsByKeywords` | Find subreddits related to a topic |
+
+### TikTok
+
+| Tool | Description |
+|------|-------------|
+| `XpozTiktokSearch` | Search videos by keywords |
+| `XpozTiktokUser` | Get a creator profile by username or ID |
+| `XpozTiktokUserPosts` | Get videos by a specific creator |
+| `XpozTiktokPostComments` | Get comments on a video |
+| `XpozTiktokSearchUsers` | Search creators by name |
+| `XpozTiktokPostsByHashtags` | Search videos by hashtags |
+| `XpozTiktokUsersByKeywords` | Find creators who posted about a topic |
+| `XpozTiktokPostsByIds` | Get specific videos by their IDs |
+| `XpozTiktokUsersByHashtags` | Find creators who posted with specific hashtags |
+
+### Tracking & Account
+
+| Tool | Description |
+|------|-------------|
+| `XpozGetTrackedItems` | List all tracked keywords, users, and hashtags |
+| `XpozAddTrackedItems` | Add items to track across platforms |
+| `XpozRemoveTrackedItems` | Stop tracking items |
+| `XpozAccountDetails` | Get account plan, usage, and billing info |
+
+## Configuration
+
+All tools accept an optional `api_key` parameter. If not provided, the `XPOZ_API_KEY` environment variable is used:
+
+```python
+from langchain_xpoz import XpozTwitterSearch
+
+# Using environment variable (recommended)
+tool = XpozTwitterSearch()
+
+# Passing API key explicitly
+tool = XpozTwitterSearch(api_key="your-access-key")
+```
+
+## What You Can Do
+
+- Search posts by keyword across Twitter, Instagram, Reddit, and TikTok
+- Look up user profiles and follower counts
+- Analyze engagement metrics and trends
+- Track keywords and users for continuous monitoring
+- Build AI agents that autonomously research social media topics
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    View the package on PyPI
 
