@@ -26,6 +26,7 @@
           {
             "group": "Guides",
             "pages": [
+              "guides/connect-claude-chatgpt-social-media-data",
               "guides/query-syntax",
               "guides/csv-exports",
               "tracking",

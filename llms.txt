@@ -17,6 +17,7 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [Pricing & Credits](https://docs.xpoz.ai/pricing): plans, what a search costs per platform, and how credits translate into results
 
 ## Guides
+- [Connect Claude or ChatGPT to Live Social Media Data](https://docs.xpoz.ai/guides/connect-claude-chatgpt-social-media-data): Connect Claude, ChatGPT, or Gemini to live Twitter/X, Instagram, Reddit, and TikTok data through the MCP server in about 2 minutes
 - [Query Syntax](https://docs.xpoz.ai/guides/query-syntax): Search with boolean operators, exact phrases, and grouping
 - [CSV Exports](https://docs.xpoz.ai/guides/csv-exports): Bulk data export up to 500K rows
 - [Continuous Tracking](https://docs.xpoz.ai/tracking): Track keywords, users, and hashtags for better data coverage and fresher results
