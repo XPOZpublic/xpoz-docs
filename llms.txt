@@ -77,5 +77,5 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [Claude Cowork](https://docs.xpoz.ai/integrations/claude-cowork): Give Cowork agents live social media data via the shared account connector
 - [Claude Code](https://docs.xpoz.ai/integrations/claude-code): One-command setup
 - [ChatGPT](https://docs.xpoz.ai/integrations/chatgpt): Connect ChatGPT to live social media data via a developer-mode MCP connector
-- [Gemini CLI](https://docs.xpoz.ai/integrations/gemini-cli): Settings file configuration
 - [Codex](https://docs.xpoz.ai/integrations/codex): OpenAI Codex CLI setup
+- [Gemini CLI](https://docs.xpoz.ai/integrations/gemini-cli): Settings file configuration

@@ -6248,67 +6248,6 @@ ChatGPT connects to the Xpoz MCP server through developer mode connectors. Once 
 
 ---
 
-# Gemini CLI
-Source: https://docs.xpoz.ai/integrations/gemini-cli
-
-
-Gemini CLI supports MCP servers natively. Add the Xpoz MCP server to your settings file to access all [48 tools](/mcp/tools/overview) from the Gemini CLI.
-
-## Setup
-  
-    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
-    Add the Xpoz server to your Gemini CLI settings file at `~/.gemini/settings.json`:
-
-    ```json
-    {
-      "mcpServers": {
-        "xpoz": {
-          "uri": "https://mcp.xpoz.ai/mcp",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
-
-    Replace `YOUR_API_KEY` with your actual Xpoz access key.
-    If the file already contains other MCP servers, add the `"xpoz"` entry inside the existing `"mcpServers"` object.
-  
-    Close and reopen Gemini CLI to pick up the new configuration. The 48 Xpoz tools will be available in your next session.
-    Ask Gemini to run a query:
-
-    ```
-    Look up the Twitter user @elonmusk using Xpoz
-    ```
-
-    If Gemini calls `getTwitterUser` and returns profile data, the connection is working.
-
-## Example Queries
-
-Once connected, you can ask Gemini to perform social media research:
-
-```
-Search Reddit for posts about "rust programming" in the learnrust subreddit
-```
-
-```
-Find the top Instagram posts mentioning "sustainable fashion" this month
-```
-
-```
-Get TikTok user profile for @charlidamelio
-```
-
-Gemini will call the appropriate Xpoz MCP tools and return structured results.
-
-## Next Steps
-  
-    Browse all 48 tools across 4 platforms
-    Learn about fast, paging, and CSV response modes
-
----
-
 # OpenAI Codex
 Source: https://docs.xpoz.ai/integrations/codex
 
@@ -6368,6 +6307,67 @@ See the full list of available tools in the [MCP Tools reference](/mcp/tools/ove
   
     Browse all 48 tools across 4 platforms
     Get started with Xpoz in under 2 minutes
+
+---
+
+# Gemini CLI
+Source: https://docs.xpoz.ai/integrations/gemini-cli
+
+
+Gemini CLI supports MCP servers natively. Add the Xpoz MCP server to your settings file to access all [48 tools](/mcp/tools/overview) from the Gemini CLI.
+
+## Setup
+  
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+    Add the Xpoz server to your Gemini CLI settings file at `~/.gemini/settings.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "uri": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    Replace `YOUR_API_KEY` with your actual Xpoz access key.
+    If the file already contains other MCP servers, add the `"xpoz"` entry inside the existing `"mcpServers"` object.
+  
+    Close and reopen Gemini CLI to pick up the new configuration. The 48 Xpoz tools will be available in your next session.
+    Ask Gemini to run a query:
+
+    ```
+    Look up the Twitter user @elonmusk using Xpoz
+    ```
+
+    If Gemini calls `getTwitterUser` and returns profile data, the connection is working.
+
+## Example Queries
+
+Once connected, you can ask Gemini to perform social media research:
+
+```
+Search Reddit for posts about "rust programming" in the learnrust subreddit
+```
+
+```
+Find the top Instagram posts mentioning "sustainable fashion" this month
+```
+
+```
+Get TikTok user profile for @charlidamelio
+```
+
+Gemini will call the appropriate Xpoz MCP tools and return structured results.
+
+## Next Steps
+  
+    Browse all 48 tools across 4 platforms
+    Learn about fast, paging, and CSV response modes
 
 ---
 

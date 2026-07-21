@@ -132,8 +132,8 @@
               "integrations/claude-cowork",
               "integrations/claude-code",
               "integrations/chatgpt",
-              "integrations/gemini-cli",
               "integrations/codex",
+              "integrations/gemini-cli",
               "integrations/vercel-ai-sdk",
               "integrations/langchain"
             ]
