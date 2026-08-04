@@ -1,0 +1,55 @@
+---
+title: n8n
+description: Use Xpoz social media data in n8n AI agent workflows via the MCP Client Tool node.
+---
+
+n8n's built-in **MCP Client Tool** node connects any AI Agent workflow to the Xpoz MCP server, giving your agents live access to Twitter/X, Instagram, Reddit, and TikTok data. No custom node installation required.
+
+## Setup
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Add an AI Agent to your workflow">
+    Create a workflow with an **AI Agent** node (for example, triggered by **When chat message received**) and attach a chat model to it.
+  </Step>
+  <Step title="Attach the MCP Client Tool node">
+    Add the **MCP Client Tool** node as a tool of the AI Agent and configure it:
+
+    - **Server Transport**: HTTP Streamable
+    - **Endpoint**: `https://mcp.xpoz.ai/mcp`
+    - **Authentication**: Bearer Auth, with your Xpoz access key as the token
+    - **Tools to Include**: All (or select specific tools; see the tip below)
+  </Step>
+  <Step title="Run it">
+    Ask the agent something that needs social media data, for example: "What are people saying about our brand on Reddit this week?" The agent discovers the Xpoz tools automatically and calls them as needed.
+  </Step>
+</Steps>
+
+<Tip>
+  Xpoz exposes 48 tools. If your workflow only needs one platform, use **Tools to Include → Selected** and pick the relevant tools (for example `getTwitterPostsByKeywords` and `getTwitterUser`). A smaller tool list helps the model choose correctly and keeps prompts shorter.
+</Tip>
+
+## Example workflows
+
+- **Brand monitoring digest**: Schedule Trigger → AI Agent ("summarize the last day of posts mentioning our brand across Twitter and Reddit") with the Xpoz MCP tool → email or Slack node with the summary.
+- **Lead research**: Chat Trigger → AI Agent that looks up a prospect's Twitter/Instagram profile and recent posts before a sales call.
+- **Competitor tracking**: Schedule Trigger → AI Agent using tracked keywords (`getTrackedItems`, `addTrackedItems`) to maintain continuous coverage, then post changes to a channel.
+
+## Notes
+
+- The MCP Client Tool node requires a recent n8n version; the HTTP Streamable transport is the current recommended option (SSE is legacy).
+- Long-running Xpoz operations return an `operationId`; agents can poll with `checkOperationStatus`. For most searches the default fast mode returns results directly.
+- Each tool call consumes Xpoz credits per your plan.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/mcp/query-syntax">
+    Get better search results with boolean operators and filters
+  </Card>
+</CardGroup>
