@@ -138,6 +138,7 @@
               "integrations/vercel-ai-sdk",
               "integrations/langchain",
               "integrations/crewai",
+              "integrations/llamaindex",
               "integrations/n8n"
             ]
           }
