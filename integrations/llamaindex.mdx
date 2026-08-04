@@ -1,0 +1,97 @@
+---
+title: LlamaIndex
+description: Give your LlamaIndex agents social media intelligence with Xpoz.
+---
+
+The [`llama-index-tools-xpoz`](https://pypi.org/project/llama-index-tools-xpoz/) Python package provides five Xpoz tool specs (32 tools) for LlamaIndex agents: search and analyze Twitter/X, Instagram, Reddit, and TikTok data with no social media API keys required.
+
+## Setup
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Install the package">
+    ```bash
+    pip install llama-index-tools-xpoz
+    ```
+
+    You also need LlamaIndex and an LLM provider, for example:
+
+    ```bash
+    pip install llama-index llama-index-llms-openai
+    ```
+  </Step>
+  <Step title="Set your access key">
+    ```bash
+    export XPOZ_API_KEY=your-access-key
+    ```
+  </Step>
+  <Step title="Use with a LlamaIndex agent">
+    ```python
+    from llama_index.core.agent.workflow import FunctionAgent
+    from llama_index.llms.openai import OpenAI
+    from llama_index.tools.xpoz import XpozTwitterToolSpec, XpozRedditToolSpec
+
+    tools = XpozTwitterToolSpec().to_tool_list() + XpozRedditToolSpec().to_tool_list()
+
+    agent = FunctionAgent(
+        tools=tools,
+        llm=OpenAI(model="gpt-5.4"),
+        system_prompt="You are a social media research assistant. Use the Xpoz tools for data.",
+    )
+
+    response = await agent.run(
+        "What are people saying about AI agents on Twitter and Reddit?"
+    )
+    print(response)
+    ```
+  </Step>
+</Steps>
+
+## Using Individual Tools
+
+Call spec methods directly without an agent:
+
+```python
+from llama_index.tools.xpoz import XpozTwitterToolSpec
+
+spec = XpozTwitterToolSpec()
+result = spec.search_twitter_posts("AI agents", limit=5)
+```
+
+Pass `api_key` explicitly instead of using the environment variable: `XpozTwitterToolSpec(api_key="your-access-key")`.
+
+<Tip>
+  When a task needs the most recent posts, tell the agent to omit date filters. Tools accept optional date-range parameters, and models sometimes fill them speculatively, which skews results older.
+</Tip>
+
+## Tool Specs
+
+| Spec | Tools |
+| --- | --- |
+| `XpozTwitterToolSpec` | search posts, user profile, user posts, post comments, search users, followers/following, users by keywords, count posts |
+| `XpozInstagramToolSpec` | search posts, user profile, user posts, post comments, search users, users by keywords |
+| `XpozRedditToolSpec` | search posts, post with comments, search comments, user profile, search subreddits, subreddit with posts, subreddits by keywords |
+| `XpozTiktokToolSpec` | search videos, videos by hashtags, creator profile, creator videos, video comments, search creators, creators by hashtags |
+| `XpozTrackingToolSpec` | list/add/remove tracked items, account details |
+
+Give an agent only the specs it needs; a smaller tool list helps the model choose correctly.
+
+## What You Can Do
+
+- Build research agents that ground answers in live posts across four platforms
+- Look up user profiles, followers, and engagement metrics mid-task
+- Track keywords and users for continuous monitoring (`XpozTrackingToolSpec`)
+- Combine with your indexes: retrieve internal docs and live social data in one agent
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="PyPI Package" icon="python" href="https://pypi.org/project/llama-index-tools-xpoz/">
+    View the package on PyPI
+  </Card>
+</CardGroup>
