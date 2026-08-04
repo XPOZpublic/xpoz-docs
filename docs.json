@@ -134,6 +134,7 @@
               "integrations/chatgpt",
               "integrations/codex",
               "integrations/gemini-cli",
+              "integrations/cursor",
               "integrations/vercel-ai-sdk",
               "integrations/langchain"
             ]
