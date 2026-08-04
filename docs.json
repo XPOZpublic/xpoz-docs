@@ -137,7 +137,8 @@
               "integrations/cursor",
               "integrations/vercel-ai-sdk",
               "integrations/langchain",
-              "integrations/crewai"
+              "integrations/crewai",
+              "integrations/n8n"
             ]
           }
         ]
