@@ -79,3 +79,4 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [ChatGPT](https://docs.xpoz.ai/integrations/chatgpt): Connect ChatGPT to live social media data via a developer-mode MCP connector
 - [Codex](https://docs.xpoz.ai/integrations/codex): OpenAI Codex CLI setup
 - [Gemini CLI](https://docs.xpoz.ai/integrations/gemini-cli): Settings file configuration
+- [Cursor](https://docs.xpoz.ai/integrations/cursor): Official plugin with MCP tools, commands, and skills

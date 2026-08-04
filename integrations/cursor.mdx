@@ -1,0 +1,89 @@
+---
+title: Cursor
+description: Install the official Xpoz plugin for Cursor to get social media intelligence tools, skills, and commands in your IDE.
+---
+
+Cursor supports MCP servers natively, and Xpoz ships an official Cursor plugin that bundles the MCP server configuration with slash commands and auto-discovered skills. Install the plugin for the full experience, or add the MCP server directly to your Cursor settings for tools only. Either way you get access to all [48 tools](/mcp/tools/overview) across Twitter/X, Instagram, Reddit, and TikTok.
+
+## Setup with the Plugin
+
+<Steps>
+  <Step title="Get your access key">
+    Sign up at [xpoz.ai](https://xpoz.ai) and copy your access key from the [Get Token](https://xpoz.ai/get-token) page.
+  </Step>
+  <Step title="Install the plugin">
+    Install the official Xpoz plugin from [cursor.directory/plugins/xpoz](https://cursor.directory/plugins/xpoz). The plugin includes the MCP server configuration, three slash commands, and three skills.
+  </Step>
+  <Step title="Set your access token">
+    The plugin reads your token from the `XPOZ_ACCESS_TOKEN` environment variable. Alternatively, configure the server directly in your Cursor MCP settings (`~/.cursor/mcp.json` or Cursor Settings, then MCP):
+
+    ```json
+    {
+      "mcpServers": {
+        "xpoz": {
+          "url": "https://mcp.xpoz.ai/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    Replace `YOUR_API_KEY` with your actual Xpoz access key.
+  </Step>
+  <Step title="Verify the connection">
+    Run `/xpoz-setup` in Cursor to verify your connection, or ask directly:
+
+    ```
+    Search Twitter for posts about "artificial intelligence" from the last week
+    ```
+
+    If Cursor calls `getTwitterPostsByKeywords` and returns results, the connection is working.
+  </Step>
+</Steps>
+
+## Commands
+
+The plugin adds three slash commands:
+
+| Command                | Description                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| `/xpoz-setup`          | Configure the MCP connection and verify your account         |
+| `/xpoz-track`          | Manage tracked keywords, users, subreddits, and hashtags     |
+| `/xpoz-best-practices` | Reference docs for query syntax, pagination, field selection |
+
+## Skills
+
+Skills are auto-discovered by Cursor and activate based on context:
+
+| Skill                    | When It Activates                                                               |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| **xpoz-getting-started** | Setting up Xpoz, checking account status, first-time onboarding                 |
+| **xpoz-social-tracking** | Adding or removing tracked items, monitoring brands, social listening           |
+| **xpoz-best-practices**  | Any Xpoz tool usage: query syntax, pagination, field selection, troubleshooting |
+
+## MCP Server Only
+
+If you prefer to skip the plugin, add the server configuration from step 3 above to `~/.cursor/mcp.json` on its own. Cursor discovers all 48 tools automatically; you only miss the bundled commands and skills.
+
+## What You Can Do
+
+Once connected, ask Cursor to perform any social media research task:
+
+- Search posts by keyword across Twitter, Instagram, Reddit, and TikTok
+- Look up user profiles, followers, and connections
+- Analyze engagement metrics and trends
+- Track keywords, users, subreddits, and hashtags for continuous monitoring
+- Export large datasets in CSV format
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Browse all 48 tools across 4 platforms
+  </Card>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/guides/query-syntax">
+    Write effective search queries with boolean operators
+  </Card>
+</CardGroup>
