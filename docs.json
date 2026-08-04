@@ -136,7 +136,8 @@
               "integrations/gemini-cli",
               "integrations/cursor",
               "integrations/vercel-ai-sdk",
-              "integrations/langchain"
+              "integrations/langchain",
+              "integrations/crewai"
             ]
           }
         ]
