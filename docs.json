@@ -71,6 +71,7 @@
             "pages": [
               "sdks/typescript/quickstart",
               "sdks/typescript/pagination",
+              "sdks/typescript/live-data",
               "sdks/typescript/error-handling",
               "sdks/typescript/reference"
             ]
@@ -80,6 +81,7 @@
             "pages": [
               "sdks/python/quickstart",
               "sdks/python/pagination",
+              "sdks/python/live-data",
               "sdks/python/error-handling",
               "sdks/python/reference"
             ]

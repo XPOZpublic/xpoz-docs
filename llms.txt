@@ -43,12 +43,14 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 ## TypeScript SDK (@xpoz/xpoz)
 - [Quickstart](https://docs.xpoz.ai/sdks/typescript/quickstart): Installation, authentication, first query
 - [Pagination](https://docs.xpoz.ai/sdks/typescript/pagination): PaginatedResult<T> and response type patterns
+- [Live Data](https://docs.xpoz.ai/sdks/typescript/live-data): instagramLive namespace, always-current data with cursor pagination
 - [Error Handling](https://docs.xpoz.ai/sdks/typescript/error-handling): Error hierarchy and retry patterns
 - [SDK Reference](https://docs.xpoz.ai/sdks/typescript/reference): Full method reference for all namespaces
 
 ## Python SDK (xpoz)
 - [Quickstart](https://docs.xpoz.ai/sdks/python/quickstart): Installation, sync/async clients, first query
 - [Pagination](https://docs.xpoz.ai/sdks/python/pagination): PaginatedResult[T] and response type patterns
+- [Live Data](https://docs.xpoz.ai/sdks/python/live-data): instagram_live namespace, always-current data with cursor pagination
 - [Error Handling](https://docs.xpoz.ai/sdks/python/error-handling): Exception hierarchy and retry patterns
 - [SDK Reference](https://docs.xpoz.ai/sdks/python/reference): Full method reference for all namespaces
 
