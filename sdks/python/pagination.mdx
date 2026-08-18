@@ -161,3 +161,7 @@ These methods accept `limit` only (no `response_type`):
 <Note>
 For the equivalent pagination patterns in TypeScript, see [TypeScript SDK Pagination](/sdks/typescript/pagination). The TypeScript SDK uses `ResponseType.Fast`, `ResponseType.Paging`, and `ResponseType.Csv` (PascalCase enum values) and camelCase field names.
 </Note>
+
+<Note>
+Instagram live methods (`client.instagram_live`) page differently — they use an opaque forward-only cursor with no page numbers or totals. See [Python SDK Live Data](/sdks/python/live-data).
+</Note>

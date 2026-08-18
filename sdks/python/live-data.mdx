@@ -1,0 +1,158 @@
+---
+title: "Python SDK Live Data"
+description: "Fetch always-current Instagram data with cursor pagination using the Xpoz Python SDK."
+---
+
+## What Live Data Is
+
+Most SDK methods read from the Xpoz database, topping up from the crawler when results look stale. The `instagram_live` namespace is different: it **bypasses the database entirely** and fetches straight from the crawler API, so every call returns what Instagram is serving right now.
+
+That trade-off is deliberate:
+
+| | `client.instagram` | `client.instagram_live` |
+|---|---|---|
+| Source | Database, topped up on demand | Crawler API only |
+| Freshness | May be minutes to days old | Current |
+| Speed | Fast (indexed reads) | Slower (live fetch per call) |
+| Pagination | Page numbers, totals, CSV export | Cursor only |
+| Trial access | Yes | No |
+
+Reach for `instagram_live` when freshness matters more than latency — checking a post's engagement right now, or pulling a follower list that changed this morning. For analysis over large historical sets, the database-backed methods are faster and support CSV export.
+
+<Note>
+Live methods require a paid account. They always trigger a live fetch, so they are not available on trial access and raise `AuthenticationError` (HTTP 403).
+</Note>
+
+## CursorResult
+
+Live methods return a `CursorResult[T]` rather than the `PaginatedResult[T]` used elsewhere. The upstream API pages with an opaque **cursor** and reports no totals, so there is no page number, no `total_pages`, and no `get_page(n)`.
+
+```python
+page = client.instagram_live.search_posts("travel", fields=["id", "caption"])
+
+page.data              # list[InstagramPost] — this page
+page.has_more          # bool — another page is available upstream
+page.next_page_cursor  # opaque token for the next call
+page.has_next_page()   # bool
+```
+
+### Navigating Pages
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    page = client.instagram_live.search_posts("travel")
+
+    # One page at a time
+    if page.has_next_page():
+        page = page.next_page()
+
+    # Or walk every page
+    for post in page.iter_items():
+        print(post.id)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    page = await client.instagram_live.search_posts("travel")
+
+    if page.has_next_page():
+        page = await page.next_page()
+
+    async for post in page.iter_items():
+        print(post.id)
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+Drive pagination off `has_more` and the cursor — **never off the item count**. The upstream API may return a short or even empty page while `has_more` is still `true`. Stopping when a page looks empty will cut your results short.
+</Warning>
+
+```python
+# Correct
+while page.has_next_page():
+    page = page.next_page()
+    process(page.data)
+
+# Wrong — stops early on a legitimately empty page
+while len(page.data) > 0:
+    page = page.next_page()
+```
+
+## Methods
+
+All methods accept `fields` to select which fields come back, and all paged methods accept `cursor` to resume from a previous response.
+
+| Method | Returns |
+|---|---|
+| `search_posts(query)` | `CursorResult[InstagramPost]` |
+| `get_posts_by_user(identifier)` | `CursorResult[InstagramPost]` |
+| `get_post(post_id)` | `InstagramPost \| None` |
+| `get_comments(post_id)` | `CursorResult[InstagramComment]` |
+| `get_post_interacting_users(post_id, interaction_type)` | `CursorResult[InstagramUser]` |
+| `search_users(name)` | `CursorResult[InstagramUser]` |
+| `get_user(identifier)` | `InstagramUser \| None` |
+| `get_user_connections(identifier, connection_type)` | `CursorResult[InstagramUser]` |
+
+`interaction_type` is `"commenters"` or `"likers"`. `connection_type` is `"followers"` or `"following"`.
+
+`get_post` and `get_user` are single-item lookups and return the object directly, or `None` if nothing was found.
+
+### Examples
+
+```python
+from xpoz import XpozClient
+
+client = XpozClient(api_key="your-api-key")
+
+# Search posts by keyword
+posts = client.instagram_live.search_posts("travel", fields=["id", "caption", "like_count"])
+
+# A user's recent posts
+user_posts = client.instagram_live.get_posts_by_user("natgeo", fields=["id", "like_count"])
+
+# Who liked a post
+likers = client.instagram_live.get_post_interacting_users(
+    "3820275679950397949_495767729", "likers", fields=["id", "username"]
+)
+
+# Who a user follows
+following = client.instagram_live.get_user_connections("natgeo", "following", fields=["username"])
+
+# Single lookups
+post = client.instagram_live.get_post("3820275679950397949_495767729")
+user = client.instagram_live.get_user("natgeo")
+```
+
+### Resuming From a Cursor
+
+Cursors are opaque strings you can persist and reuse later, which is useful for long-running or resumable jobs:
+
+```python
+page = client.instagram_live.search_posts("travel")
+saved_cursor = page.next_page_cursor
+
+# Later, in another process
+page = client.instagram_live.search_posts("travel", cursor=saved_cursor)
+```
+
+<Note>
+A cursor is only valid for the same query on the same endpoint. Reusing one elsewhere is rejected with a `400`.
+</Note>
+
+## Field Selection
+
+Live methods accept the same `fields` values as their database-backed counterparts — see the [Python SDK Reference](/sdks/python/reference) for the full Instagram field lists. Field names are snake_case and mapped automatically.
+
+Live methods do **not** support `since` / `until` date filtering. The upstream API accepts only the query and a cursor, so use `client.instagram.search_posts()` when you need a date range.
+
+## Connection Details
+
+Live methods talk to the Xpoz REST API (`https://api.xpoz.ai`) rather than the MCP server, using the same API key. Override the base URL when needed:
+
+```python
+client = XpozClient(api_key="your-api-key", api_url="https://api.xpoz.ai")
+```
+
+The `XPOZ_API_URL` environment variable does the same thing.
