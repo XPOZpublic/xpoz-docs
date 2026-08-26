@@ -1,0 +1,38 @@
+---
+title: "AI Answer Trace"
+description: "Ask Claude, ChatGPT, and Gemini a question and capture the full evidence trail: search queries, retrieved pages, and cited sources."
+---
+
+The AI Answer Trace skill asks the major AI engines a question the way a real user would, with live web search on, and captures the complete evidence trail behind each answer. Every trace records three layers: the answer text, the search queries the engine silently ran with the pages each search retrieved, and the URLs the answer actually cited. This is the raw material of GEO measurement: knowing not just what the engines say, but which sources made them say it.
+
+## Example Prompts
+
+- "What does ChatGPT say about [topic], and which sources does it use?"
+- "Trace the answer to [question] across Claude, ChatGPT, and Gemini"
+- "Why do AI assistants recommend [competitor] instead of us?"
+- "Which domains dominate the citations for [prompt]?"
+
+## Trace Methodology
+
+<Steps>
+  <Step title="Run the question per engine">
+    Self-contained trace scripts (one per engine) ask the question with web search enabled and save a structured JSON trace per run. Each engine's script runs independently; one API key is enough to start.
+  </Step>
+  <Step title="Normalize the quirks">
+    Gemini's expiring redirect links are resolved to real URLs at capture time; ChatGPT's tracking suffixes are stripped from retrieved sources; Claude's scattered citations are reassembled in answer order.
+  </Step>
+  <Step title="Aggregate cited domains">
+    A deterministic aggregator counts cited domains across engines and samples.
+  </Step>
+  <Step title="Analyze">
+    Presence, citation paths, winning domains and their surface types, near-misses (retrieved but never cited), and stability across samples.
+  </Step>
+</Steps>
+
+## Requirements
+
+This skill needs AI engine API keys rather than an Xpoz account: any of `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GEMINI_API_KEY`, each enabling that engine's trace. It pairs with [GEO Visibility Check](/skills/geo-visibility-check) (which uses it as the tracing layer) and [GEO Reddit](/skills/geo-reddit) (which mines its traces for cited threads).
+
+## Get Started
+
+See the [installation guide](/skills/overview#setup) to add this skill to your agent. For ongoing weekly measurement against a tracked prompt panel, use the open-source [geo-seo-agent](https://github.com/XPOZpublic/geo-seo-agent).

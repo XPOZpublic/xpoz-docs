@@ -1,0 +1,54 @@
+---
+title: "Lead Gen Scan"
+description: "Find fresh buying-intent posts across Reddit, Twitter/X, Instagram, and TikTok, qualified and prioritized for human engagement."
+---
+
+The Lead Gen Scan skill runs a one-shot buying-intent scan across the four platforms. It finds people actively asking for what a product does or frustrated with its competitors, qualifies the real asks, and delivers a prioritized report of where to comment and who to reach while the intent is still live. The skill finds and reports; humans do all engagement.
+
+## Example Prompts
+
+- "Find this week's leads for my social listening SaaS"
+- "Who's complaining about [competitor]'s pricing right now?"
+- "Scan Reddit and X for people asking for CRM recommendations"
+- "Find named prospects with buying intent for [product] on Twitter"
+
+## Scan Methodology
+
+<Steps>
+  <Step title="Build the query book">
+    Three search motions every scan: product relevance (asking and budgeting phrasings), competitor disappointment (switching and struggling phrasings, per competitor), and the product's own name (people already comparing it).
+  </Step>
+  <Step title="Search the four platforms">
+    Reddit posts and comments carry most of the signal and get the call budget first, then Twitter/X, then Instagram and TikTok.
+  </Step>
+  <Step title="Classify by lead shape">
+    Reddit produces threads to comment in; X, Instagram, and TikTok produce likely converters (named prospects) and high-engagement comment spots. Replies are chased up to their parent thread before classification.
+  </Step>
+  <Step title="Qualify and prioritize">
+    Intent, fit, freshness (last 72 hours weigh heaviest), and reach. Vendors, unrelated keyword hits, and spam are hard disqualifiers.
+  </Step>
+  <Step title="Report">
+    P1 (act now), P2 (worth engaging), P3 (watch), plus named prospects and the demand signals that repeated across candidates.
+  </Step>
+</Steps>
+
+## Ground Rules
+
+- The skill never posts, comments, DMs, or follows anyone; humans act on the report.
+- Suggested angles only, never full reply drafts.
+- Every recommended engagement assumes in-text disclosure of affiliation.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getRedditPostsByKeywords` | Search Reddit posts per query bucket |
+| `getRedditCommentsByKeywords` | Find asks living in comments, not posts |
+| `getRedditPostWithCommentsById` | Resolve a comment up to its parent thread |
+| `getTwitterPostsByKeywords` | Search X posts (retweets filtered out) |
+| `getTwitterPostsByIds` | Resolve a reply's conversation root |
+| `getInstagramPostsByKeywords` / `getTiktokPostsByKeywords` | Extend the scan to Instagram and TikTok |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent. For a recurring weekly loop with lead dedup and a self-tuning query book, use the open-source [lead-gen-agent](https://github.com/XPOZpublic/lead-gen-agent).
