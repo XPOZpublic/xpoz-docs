@@ -117,7 +117,11 @@
               "skills/influencer-discovery",
               "skills/reddit-research",
               "skills/competitive-intel",
-              "skills/security-osint"
+              "skills/security-osint",
+              "skills/lead-gen-scan",
+              "skills/geo-visibility-check",
+              "skills/geo-reddit",
+              "skills/ai-answer-trace"
             ]
           }
         ]

@@ -1,0 +1,50 @@
+---
+title: "GEO Reddit"
+description: "Map the subreddits and threads AI engines actually cite for your category, plus the live threads worth answering now."
+---
+
+Reddit is among the most-cited domains in AI answers, and a helpful comment in a thread the engines already cite inherits that thread's citation. The GEO Reddit skill builds a Reddit influence map: the ranked list of subreddits and threads where presence would actually move AI answers for a brand, grounded in the engines' own citations plus live demand research. The output is where and what; a human writes and posts everything.
+
+## Example Prompts
+
+- "Build a Reddit influence map for [brand] in the [category] space"
+- "ChatGPT cites Reddit for my category. Which threads and subreddits?"
+- "Where should [brand] earn Reddit presence to show up in AI answers?"
+- "Find live Reddit threads asking about [problem] that we could answer"
+
+## Mapping Methodology
+
+<Steps>
+  <Step title="Trace engine citations">
+    Runs the brand's buyer prompts through Claude, ChatGPT, and Gemini and records every Reddit URL the answers cite, including answers where competitors win. This is the primary evidence.
+  </Step>
+  <Step title="Research the venues">
+    Via Xpoz: subreddit profiles and activity, where the buyer questions actually get asked, and the live threads answerable right now.
+  </Step>
+  <Step title="Build the influence map">
+    Cited threads ranked by citation instances, influential subreddits, live threads worth answering, and a watch list.
+  </Step>
+  <Step title="Report with ground rules">
+    Every recommended venue comes with its self-promotion rules checked; the report says what a winning answer adds, never drafts it.
+  </Step>
+</Steps>
+
+## Ground Rules
+
+- A human writes and posts everything; the skill never posts, comments, or messages anyone.
+- Brand-affiliated answers must disclose the affiliation in the post itself.
+- Subreddits that ban vendor participation are reported as such, not worked around.
+- Manufactured threads, vote manipulation, and sockpuppets are off the table.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getRedditPostsByKeywords` | Find where the buyer questions get asked |
+| `getRedditSubredditsByKeywords` / `searchRedditSubreddits` | Profile candidate subreddits |
+| `getRedditSubredditWithPostsByName` | Read a venue's live activity |
+| `getRedditPostWithCommentsById` | Read a cited or answerable thread in full |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent. Engine tracing needs AI engine API keys (see [AI Answer Trace](/skills/ai-answer-trace)); with no engine access the skill delivers the demand-side map and labels it as such.

@@ -1,0 +1,45 @@
+---
+title: "GEO Visibility Check"
+description: "One-shot audit of whether AI engines recommend your brand: per-prompt verdicts, who wins instead, and which sources the answers come from."
+---
+
+The GEO Visibility Check skill answers the first question of any GEO (Generative Engine Optimization) effort: for the buyer questions that matter, does the brand appear in Claude, ChatGPT, and Gemini answers, and if not, who does and through which sources? It assembles a small panel of buyer prompts, runs each through the engines with full citation tracing, and delivers a per-prompt visibility verdict. One-shot by design: it is the measurement pass that tells you whether a full GEO program is worth running.
+
+## Example Prompts
+
+- "Do AI assistants recommend [brand]?"
+- "GEO audit for [brand]: 8 prompts, all three engines"
+- "Who wins [category] in AI answers, and why?"
+- "Which sources do AI engines assemble [category] answers from?"
+
+## Audit Methodology
+
+<Steps>
+  <Step title="Build the prompt panel">
+    3-8 questions buyers actually ask assistants, derived from the product's category, personas, and competitor set (community mining via Xpoz helps surface real phrasings).
+  </Step>
+  <Step title="Trace every prompt">
+    Each prompt runs through Claude, ChatGPT, and Gemini with live web search on, capturing answers, the engines' search queries, and cited URLs (the ai-answer-trace skill provides the tracing).
+  </Step>
+  <Step title="Judge visibility per prompt">
+    Present (recommended, listed, mentioned, or absent), cited (brand-owned URL in the citations), who wins instead and via which URLs, and stability across samples.
+  </Step>
+  <Step title="Report">
+    Per-prompt verdict table, cited-domain rankings with surface types, brand citation paths, lost prompts diagnosed, and recommended next steps.
+  </Step>
+</Steps>
+
+## Requirements
+
+Engine tracing needs AI engine API keys (any of Anthropic, OpenAI, Gemini; one is enough to start). The demand-research side needs only Xpoz. Engine answers are nondeterministic, so verdicts use 2+ samples per engine, and keeping the trace files makes a re-run next month a real before/after.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getRedditPostsByKeywords` | Mine real buyer phrasings for the prompt panel |
+| `getTwitterPostsByKeywords` | Same, on X |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent. For the weekly program this check previews (tracked prompt panel, dated snapshots, gap analysis, content production), use the open-source [geo-seo-agent](https://github.com/XPOZpublic/geo-seo-agent).
