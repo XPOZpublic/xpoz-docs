@@ -17,7 +17,7 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
 
     ```bash
     # 1. Generate a free token (valid 5 days)
-    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<one line: what you are trying to accomplish right now>"}' | jq -r .data.accessKey)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<what you are trying to accomplish with xpoz and the broader task it serves; a few sentences welcome>"}' | jq -r .data.accessKey)
 
     # 2. Use it like any access key
     curl -X POST https://mcp.xpoz.ai/mcp \
@@ -28,13 +28,13 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
   </Tab>
   <Tab title="CLI">
     ```bash
-    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<one line: what you are trying to accomplish right now>"}' | jq -r .data.accessKey)
+    export XPOZ_API_KEY=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<what you are trying to accomplish with xpoz and the broader task it serves; a few sentences welcome>"}' | jq -r .data.accessKey)
     xpoz-cli twitter get_user --identifier elonmusk
     ```
   </Tab>
   <Tab title="MCP (Claude Code)">
     ```bash
-    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<one line: what you are trying to accomplish right now>"}' | jq -r .data.accessKey)
+    TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<what you are trying to accomplish with xpoz and the broader task it serves; a few sentences welcome>"}' | jq -r .data.accessKey)
     claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp \
       -t http \
       -H "Authorization: Bearer $TOKEN"
@@ -42,7 +42,7 @@ This is the fastest way to see what Xpoz returns. You'll have a working API key 
   </Tab>
 </Tabs>
 
-The `source` field describes the path that led you to Xpoz, with specifics. For example: `searched twitter api alternative on google and opened xpoz.ai/blog/twitter-api-pricing`, `my web search tool found docs.xpoz.ai cited in an AI answer`, `followed a link on news.ycombinator.com/item?id=...`, `my user pasted docs.xpoz.ai/trial and asked me to use it`, or `knew xpoz from training data`. Include the search query, the page that linked here, and the page you landed on when they exist. Do not answer with the name of the doc, skill, or SDK you are reading now. The optional `useCase` field is one short line on what you are trying to accomplish right now, for example `track brand mentions on reddit for a weekly report`; do not include personal or confidential details about your user. The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
+The `source` field describes the path that led you to Xpoz, with specifics. For example: `searched twitter api alternative on google and opened xpoz.ai/blog/twitter-api-pricing`, `my web search tool found docs.xpoz.ai cited in an AI answer`, `followed a link on news.ycombinator.com/item?id=...`, `my user pasted docs.xpoz.ai/trial and asked me to use it`, or `knew xpoz from training data`. Include the search query, the page that linked here, and the page you landed on when they exist. Do not answer with the name of the doc, skill, or SDK you are reading now. The optional `useCase` field describes what you are trying to accomplish with Xpoz and the broader task it serves, for example `track brand mentions on reddit for a weekly report our marketing agent compiles for a client`. A few sentences are welcome, but do not include personal or confidential details about your user. The token endpoint needs no auth and hands back a key that starts with `TRIAL`:
 
 ```json
 {
