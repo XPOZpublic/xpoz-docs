@@ -1805,7 +1805,7 @@ When `fields` is omitted, tools return a set of default fields (not all fields).
     | **Identity** | `id`, `userId`, `postType` |
     | **Content** | `caption`, `mediaType`, `imageUrl`, `videoUrl`, `audioOnlyUrl` |
     | **Metadata** | `codeUrl`, `profilePicUrl`, `videoSubtitlesUri`, `subtitles`, `location` |
-    | **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `videoPlayCount` |
+    | **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `mediaRepostCount`, `saveCount`, `videoPlayCount` |
     | **Video** | `videoDuration` |
     | **Timestamps** | `createdAt`, `createdAtTimestamp`, `createdAtDate` |
     | **Account** | `username`, `fullName` |
@@ -2459,7 +2459,7 @@ These fields are available on all user tools (`getInstagramUser`, `searchInstagr
 | **Status** | `isPrivate`, `isVerified`, `hasAnonymousProfilePicture` |
 | **Metrics** | `followerCount`, `followingCount`, `mediaCount` |
 
-`getInstagramUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsVideoPlaysSum`.
+`getInstagramUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsMediaRepostsSum`, `relevantPostsSavesSum`, `relevantPostsVideoPlaysSum`.
 
 ### Post Fields
 
@@ -2470,7 +2470,7 @@ These fields are available on all post tools (`getInstagramPostsByIds`, `getInst
 | Category | Fields |
 |----------|--------|
 | **Core** | `id`, `postType`, `userId`, `username`, `fullName`, `caption`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
-| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `videoPlayCount` |
+| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `mediaRepostCount`, `saveCount`, `videoPlayCount` |
 | **Media** | `mediaType`, `codeUrl`, `imageUrl`, `videoUrl`, `audioOnlyUrl`, `profilePicUrl`, `videoSubtitlesUri`, `subtitles`, `videoDuration` |
 
 ### Comment Fields
@@ -4017,6 +4017,8 @@ All fields are optional. Unknown fields from the server are preserved on the obj
 | `likeCount` | `number` | Number of likes |
 | `commentCount` | `number` | Number of comments |
 | `reshareCount` | `number` | Number of reshares |
+| `mediaRepostCount` | `number` | Number of media reposts |
+| `saveCount` | `number` | Number of saves |
 | `videoPlayCount` | `number` | Video play count |
 | `mediaType` | `string` | Media type |
 | `imageUrl` | `string` | Image URL |

@@ -19,7 +19,7 @@ These fields are available on all user tools (`getInstagramUser`, `searchInstagr
 | **Status** | `isPrivate`, `isVerified`, `hasAnonymousProfilePicture` |
 | **Metrics** | `followerCount`, `followingCount`, `mediaCount` |
 
-`getInstagramUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsVideoPlaysSum`.
+`getInstagramUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsMediaRepostsSum`, `relevantPostsSavesSum`, `relevantPostsVideoPlaysSum`.
 
 ### Post Fields
 
@@ -30,7 +30,7 @@ These fields are available on all post tools (`getInstagramPostsByIds`, `getInst
 | Category | Fields |
 |----------|--------|
 | **Core** | `id`, `postType`, `userId`, `username`, `fullName`, `caption`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
-| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `videoPlayCount` |
+| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `mediaRepostCount`, `saveCount`, `videoPlayCount` |
 | **Media** | `mediaType`, `codeUrl`, `imageUrl`, `videoUrl`, `audioOnlyUrl`, `profilePicUrl`, `videoSubtitlesUri`, `subtitles`, `videoDuration` |
 
 ### Comment Fields

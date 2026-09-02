@@ -306,7 +306,7 @@ Pass these in the `options.fields` parameter on any user method.
 | **Status** | `isPrivate`, `isVerified`, `hasAnonymousProfilePicture` |
 | **Metrics** | `followerCount`, `followingCount`, `mediaCount` |
 
-`getUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsVideoPlaysSum`.
+`getUsersByKeywords` also returns aggregation fields: `aggRelevance`, `relevantPostsCount`, `relevantPostsLikesSum`, `relevantPostsCommentsSum`, `relevantPostsResharesSum`, `relevantPostsMediaRepostsSum`, `relevantPostsSavesSum`, `relevantPostsVideoPlaysSum`.
 
 #### Post Fields
 
@@ -317,7 +317,7 @@ Pass these in the `options.fields` parameter on any post method.
 | Category | Fields |
 |----------|--------|
 | **Core** | `id`, `postType`, `userId`, `username`, `fullName`, `caption`, `createdAt`, `createdAtTimestamp`, `createdAtDate` |
-| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `videoPlayCount` |
+| **Engagement** | `likeCount`, `commentCount`, `reshareCount`, `mediaRepostCount`, `saveCount`, `videoPlayCount` |
 | **Media** | `mediaType`, `codeUrl`, `imageUrl`, `videoUrl`, `audioOnlyUrl`, `profilePicUrl`, `videoSubtitlesUri`, `subtitles`, `videoDuration` |
 
 #### Comment Fields
@@ -1177,6 +1177,8 @@ All fields are optional. Unknown fields from the server are preserved on the obj
 | `likeCount` | `number` | Number of likes |
 | `commentCount` | `number` | Number of comments |
 | `reshareCount` | `number` | Number of reshares |
+| `mediaRepostCount` | `number` | Number of media reposts |
+| `saveCount` | `number` | Number of saves |
 | `videoPlayCount` | `number` | Video play count |
 | `mediaType` | `string` | Media type |
 | `imageUrl` | `string` | Image URL |
