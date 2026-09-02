@@ -342,7 +342,7 @@ Pass these in the `fields` parameter on any user method (`get_user`, `search_use
 | **Status** | `is_private`, `is_verified`, `has_anonymous_profile_picture` |
 | **Metrics** | `follower_count`, `following_count`, `media_count` |
 
-`get_users_by_keywords` also returns aggregation fields: `agg_relevance`, `relevant_posts_count`, `relevant_posts_likes_sum`, `relevant_posts_comments_sum`, `relevant_posts_reshares_sum`, `relevant_posts_video_plays_sum`.
+`get_users_by_keywords` also returns aggregation fields: `agg_relevance`, `relevant_posts_count`, `relevant_posts_likes_sum`, `relevant_posts_comments_sum`, `relevant_posts_reshares_sum`, `relevant_posts_media_reposts_sum`, `relevant_posts_saves_sum`, `relevant_posts_video_plays_sum`.
 
 #### Post Fields
 
@@ -353,7 +353,7 @@ Pass these in the `fields` parameter on any post method (`get_posts_by_ids`, `ge
 | Category | Fields |
 |----------|--------|
 | **Core** | `id`, `post_type`, `user_id`, `username`, `full_name`, `caption`, `created_at`, `created_at_timestamp`, `created_at_date` |
-| **Engagement** | `like_count`, `comment_count`, `reshare_count`, `video_play_count` |
+| **Engagement** | `like_count`, `comment_count`, `reshare_count`, `media_repost_count`, `save_count`, `video_play_count` |
 | **Media** | `media_type`, `code_url`, `image_url`, `video_url`, `audio_only_url`, `profile_pic_url`, `video_subtitles_uri`, `subtitles`, `video_duration` |
 
 #### Comment Fields
@@ -1164,6 +1164,8 @@ All models are Pydantic v2 `BaseModel` subclasses with `extra="allow"` (unknown 
 | `like_count` | `int` | Number of likes |
 | `comment_count` | `int` | Number of comments |
 | `reshare_count` | `int` | Number of reshares |
+| `media_repost_count` | `int` | Number of media reposts |
+| `save_count` | `int` | Number of saves |
 | `video_play_count` | `int` | Video play count |
 | `media_type` | `str` | Media type |
 | `image_url` | `str` | Image URL |
