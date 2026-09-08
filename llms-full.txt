@@ -446,27 +446,19 @@ Only data queries spend credits. Account, tracking, auth, and operation tools (`
 | Plan       | Price                        | Credits          | Extra credits |
 | ---------- | ---------------------------- | ---------------- | ------------- |
 | Free       | \$0                           | 500 (one-time)   | —             |
-| Pro        | \$20/mo (\$16/mo billed annually)  | 30,000/month     | \$0.80 per 1,000 |
-| Max        | \$200/mo (\$160/mo billed annually) | 600,000/month    | \$0.40 per 1,000 |
+| Pro        | \$20/mo (\$16/mo billed annually)  | 7,500/month      | \$3 per 1,000    |
+| Max        | \$200/mo (\$160/mo billed annually) | 120,000/month    | \$2 per 1,000    |
 | Enterprise | Custom                       | Custom           | Custom        |
 
 Free tier credits are a one-time allocation and do not refresh. When they run out, Free users hit a hard stop; Pro and Max users continue at the extra-credit rate, or can upgrade at any time.
 
 ## What credits translate to
 
-A search returns up to 300 results for a flat credit price, so credits go a long way: up to 5 million results per month on Pro, and up to 100 million results per month on Max.
+A search returns up to 300 results for a flat credit price, so credits go a long way: up to 1 million results per month on Pro, and up to 18 million results per month on Max.
 
 ## CSV export rows
 
-CSV export is the one place rows are metered separately from credits. An export is charged twice: the query itself at the normal platform rate (2-12 credits), plus every exported row against your plan's row allowance:
-
-| Plan | Included export rows        | Extra rows      |
-| ---- | --------------------------- | --------------- |
-| Free | 10,000 total (500 per file) | —               |
-| Pro  | 50,000/month                | \$1 per 1,000    |
-| Max  | 250,000/month               | \$1 per 1,000    |
-
-See [CSV Exports](/guides/csv-exports) for how exports work.
+CSV export is the one place rows are metered separately from credits. An export is charged twice: the query itself at the normal platform rate (2-12 credits), plus every exported row against your plan's row allowance. Check your remaining allowance with `getAccountDetails`, and see [CSV Exports](/guides/csv-exports) for how exports work.
 
 ## Tracked keywords and users
 
@@ -474,10 +466,10 @@ See [CSV Exports](/guides/csv-exports) for how exports work.
 
 | Plan       | Tracked keywords/users | Extra slots        |
 | ---------- | ---------------------- | ------------------ |
-| Free       | 1                      | —                  |
-| Pro        | 10                     | \$5 per keyword/user |
-| Max        | 30                     | \$2 per keyword/user |
-| Enterprise | Unlimited              | —                  |
+| Free       | 1                      | —                            |
+| Pro        | 3                      | \$5 per keyword/user (up to 6)  |
+| Max        | 10                     | \$2 per keyword/user (up to 20) |
+| Enterprise | Unlimited              | —                            |
 
 ## Instant access costs nothing
 
@@ -5715,7 +5707,7 @@ Source: https://docs.xpoz.ai/skills/overview
 
 ## What are Agent Skills?
 
-Agent Skills are pre-written instructions that teach AI agents how to perform specific tasks correctly. They package domain expertise into a format that any compatible agent can absorb — so the agent knows the right tools to use, the right order to use them, and the right way to interpret results.
+Agent Skills are pre-written instructions that teach AI agents how to perform specific tasks correctly. They package domain expertise into a format that any compatible agent can absorb, so the agent knows the right tools to use, the right order to use them, and the right way to interpret results.
 
 Xpoz provides skills for specific social media intelligence tasks like sentiment analysis, influencer discovery, and data export, as well as general best practices for using Xpoz effectively.
 
@@ -5729,9 +5721,14 @@ Xpoz provides skills for specific social media intelligence tasks like sentiment
 | Sentiment Analyzer | Analyze brand/topic sentiment with scoring and theme extraction | Twitter, Reddit, Instagram |
 | Twitter Data Export | Export up to 500K rows of Twitter data to CSV | Twitter |
 | Influencer Discovery | Find and rank influencers by engagement, reach, and authenticity | Twitter |
+| Creator Authenticity Score | Vet Instagram creators: view-based engagement rate, bot share of comments, and a 0-100 score | Instagram |
 | Reddit Research | Deep-dive into Reddit discussions for market research | Reddit |
 | Competitive Intelligence | Compare 2-5 brands across social media metrics | Twitter, Reddit |
 | Security OSINT | Monitor for CVEs, breaches, and emerging threats | Twitter, Reddit |
+| Lead Gen Scan | Find fresh buying-intent posts, qualified and prioritized for human engagement | All |
+| GEO Visibility Check | One-shot audit of whether AI engines recommend your brand, and who wins instead | Engines: Claude, ChatGPT, Gemini |
+| GEO Reddit | Map the subreddits and threads AI engines cite for your category | Reddit + engines |
+| AI Answer Trace | Capture the searches, retrieved pages, and cited sources behind AI answers | Engines: Claude, ChatGPT, Gemini |
 
 ## Compatible Agents
 
@@ -5758,7 +5755,7 @@ npx skills add XPOZpublic/xpoz-agent-skills --skill social-sentiment-analyzer
 
 This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https://www.skills.sh/). Skills are installed directly into your agent's skills directory — no further configuration needed.
 
-**Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `reddit-research`, `competitive-intel`, `security-osint`
+**Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `creator-authenticity-score`, `reddit-research`, `competitive-intel`, `security-osint`, `lead-gen-scan`, `geo-visibility-check`, `geo-reddit`, `ai-answer-trace`
   You still need to configure Xpoz access (MCP server or access key) to use the skills. See the [MCP Installation](/mcp/installation) or [Authentication](/authentication) guide.
 ## Explore Skills
   
@@ -5768,9 +5765,14 @@ This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https
     Analyze brand/topic sentiment with scoring and theme extraction.
     Export up to 500K rows of Twitter data to CSV.
     Find and rank influencers by engagement, reach, and authenticity.
+    Vet Instagram creators: engagement rate, bot share, and a 0-100 score.
     Deep-dive into Reddit discussions for market research.
     Compare 2-5 brands across social media metrics.
     Monitor for CVEs, breaches, and emerging threats.
+    Find fresh buying-intent posts, prioritized for human engagement.
+    Audit whether AI engines recommend your brand, and who wins instead.
+    Map the subreddits and threads AI engines cite for your category.
+    Capture the searches and cited sources behind AI answers.
 
 ---
 
@@ -6143,6 +6145,45 @@ Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the
 
 ---
 
+# Creator Authenticity Score
+Source: https://docs.xpoz.ai/skills/creator-authenticity-score
+
+
+The Creator Authenticity Score skill scores Instagram creators on what a sponsor actually buys: real engagement, measured against views rather than follower count, and a real audience, measured as the bot and spam share of their comments. It works for a single creator or a batch of handles, and always shows the components next to the score. It is a screening heuristic for shortlisting and comparison, not a fraud verdict.
+
+## Example Prompts
+
+- "Is @[handle]'s audience real?"
+- "Check engagement quality for @[handle]"
+- "Vet these three creators before we sign them: @a, @b, @c"
+- "Rank these 10 Instagram handles by authenticity"
+
+## Scoring Methodology
+  
+    Look up the profile by username: follower and following counts, post count, verified and private status. Private accounts are reported as "cannot screen" rather than scored.
+    Pull the 50 most recent posts and compute likes plus comments over video plays. Views are the hardest number to fake. Accounts with no video plays fall back to a follower-based rate, flagged as lower confidence. A like-to-comment ratio above 50:1 is a soft flag, since engagement pods buy likes, not comments.
+    Pull up to 200 comments on each of the top 3-5 posts and compute the bot ratio from Xpoz's spam detection, pooled across the sample. If comments are unavailable, the creator is scored on engagement only and marked partial.
+    A 0-100 authenticity score: 40% engagement rate (scaled by follower tier), 40% audience authenticity (100 minus bot share), 20% sanity checks (following/follower ratio, post count relative to audience size, like-to-comment flag). Rounded to a whole number, never presented as precise.
+    A single creator gets a short card with a one-line verdict. A batch gets a comparison table sorted by score, with private and partial creators listed separately.
+
+## Access Requirements
+
+Full results need a real Xpoz account (free tier, no credit card). The skill can run on a no-signup trial token, but every call then returns at most 5 results, so the score rests on one profile and a handful of posts and comments and is marked as a trial sample in the output.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getInstagramUser` | Resolve the profile: `followerCount`, `followingCount`, `mediaCount`, `isPrivate`, `isVerified` |
+| `getInstagramPostsByUser` | Recent posts with `likeCount`, `commentCount`, `videoPlayCount` for the engagement rate |
+| `getInstagramCommentsByPostId` | Comments with `isSpam` for the bot ratio |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent.
+
+---
+
 # Reddit Research
 Source: https://docs.xpoz.ai/skills/reddit-research
 
@@ -6271,6 +6312,159 @@ The Security OSINT skill monitors Twitter and Reddit for security-related discus
 ## Get Started
 
 Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#installation) to add this skill to your agent.
+
+---
+
+# Lead Gen Scan
+Source: https://docs.xpoz.ai/skills/lead-gen-scan
+
+
+The Lead Gen Scan skill runs a one-shot buying-intent scan across the four platforms. It finds people actively asking for what a product does or frustrated with its competitors, qualifies the real asks, and delivers a prioritized report of where to comment and who to reach while the intent is still live. The skill finds and reports; humans do all engagement.
+
+## Example Prompts
+
+- "Find this week's leads for my social listening SaaS"
+- "Who's complaining about [competitor]'s pricing right now?"
+- "Scan Reddit and X for people asking for CRM recommendations"
+- "Find named prospects with buying intent for [product] on Twitter"
+
+## Scan Methodology
+  
+    Three search motions every scan: product relevance (asking and budgeting phrasings), competitor disappointment (switching and struggling phrasings, per competitor), and the product's own name (people already comparing it).
+    Reddit posts and comments carry most of the signal and get the call budget first, then Twitter/X, then Instagram and TikTok.
+    Reddit produces threads to comment in; X, Instagram, and TikTok produce likely converters (named prospects) and high-engagement comment spots. Replies are chased up to their parent thread before classification.
+    Intent, fit, freshness (last 72 hours weigh heaviest), and reach. Vendors, unrelated keyword hits, and spam are hard disqualifiers.
+    P1 (act now), P2 (worth engaging), P3 (watch), plus named prospects and the demand signals that repeated across candidates.
+
+## Ground Rules
+
+- The skill never posts, comments, DMs, or follows anyone; humans act on the report.
+- Suggested angles only, never full reply drafts.
+- Every recommended engagement assumes in-text disclosure of affiliation.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getRedditPostsByKeywords` | Search Reddit posts per query bucket |
+| `getRedditCommentsByKeywords` | Find asks living in comments, not posts |
+| `getRedditPostWithCommentsById` | Resolve a comment up to its parent thread |
+| `getTwitterPostsByKeywords` | Search X posts (retweets filtered out) |
+| `getTwitterPostsByIds` | Resolve a reply's conversation root |
+| `getInstagramPostsByKeywords` / `getTiktokPostsByKeywords` | Extend the scan to Instagram and TikTok |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent. For a recurring weekly loop with lead dedup and a self-tuning query book, use the open-source [lead-gen-agent](https://github.com/XPOZpublic/lead-gen-agent).
+
+---
+
+# GEO Visibility Check
+Source: https://docs.xpoz.ai/skills/geo-visibility-check
+
+
+The GEO Visibility Check skill answers the first question of any GEO (Generative Engine Optimization) effort: for the buyer questions that matter, does the brand appear in Claude, ChatGPT, and Gemini answers, and if not, who does and through which sources? It assembles a small panel of buyer prompts, runs each through the engines with full citation tracing, and delivers a per-prompt visibility verdict. One-shot by design: it is the measurement pass that tells you whether a full GEO program is worth running.
+
+## Example Prompts
+
+- "Do AI assistants recommend [brand]?"
+- "GEO audit for [brand]: 8 prompts, all three engines"
+- "Who wins [category] in AI answers, and why?"
+- "Which sources do AI engines assemble [category] answers from?"
+
+## Audit Methodology
+  
+    3-8 questions buyers actually ask assistants, derived from the product's category, personas, and competitor set (community mining via Xpoz helps surface real phrasings).
+    Each prompt runs through Claude, ChatGPT, and Gemini with live web search on, capturing answers, the engines' search queries, and cited URLs (the ai-answer-trace skill provides the tracing).
+    Present (recommended, listed, mentioned, or absent), cited (brand-owned URL in the citations), who wins instead and via which URLs, and stability across samples.
+    Per-prompt verdict table, cited-domain rankings with surface types, brand citation paths, lost prompts diagnosed, and recommended next steps.
+
+## Requirements
+
+Engine tracing needs AI engine API keys (any of Anthropic, OpenAI, Gemini; one is enough to start). The demand-research side needs only Xpoz. Engine answers are nondeterministic, so verdicts use 2+ samples per engine, and keeping the trace files makes a re-run next month a real before/after.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getRedditPostsByKeywords` | Mine real buyer phrasings for the prompt panel |
+| `getTwitterPostsByKeywords` | Same, on X |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent. For the weekly program this check previews (tracked prompt panel, dated snapshots, gap analysis, content production), use the open-source [geo-seo-agent](https://github.com/XPOZpublic/geo-seo-agent).
+
+---
+
+# GEO Reddit
+Source: https://docs.xpoz.ai/skills/geo-reddit
+
+
+Reddit is among the most-cited domains in AI answers, and a helpful comment in a thread the engines already cite inherits that thread's citation. The GEO Reddit skill builds a Reddit influence map: the ranked list of subreddits and threads where presence would actually move AI answers for a brand, grounded in the engines' own citations plus live demand research. The output is where and what; a human writes and posts everything.
+
+## Example Prompts
+
+- "Build a Reddit influence map for [brand] in the [category] space"
+- "ChatGPT cites Reddit for my category. Which threads and subreddits?"
+- "Where should [brand] earn Reddit presence to show up in AI answers?"
+- "Find live Reddit threads asking about [problem] that we could answer"
+
+## Mapping Methodology
+  
+    Runs the brand's buyer prompts through Claude, ChatGPT, and Gemini and records every Reddit URL the answers cite, including answers where competitors win. This is the primary evidence.
+    Via Xpoz: subreddit profiles and activity, where the buyer questions actually get asked, and the live threads answerable right now.
+    Cited threads ranked by citation instances, influential subreddits, live threads worth answering, and a watch list.
+    Every recommended venue comes with its self-promotion rules checked; the report says what a winning answer adds, never drafts it.
+
+## Ground Rules
+
+- A human writes and posts everything; the skill never posts, comments, or messages anyone.
+- Brand-affiliated answers must disclose the affiliation in the post itself.
+- Subreddits that ban vendor participation are reported as such, not worked around.
+- Manufactured threads, vote manipulation, and sockpuppets are off the table.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getRedditPostsByKeywords` | Find where the buyer questions get asked |
+| `getRedditSubredditsByKeywords` / `searchRedditSubreddits` | Profile candidate subreddits |
+| `getRedditSubredditWithPostsByName` | Read a venue's live activity |
+| `getRedditPostWithCommentsById` | Read a cited or answerable thread in full |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent. Engine tracing needs AI engine API keys (see [AI Answer Trace](/skills/ai-answer-trace)); with no engine access the skill delivers the demand-side map and labels it as such.
+
+---
+
+# AI Answer Trace
+Source: https://docs.xpoz.ai/skills/ai-answer-trace
+
+
+The AI Answer Trace skill asks the major AI engines a question the way a real user would, with live web search on, and captures the complete evidence trail behind each answer. Every trace records three layers: the answer text, the search queries the engine silently ran with the pages each search retrieved, and the URLs the answer actually cited. This is the raw material of GEO measurement: knowing not just what the engines say, but which sources made them say it.
+
+## Example Prompts
+
+- "What does ChatGPT say about [topic], and which sources does it use?"
+- "Trace the answer to [question] across Claude, ChatGPT, and Gemini"
+- "Why do AI assistants recommend [competitor] instead of us?"
+- "Which domains dominate the citations for [prompt]?"
+
+## Trace Methodology
+  
+    Self-contained trace scripts (one per engine) ask the question with web search enabled and save a structured JSON trace per run. Each engine's script runs independently; one API key is enough to start.
+    Gemini's expiring redirect links are resolved to real URLs at capture time; ChatGPT's tracking suffixes are stripped from retrieved sources; Claude's scattered citations are reassembled in answer order.
+    A deterministic aggregator counts cited domains across engines and samples.
+    Presence, citation paths, winning domains and their surface types, near-misses (retrieved but never cited), and stability across samples.
+
+## Requirements
+
+This skill needs AI engine API keys rather than an Xpoz account: any of `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GEMINI_API_KEY`, each enabling that engine's trace. It pairs with [GEO Visibility Check](/skills/geo-visibility-check) (which uses it as the tracing layer) and [GEO Reddit](/skills/geo-reddit) (which mines its traces for cited threads).
+
+## Get Started
+
+See the [installation guide](/skills/overview#setup) to add this skill to your agent. For ongoing weekly measurement against a tracked prompt panel, use the open-source [geo-seo-agent](https://github.com/XPOZpublic/geo-seo-agent).
 
 ---
 
