@@ -19,6 +19,7 @@ Xpoz provides skills for specific social media intelligence tasks like sentiment
 | Sentiment Analyzer | Analyze brand/topic sentiment with scoring and theme extraction | Twitter, Reddit, Instagram |
 | Twitter Data Export | Export up to 500K rows of Twitter data to CSV | Twitter |
 | Influencer Discovery | Find and rank influencers by engagement, reach, and authenticity | Twitter |
+| Creator Authenticity Score | Vet Instagram creators: view-based engagement rate, bot share of comments, and a 0-100 score | Instagram |
 | Reddit Research | Deep-dive into Reddit discussions for market research | Reddit |
 | Competitive Intelligence | Compare 2-5 brands across social media metrics | Twitter, Reddit |
 | Security OSINT | Monitor for CVEs, breaches, and emerging threats | Twitter, Reddit |
@@ -52,7 +53,7 @@ npx skills add XPOZpublic/xpoz-agent-skills --skill social-sentiment-analyzer
 
 This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https://www.skills.sh/). Skills are installed directly into your agent's skills directory — no further configuration needed.
 
-**Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `reddit-research`, `competitive-intel`, `security-osint`, `lead-gen-scan`, `geo-visibility-check`, `geo-reddit`, `ai-answer-trace`
+**Available skill names:** `xpoz-best-practices`, `xpoz-getting-started`, `xpoz-social-tracking`, `social-sentiment-analyzer`, `twitter-data-export`, `influencer-discovery`, `creator-authenticity-score`, `reddit-research`, `competitive-intel`, `security-osint`, `lead-gen-scan`, `geo-visibility-check`, `geo-reddit`, `ai-answer-trace`
 
 <Tip>
   You still need to configure Xpoz access (MCP server or access key) to use the skills. See the [MCP Installation](/mcp/installation) or [Authentication](/authentication) guide.
@@ -78,6 +79,9 @@ This works with Claude Code, Cursor, Codex, Gemini, and [15+ other agents](https
   </Card>
   <Card title="Influencer Discovery" icon="users" href="/skills/influencer-discovery">
     Find and rank influencers by engagement, reach, and authenticity.
+  </Card>
+  <Card title="Creator Authenticity Score" icon="user-check" href="/skills/creator-authenticity-score">
+    Vet Instagram creators: engagement rate, bot share, and a 0-100 score.
   </Card>
   <Card title="Reddit Research" icon="magnifying-glass-chart" href="/skills/reddit-research">
     Deep-dive into Reddit discussions for market research.

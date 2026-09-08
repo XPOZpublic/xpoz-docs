@@ -115,6 +115,7 @@
               "skills/sentiment-analyzer",
               "skills/twitter-data-export",
               "skills/influencer-discovery",
+              "skills/creator-authenticity-score",
               "skills/reddit-research",
               "skills/competitive-intel",
               "skills/security-osint",

@@ -65,6 +65,7 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [Sentiment Analyzer](https://docs.xpoz.ai/skills/sentiment-analyzer): Analyze sentiment across posts and comments
 - [Twitter Data Export](https://docs.xpoz.ai/skills/twitter-data-export): Export Twitter data at scale
 - [Influencer Discovery](https://docs.xpoz.ai/skills/influencer-discovery): Find influencers by topic and engagement
+- [Creator Authenticity Score](https://docs.xpoz.ai/skills/creator-authenticity-score): Vet Instagram creators by engagement rate and bot share
 - [Reddit Research](https://docs.xpoz.ai/skills/reddit-research): Deep research across subreddits
 - [Competitive Intel](https://docs.xpoz.ai/skills/competitive-intel): Monitor competitor social media presence
 - [Security OSINT](https://docs.xpoz.ai/skills/security-osint): Open-source intelligence gathering

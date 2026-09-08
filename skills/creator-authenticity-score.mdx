@@ -1,0 +1,49 @@
+---
+title: "Creator Authenticity Score"
+description: "Vet Instagram creators before a sponsorship: view-based engagement rate, bot share of comments, and a 0-100 authenticity score for one creator or a list."
+---
+
+The Creator Authenticity Score skill scores Instagram creators on what a sponsor actually buys: real engagement, measured against views rather than follower count, and a real audience, measured as the bot and spam share of their comments. It works for a single creator or a batch of handles, and always shows the components next to the score. It is a screening heuristic for shortlisting and comparison, not a fraud verdict.
+
+## Example Prompts
+
+- "Is @[handle]'s audience real?"
+- "Check engagement quality for @[handle]"
+- "Vet these three creators before we sign them: @a, @b, @c"
+- "Rank these 10 Instagram handles by authenticity"
+
+## Scoring Methodology
+
+<Steps>
+  <Step title="Resolve the creator">
+    Look up the profile by username: follower and following counts, post count, verified and private status. Private accounts are reported as "cannot screen" rather than scored.
+  </Step>
+  <Step title="Measure real engagement">
+    Pull the 50 most recent posts and compute likes plus comments over video plays. Views are the hardest number to fake. Accounts with no video plays fall back to a follower-based rate, flagged as lower confidence. A like-to-comment ratio above 50:1 is a soft flag, since engagement pods buy likes, not comments.
+  </Step>
+  <Step title="Read the audience">
+    Pull up to 200 comments on each of the top 3-5 posts and compute the bot ratio from Xpoz's spam detection, pooled across the sample. If comments are unavailable, the creator is scored on engagement only and marked partial.
+  </Step>
+  <Step title="Score">
+    A 0-100 authenticity score: 40% engagement rate (scaled by follower tier), 40% audience authenticity (100 minus bot share), 20% sanity checks (following/follower ratio, post count relative to audience size, like-to-comment flag). Rounded to a whole number, never presented as precise.
+  </Step>
+  <Step title="Report">
+    A single creator gets a short card with a one-line verdict. A batch gets a comparison table sorted by score, with private and partial creators listed separately.
+  </Step>
+</Steps>
+
+## Access Requirements
+
+Full results need a real Xpoz account (free tier, no credit card). The skill can run on a no-signup trial token, but every call then returns at most 5 results, so the score rests on one profile and a handful of posts and comments and is marked as a trial sample in the output.
+
+## Xpoz Tools Used
+
+| Tool | Purpose |
+| --- | --- |
+| `getInstagramUser` | Resolve the profile: `followerCount`, `followingCount`, `mediaCount`, `isPrivate`, `isVerified` |
+| `getInstagramPostsByUser` | Recent posts with `likeCount`, `commentCount`, `videoPlayCount` for the engagement rate |
+| `getInstagramCommentsByPostId` | Comments with `isSpam` for the bot ratio |
+
+## Get Started
+
+Get a free access key at [xpoz.ai/get-token](https://xpoz.ai/get-token). See the [installation guide](/skills/overview#setup) to add this skill to your agent.
