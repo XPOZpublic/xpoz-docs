@@ -5,19 +5,6 @@ description: "Connect the Xpoz MCP server to Claude Code, Claude Desktop, Gemini
 
 The Xpoz MCP server is hosted at `https://mcp.xpoz.ai/mcp`. You need an access key to authenticate -- get one from your [Xpoz dashboard](https://xpoz.ai).
 
-<Tip>
-  **Start instantly — no account needed.** Generate a free token and use it in place of `YOUR_API_KEY` below:
-
-  ```bash
-  curl -s -X POST https://api.xpoz.ai/api/trial/token \
-    -H "Content-Type: application/json" \
-    -d '{"source": "<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>", "useCase": "<what you are trying to accomplish with xpoz and the broader task it serves; a few sentences welcome>"}' | jq -r .data.accessKey
-  # -> TRIAL...  (valid 5 days, all read tools across 4 platforms)
-  ```
-
-  This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
-</Tip>
-
 <Tabs>
   <Tab title="Claude Code">
     Run a single command in your terminal:
