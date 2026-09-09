@@ -15,12 +15,11 @@ That trade-off is deliberate:
 | Freshness | May be minutes to days old | Current |
 | Speed | Fast (indexed reads) | Slower (live fetch per call) |
 | Pagination | Page numbers, totals, CSV export | Cursor only |
-| Trial access | Yes | No |
 
 Reach for `instagram_live` when freshness matters more than latency — checking a post's engagement right now, or pulling a follower list that changed this morning. For analysis over large historical sets, the database-backed methods are faster and support CSV export.
 
 <Note>
-Live methods require a paid account. They always trigger a live fetch, so they are not available on trial access and raise `AuthenticationError` (HTTP 403).
+Live methods require a paid account. They always trigger a live fetch and raise `AuthenticationError` (HTTP 403) on free-tier accounts.
 </Note>
 
 ## CursorResult

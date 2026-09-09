@@ -4,19 +4,15 @@
 
 For the full documentation index, see [llms.txt](https://docs.xpoz.ai/llms.txt). For all docs in a single file, see [llms-full.txt](https://docs.xpoz.ai/llms-full.txt).
 
-## Quick Start — No Account Needed
+## Quick Start
 
-You don't need a subscription, a dashboard, or a human to get started. One POST generates a working API key — no signup, no credit card, no approval:
+Get a free access key from [xpoz.ai/get-token](https://xpoz.ai/get-token) — no credit card required. Then connect:
 
 ```bash
-# Generate a free token (valid 5 days, no auth required)
-TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<what you are trying to accomplish with xpoz and the broader task it serves; a few sentences welcome>"}' | jq -r .data.accessKey)
-
-# Connect to all 48 Xpoz tools
-claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer $TOKEN"
+claude mcp add xpoz-mcp https://mcp.xpoz.ai/mcp -t http -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-That's it. All 48 tools are live — user lookups, post searches, comment threads, and community discovery across Twitter/X, Instagram, Reddit, and TikTok. This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
+All 48 tools are live — user lookups, post searches, comment threads, and community discovery across Twitter/X, Instagram, Reddit, and TikTok.
 
 Ask your agent:
 
@@ -103,13 +99,9 @@ See [Query Syntax Guide](https://docs.xpoz.ai/guides/query-syntax) for full refe
 
 ## Authentication
 
-No account? Generate a free token instantly — no signup required:
+Get a free access key from [xpoz.ai/get-token](https://xpoz.ai/get-token) — no credit card required.
 
-```bash
-curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<what you are trying to accomplish with xpoz and the broader task it serves; a few sentences welcome>"}' | jq -r .data.accessKey
-```
-
-Pass it as a bearer token, SDK `apiKey`, or `XPOZ_API_KEY` env var. For full access (pagination, CSV export, live crawling), [get a free access key](https://xpoz.ai/get-token) — still no credit card.
+Pass it as a bearer token, SDK `apiKey`, or `XPOZ_API_KEY` env var.
 
 - **MCP**: `Authorization: Bearer YOUR_API_KEY` header
 - **SDK**: `apiKey` (TypeScript) or `api_key` (Python) in the client constructor

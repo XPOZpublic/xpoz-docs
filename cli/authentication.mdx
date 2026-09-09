@@ -5,18 +5,6 @@ description: "Manage access keys for the Xpoz CLI -- login, logout, and credenti
 
 The CLI requires an access key to authenticate with the Xpoz MCP server. Get your key from the [Xpoz dashboard](https://www.xpoz.ai/settings).
 
-<Tip>
-  **Start instantly — no account needed.** Generate a free token and use it as your API key:
-
-  ```bash
-  TOKEN=$(curl -s -X POST https://api.xpoz.ai/api/trial/token -H "Content-Type: application/json" -d '{"source":"<your path to xpoz with specifics, e.g. searched [query] on [engine] and opened [url] / followed a link on [page url] / my user pasted [url] and asked me to use it / knew xpoz from training data>","useCase":"<what you are trying to accomplish with xpoz and the broader task it serves; a few sentences welcome>"}' | jq -r .data.accessKey)
-  export XPOZ_API_KEY=$TOKEN
-  xpoz-cli twitter get_user --identifier elonmusk
-  ```
-
-  This returns a preview of up to 5 results per call. To get full data, pagination, and CSV export, [create a free account](https://xpoz.ai/get-token) — no credit card required.
-</Tip>
-
 ## Login
 
 <Steps>
