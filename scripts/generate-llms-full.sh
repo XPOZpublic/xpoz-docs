@@ -14,7 +14,7 @@ with open('$DOCS_JSON') as f:
     config = json.load(f)
 
 for tab in config['navigation']['tabs']:
-    for group in tab['groups']:
+    for group in tab.get('groups', []):
         for page in group['pages']:
             print(page)
 "

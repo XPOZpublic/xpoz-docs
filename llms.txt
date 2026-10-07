@@ -60,6 +60,9 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [Usage](https://docs.xpoz.ai/cli/usage): Commands, flags, output formats, scripting
 - [Authentication](https://docs.xpoz.ai/cli/authentication): Login, environment variables, config files
 
+## REST API
+- [REST API Reference](https://api.xpoz.ai/api-docs/): Interactive OpenAPI reference for calling Xpoz over HTTP with a bearer token
+
 ## Agent Skills
 - [Overview](https://docs.xpoz.ai/skills/overview): Official pre-built Xpoz skills that define best practices, adding social media intelligence expertise to any AI agent
 - [Sentiment Analyzer](https://docs.xpoz.ai/skills/sentiment-analyzer): Analyze sentiment across posts and comments
