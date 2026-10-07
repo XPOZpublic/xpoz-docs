@@ -61,7 +61,11 @@ Then use this file ([llms.txt](https://docs.xpoz.ai/llms.txt)) to find a specifi
 - [Authentication](https://docs.xpoz.ai/cli/authentication): Login, environment variables, config files
 
 ## REST API
-- [REST API Reference](https://api.xpoz.ai/api-docs/): Interactive OpenAPI reference for calling Xpoz over HTTP with a bearer token
+- [Overview](https://docs.xpoz.ai/rest-api/overview): Call Xpoz over plain HTTP, base URL, first request, common parameters, errors
+- [Authentication](https://docs.xpoz.ai/rest-api/authentication): Access key as bearer token; which endpoints use the dashboard session instead
+- [Pagination](https://docs.xpoz.ai/rest-api/pagination): Cursor paging for live endpoints and polling background operations
+- [Endpoint Reference](https://docs.xpoz.ai/api-reference/twitter-live/search-tweets-live): Every endpoint generated from the OpenAPI spec, with request builder
+- [OpenAPI spec](https://api.xpoz.ai/openapi.json): Raw spec, also rendered as [Swagger UI](https://api.xpoz.ai/api-docs/)
 
 ## Agent Skills
 - [Overview](https://docs.xpoz.ai/skills/overview): Official pre-built Xpoz skills that define best practices, adding social media intelligence expertise to any AI agent

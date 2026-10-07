@@ -23,7 +23,7 @@ Choose the integration that fits your workflow:
     Typed async client for Node.js applications. Install via `npm install @xpoz/xpoz`.
     Sync and async clients for Python. Install via `pip install xpoz`.
     Command-line interface for quick lookups and scripting. Install via Homebrew, pip, or binary.
-    Call Xpoz over HTTP from any language. Interactive OpenAPI reference with every endpoint.
+    Call Xpoz over HTTP from any language. Every endpoint documented with an interactive request builder.
 
 ## Platform coverage
 
@@ -5561,6 +5561,186 @@ xpoz-cli twitter get_user --identifier elonmusk
   
     Start querying platforms with the CLI.
     Set up the same access key with the MCP server directly.
+
+---
+
+# Xpoz REST API
+Source: https://docs.xpoz.ai/rest-api/overview
+
+
+The Xpoz REST API exposes the same social media data layer as the [MCP server](/mcp/overview) and the [SDKs](/sdks/typescript/quickstart) through ordinary HTTPS requests. Use it when your stack has no SDK, when you want to call Xpoz from a serverless function or a shell script, or when you prefer to work directly with JSON.
+
+**Base URL:** `https://api.xpoz.ai`
+  
+    Every endpoint with parameters, responses, and an interactive request builder, generated from the live OpenAPI spec.
+    The same spec rendered by Swagger, served by the API itself.
+    Import into Postman, Insomnia, or a code generator.
+    The same document in YAML.
+
+## Endpoint families
+
+| Family | Path prefix | Auth | Metered |
+|---|---|---|---|
+| **Live data** | `/api/data/{platform}/.../live` | Access key | Yes |
+| **Operations** | `/api/data/operations/{id}` | Access key | No |
+| **Account, billing, crawl settings** | `/api/tokens`, `/api/plan`, `/api/usage`, `/api/crawl/...`, `/api/stripe/...` | Dashboard session | No |
+| **System status** | `/api/status`, `/api/status/history` | None | No |
+| **Platform** | `/health`, `/metrics`, `/openapi.json` | None | No |
+
+Live data endpoints fetch from the platform on demand and return one page plus a cursor. See [Pagination](/rest-api/pagination). Account, billing, and crawl settings endpoints are the ones the Xpoz dashboard uses and are documented for completeness.
+
+## First request
+
+Search Twitter/X for recent posts about a topic. Get a free access key from [xpoz.ai/get-token](https://xpoz.ai/get-token).
+
+```bash
+curl -G "https://api.xpoz.ai/api/data/twitter/posts/live" \
+  -H "Authorization: Bearer $XPOZ_API_KEY" \
+  --data-urlencode "q=artificial intelligence" \
+  --data-urlencode "fields=id,authorUsername,text,likeCount"
+```
+
+```json
+{
+  "results": [
+    {
+      "id": "1973412345678901234",
+      "authorUsername": "example",
+      "text": "...",
+      "likeCount": 42
+    }
+  ],
+  "count": 20,
+  "dataSource": "live",
+  "has_more": true,
+  "next_page_cursor": "DAACCgABG..."
+}
+```
+
+Pass `next_page_cursor` back as `cursor` to fetch the next page.
+
+## Common query parameters
+
+Most data endpoints accept the same options:
+
+| Parameter | Purpose |
+|---|---|
+| `q` | Search query using the [query syntax](/guides/query-syntax) |
+| `fields` | Comma-separated list of attributes to return. See [field selection](/mcp/field-selection) |
+| `since`, `until` | Inclusive date bounds, `YYYY-MM-DD` |
+| `cursor` | Opaque cursor from the previous page |
+
+The exact parameters and allowed field names for each endpoint are listed on its reference page.
+
+## Errors
+
+| Status | Meaning |
+|---|---|
+| `400` | Validation failed, for example an empty search query or an invalid parameter. |
+| `401` | Missing or invalid credentials. |
+| `402` | The request is blocked by plan limits. |
+| `403` | The endpoint is not available for this access key. |
+| `404` | The post, user, or operation does not exist or has expired. |
+| `500` | The request could not be fulfilled. Retry after a short pause. |
+
+Error bodies are JSON. Each endpoint's reference page lists the exact statuses it returns.
+
+## Same data, other interfaces
+
+The REST API, the MCP server, the SDKs, and the CLI all read the same data and meter the same credits. The SDKs' live methods call these endpoints under the hood. Pick whichever fits your runtime; see [how to access Xpoz](/introduction#how-to-access-xpoz).
+
+---
+
+# Authentication
+Source: https://docs.xpoz.ai/rest-api/authentication
+
+
+Every request to a data endpoint carries an Xpoz access key in the `Authorization` header:
+
+```http
+Authorization: Bearer <access key>
+```
+
+Get a key from [xpoz.ai/get-token](https://xpoz.ai/get-token) or create one with `POST /api/tokens` from a signed-in dashboard session. Keys are the same ones used by the MCP server, the SDKs, and the CLI. See [Authentication](/authentication) for the full picture across interfaces.
+
+## Two security schemes
+
+The spec declares two bearer schemes. Each endpoint's reference page shows which one it expects.
+
+| Scheme | Token | Used by |
+|---|---|---|
+| **AccessKey** | Xpoz access key | `/api/data/*` endpoints |
+| **UserSession** | Descope session JWT of a signed-in dashboard user | Account, billing, and crawl settings endpoints |
+
+Only the access key scheme is meant for integrations. The session scheme exists because the Xpoz dashboard calls the same API, and those endpoints appear in the reference so the spec is complete.
+
+## Example
+
+```bash
+export XPOZ_API_KEY=your-access-key
+
+curl "https://api.xpoz.ai/api/data/reddit/users/spez/live" \
+  -H "Authorization: Bearer $XPOZ_API_KEY"
+```
+
+## Failure responses
+
+| Status | Cause |
+|---|---|
+| `401` | No `Authorization` header, a malformed value, or a key that does not exist or was revoked |
+| `403` | The key is valid but this endpoint is not available to it |
+
+## Trying endpoints from the docs
+
+Each endpoint page has a request builder. Paste your access key into its authorization field once and it is reused across pages in this browser session. The same applies to the **Authorize** button on the [Swagger UI](https://api.xpoz.ai/api-docs/).
+
+---
+
+# Pagination
+Source: https://docs.xpoz.ai/rest-api/pagination
+
+
+## Live endpoints: cursors
+
+Endpoints ending in `/live` fetch from the platform on demand and return a single page:
+
+```json
+{
+  "results": [ ... ],
+  "count": 20,
+  "dataSource": "live",
+  "has_more": true,
+  "next_page_cursor": "DAACCgABG..."
+}
+```
+
+To continue, repeat the same request with `cursor` set to `next_page_cursor`. Keep the other parameters identical. Stop when `has_more` is `false` or `next_page_cursor` is absent.
+
+```bash
+curl -G "https://api.xpoz.ai/api/data/twitter/posts/live" \
+  -H "Authorization: Bearer $XPOZ_API_KEY" \
+  --data-urlencode "q=artificial intelligence" \
+  --data-urlencode "cursor=DAACCgABG..."
+```
+
+Cursors are opaque and short-lived. Do not store them beyond the current session, and do not reuse a cursor with different query parameters.
+
+Live requests are metered against your credits. See [Pricing and credits](/pricing).
+
+## Background operations
+
+Some requests run as a background operation and return an operation id instead of results. Poll `GET /api/data/operations/{id}` every few seconds until `status` is `success`, `no_data`, or `error`.
+
+```bash
+curl "https://api.xpoz.ai/api/data/operations/op_123" \
+  -H "Authorization: Bearer $XPOZ_API_KEY"
+```
+
+Completed operations expire 15 minutes after finishing, after which the endpoint returns `404`. The response shape is documented on the [operation status](/api-reference/operations/get-operation-status) reference page.
+
+## Comparison with the MCP server
+
+The MCP server and SDKs add server-side paging over cached result tables with fixed 100-row pages and CSV export. Those modes are described in [Response modes](/mcp/response-modes) and [Pagination](/mcp/pagination). The REST live endpoints use platform cursors instead, which is why page sizes vary by platform.
 
 ---
 

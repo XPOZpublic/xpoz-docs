@@ -1,0 +1,46 @@
+---
+title: "Pagination"
+description: "Walk through live results with cursors and poll background operations"
+---
+
+## Live endpoints: cursors
+
+Endpoints ending in `/live` fetch from the platform on demand and return a single page:
+
+```json
+{
+  "results": [ ... ],
+  "count": 20,
+  "dataSource": "live",
+  "has_more": true,
+  "next_page_cursor": "DAACCgABG..."
+}
+```
+
+To continue, repeat the same request with `cursor` set to `next_page_cursor`. Keep the other parameters identical. Stop when `has_more` is `false` or `next_page_cursor` is absent.
+
+```bash
+curl -G "https://api.xpoz.ai/api/data/twitter/posts/live" \
+  -H "Authorization: Bearer $XPOZ_API_KEY" \
+  --data-urlencode "q=artificial intelligence" \
+  --data-urlencode "cursor=DAACCgABG..."
+```
+
+Cursors are opaque and short-lived. Do not store them beyond the current session, and do not reuse a cursor with different query parameters.
+
+Live requests are metered against your credits. See [Pricing and credits](/pricing).
+
+## Background operations
+
+Some requests run as a background operation and return an operation id instead of results. Poll `GET /api/data/operations/{id}` every few seconds until `status` is `success`, `no_data`, or `error`.
+
+```bash
+curl "https://api.xpoz.ai/api/data/operations/op_123" \
+  -H "Authorization: Bearer $XPOZ_API_KEY"
+```
+
+Completed operations expire 15 minutes after finishing, after which the endpoint returns `404`. The response shape is documented on the [operation status](/api-reference/operations/get-operation-status) reference page.
+
+## Comparison with the MCP server
+
+The MCP server and SDKs add server-side paging over cached result tables with fixed 100-row pages and CSV export. Those modes are described in [Response modes](/mcp/response-modes) and [Pagination](/mcp/pagination). The REST live endpoints use platform cursors instead, which is why page sizes vary by platform.

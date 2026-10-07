@@ -1,0 +1,43 @@
+---
+title: "Authentication"
+description: "Send your access key as a bearer token on every REST request"
+---
+
+Every request to a data endpoint carries an Xpoz access key in the `Authorization` header:
+
+```http
+Authorization: Bearer <access key>
+```
+
+Get a key from [xpoz.ai/get-token](https://xpoz.ai/get-token) or create one with `POST /api/tokens` from a signed-in dashboard session. Keys are the same ones used by the MCP server, the SDKs, and the CLI. See [Authentication](/authentication) for the full picture across interfaces.
+
+## Two security schemes
+
+The spec declares two bearer schemes. Each endpoint's reference page shows which one it expects.
+
+| Scheme | Token | Used by |
+|---|---|---|
+| **AccessKey** | Xpoz access key | `/api/data/*` endpoints |
+| **UserSession** | Descope session JWT of a signed-in dashboard user | Account, billing, and crawl settings endpoints |
+
+Only the access key scheme is meant for integrations. The session scheme exists because the Xpoz dashboard calls the same API, and those endpoints appear in the reference so the spec is complete.
+
+## Example
+
+```bash
+export XPOZ_API_KEY=your-access-key
+
+curl "https://api.xpoz.ai/api/data/reddit/users/spez/live" \
+  -H "Authorization: Bearer $XPOZ_API_KEY"
+```
+
+## Failure responses
+
+| Status | Cause |
+|---|---|
+| `401` | No `Authorization` header, a malformed value, or a key that does not exist or was revoked |
+| `403` | The key is valid but this endpoint is not available to it |
+
+## Trying endpoints from the docs
+
+Each endpoint page has a request builder. Paste your access key into its authorization field once and it is reused across pages in this browser session. The same applies to the **Authorize** button on the [Swagger UI](https://api.xpoz.ai/api-docs/).
