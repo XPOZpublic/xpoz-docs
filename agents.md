@@ -28,7 +28,7 @@ Pick based on your context:
 - **TypeScript SDK** (`@xpoz/xpoz`) — you are building Xpoz into a Node.js application or agent runtime. Install via `npm install @xpoz/xpoz`. See [TypeScript Quickstart](https://docs.xpoz.ai/sdks/typescript/quickstart).
 - **Python SDK** (`xpoz`) — you are building Xpoz into a Python application or agent runtime. Install via `pip install xpoz`. See [Python Quickstart](https://docs.xpoz.ai/sdks/python/quickstart).
 - **CLI** (`xpoz-cli`) — you need Xpoz for terminal scripting, quick lookups, or shell pipelines. Install via `brew install xpoz-ai/tap/xpoz-cli` or `pip install xpoz-cli`. See [CLI Overview](https://docs.xpoz.ai/cli/overview).
-- **REST API**: you are calling Xpoz over plain HTTP from a language without an SDK. Base URL `https://api.xpoz.ai` with a bearer token. See the [REST API reference](https://api.xpoz.ai/api-docs/).
+- **REST API**: you are calling Xpoz over plain HTTP from a language without an SDK. Base URL `https://api.xpoz.ai` with a bearer token. See [REST API](https://docs.xpoz.ai/rest-api/overview) and the [OpenAPI spec](https://api.xpoz.ai/openapi.json).
 - **Agent Skills** — pre-built AI workflows for sentiment analysis, influencer discovery, competitive intel, data export, and more. See [Skills Overview](https://docs.xpoz.ai/skills/overview).
 
 ### MCP Setup for Other Clients

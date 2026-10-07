@@ -104,7 +104,19 @@
       },
       {
         "tab": "REST API",
-        "href": "https://api.xpoz.ai/api-docs/"
+        "groups": [
+          {
+            "group": "REST API",
+            "pages": ["rest-api/overview", "rest-api/authentication", "rest-api/pagination"]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": {
+              "source": "https://api.xpoz.ai/openapi.json",
+              "overlays": ["rest-api/openapi-overlay.yaml"]
+            }
+          }
+        ]
       },
       {
         "tab": "Agent Skills",

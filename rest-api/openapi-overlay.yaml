@@ -1,0 +1,10 @@
+overlay: 1.1.0
+info:
+  title: Xpoz REST API docs adjustments
+  version: 1.0.0
+extends: https://api.xpoz.ai/openapi.json
+actions:
+  - target: $.servers[0].url
+    update: https://api.xpoz.ai
+  - target: $.servers[0].description
+    update: Production
