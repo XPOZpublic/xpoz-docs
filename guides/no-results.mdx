@@ -1,0 +1,84 @@
+---
+title: Getting No Results
+description: Four changes that bring the data back when a search comes back empty, fetch live data, widen the date range, drop the quotes, drop the language filter.
+---
+
+An empty result means the search ran and nothing matched. It is not an error, and it rarely means the data does not exist. Four changes fix most empty results. Try them in order and re-run after each one.
+
+## 1. Fetch live data
+
+Xpoz answers from its own database first and reaches out to the platform only when the stored data is missing or stale. A new account, a niche topic, or anything posted in the last few hours may not be in the database yet. Ask for a live fetch and Xpoz collects it from the platform on the spot.
+
+<Tabs>
+  <Tab title="MCP">
+    Pass `forceLatest: true` to the tool. Every search, posts, comments and user tool accepts it. If you work through Claude, ChatGPT, Cursor or another agent, say it in plain words:
+
+    ```
+    Run the same search again with forceLatest set to true.
+    ```
+
+    A live fetch is slower and costs more credits than a database read, so use it when freshness matters rather than on every call.
+  </Tab>
+  <Tab title="REST API">
+    Every data endpoint has a live twin whose path ends in `/live`, for example `/api/data/twitter/posts/live` or `/api/data/reddit/subreddits/{name}/live`. The live endpoint skips the database and fetches from the platform on demand, returning one page and a cursor.
+
+    ```bash
+    curl -G "https://api.xpoz.ai/api/data/twitter/posts/live" \
+      -H "Authorization: Bearer $XPOZ_ACCESS_KEY" \
+      --data-urlencode "query=xpoz"
+    ```
+
+    See the [REST API overview](/rest-api/overview) and the endpoint reference for every live route.
+  </Tab>
+  <Tab title="SDKs">
+    Upgrade to the latest release. The live methods arrived in `@xpoz/xpoz` 0.8.0 for TypeScript and `xpoz` 0.9.0 for Python; older releases only read the database.
+
+    ```bash
+    npm install @xpoz/xpoz@latest
+    pip install --upgrade xpoz
+    ```
+
+    Then use the live namespaces, `client.twitterLive` and `client.instagramLive` in TypeScript, `client.twitter_live` and `client.instagram_live` in Python. For Reddit and TikTok, pass `forceLatest` (`force_latest` in Python) to the regular method. See [TypeScript live data](/sdks/typescript/live-data) and [Python live data](/sdks/python/live-data).
+  </Tab>
+</Tabs>
+
+## 2. Widen the date range
+
+A window of a day or two is the most common reason a legitimate search returns nothing. Posts on a niche topic are spread thin, and a narrow window often lands between them.
+
+- Run the query once with no `startDate` and `endDate`. Add dates back only if you need them, and start with a month or more.
+- If you work through an agent, say the year explicitly: "posts from September 2026", not "last month". Agents sometimes calculate relative dates a year too early.
+
+## 3. Drop the quotes
+
+Quotes require the exact phrase, in that order. People rarely write the phrase you have in mind word for word, so quoted searches come back empty several times more often than plain keywords.
+
+- Search `xpoz pricing` instead of `"xpoz pricing"`. A bare space means `OR`, so this matches posts with either word. Write `xpoz AND pricing` when you need both.
+- Keep quotes for names and fixed terms, such as `"Pope Leo"`, not for sentences.
+
+See [Query Syntax](/guides/query-syntax) for the full grammar.
+
+## 4. Drop the language filter
+
+Posts are tagged by detected language, which misses short, mixed-language and emoji-heavy posts. A `language` filter roughly doubles the chance of an empty result. Remove it and filter the results afterwards if you still need to.
+
+## Still nothing?
+
+If you have tried all four and believe the data should exist, email [hello@xpoz.ai](mailto:hello@xpoz.ai) with the tool or endpoint, the exact query and filters, and the date you ran it. We will check whether the content is missing and collect it where we can.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Query Syntax" icon="magnifying-glass" href="/guides/query-syntax">
+    Boolean operators, phrases and grouping
+  </Card>
+  <Card title="Best Practices" icon="lightbulb" href="/guides/best-practices">
+    Filters, response modes and field selection
+  </Card>
+  <Card title="REST API" icon="globe" href="/rest-api/overview">
+    Live endpoints and pagination
+  </Card>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools/overview">
+    Every tool and its parameters
+  </Card>
+</CardGroup>

@@ -27,6 +27,7 @@
             "group": "Guides",
             "pages": [
               "guides/query-syntax",
+              "guides/no-results",
               "guides/csv-exports",
               "tracking",
               "guides/best-practices"
