@@ -27,10 +27,10 @@
             "group": "Guides",
             "pages": [
               "guides/query-syntax",
-              "guides/no-results",
               "guides/csv-exports",
               "tracking",
-              "guides/best-practices"
+              "guides/best-practices",
+              "guides/no-results"
             ]
           }
         ]
